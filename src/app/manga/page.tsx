@@ -7,10 +7,12 @@ import SearchModal from "@/components/SearchModal";
 import MangaSpotlightSection from "@/components/MangaSpotlightSection";
 import Footer from "@/components/Footer";
 import Link from "next/link";
-import { BookOpen, Star } from "lucide-react";
+import { BookOpen, Star, Sparkles, BookMarked } from "lucide-react";
 import MangaSpotlightSkeleton from "@/components/skeletons/MangaSpotlightSkeleton";
 import CatalogGridSkeleton from "@/components/skeletons/CatalogGridSkeleton";
+import NovelSection from "@/components/NovelSection";
 import { MangaItem } from "@/lib/services/mangaTypes";
+import { NovelCard } from "@/lib/services/novelService";
 
 function MangaCatalog() {
   const searchParams = useSearchParams();
@@ -18,7 +20,9 @@ function MangaCatalog() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [filterType, setFilterType] = useState<"all" | "Manhwa" | "Manhua" | "Manga">("all");
   const [mangaList, setMangaList] = useState<MangaItem[]>([]);
+  const [novelList, setNovelList] = useState<NovelCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingNovel, setLoadingNovel] = useState(true);
   const [searchQuery, setSearchQuery] = useState(initialQ);
 
   useEffect(() => {
@@ -44,6 +48,19 @@ function MangaCatalog() {
       .finally(() => setLoading(false));
   }, [searchQuery]);
 
+  useEffect(() => {
+    setLoadingNovel(true);
+    fetch("/api/novel?action=latest&page=1")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.items && Array.isArray(d.items)) {
+          setNovelList(d.items);
+        }
+      })
+      .catch((e) => console.error("Novel fetch error:", e))
+      .finally(() => setLoadingNovel(false));
+  }, []);
+
   const filteredManga = mangaList.filter((m) => {
     if (filterType === "all") return true;
     return m.type === filterType;
@@ -61,27 +78,38 @@ function MangaCatalog() {
             <div>
               <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2">
                 <BookOpen className="w-8 h-8 text-emerald-400" />
-                <span>Reading Hub - Komik Manga &amp; Manhwa</span>
+                <span>Reading Hub - Komik Manga, Manhwa &amp; Novel</span>
               </h1>
               <p className="text-xs sm:text-sm text-gray-300 mt-2 max-w-2xl">
-                Baca ribuan judul komik bahasa Indonesia dengan pembaca Webtoon ultra-fleksibel: Fitur Zoom ponsel/PC &amp; Auto-Scroll 1x, 2x, 3x.
+                Semua bacaan komik (Manga, Manhwa, Manhua) dan Light Novel terjemahan Indonesia tergabung dalam 1 tempat tanpa perlu ganti tab.
               </p>
             </div>
 
-            {/* Reading Hub Switcher */}
+            {/* Reading Hub Quick Jump Navigation */}
             <div className="flex items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0">
-              <span className="px-3.5 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>Manga &amp; Manhwa</span>
-              </span>
-
-              <Link
-                href="/novel"
-                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-amber-300 hover:bg-white/5 transition-all flex items-center gap-1.5"
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                className="px-3.5 py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20 flex items-center gap-1.5"
               >
-                <BookOpen className="w-3.5 h-3.5 text-amber-400" />
-                <span>Light Novel (BacaLN)</span>
-              </Link>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Semua Bacaan</span>
+              </button>
+
+              <button
+                onClick={() => document.getElementById("katalog-komik")?.scrollIntoView({ behavior: "smooth" })}
+                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Manga &amp; Manhwa</span>
+              </button>
+
+              <button
+                onClick={() => document.getElementById("katalog-novel")?.scrollIntoView({ behavior: "smooth" })}
+                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
+              >
+                <BookMarked className="w-3.5 h-3.5 text-amber-400" />
+                <span>Light Novel</span>
+              </button>
             </div>
           </div>
         </div>
@@ -96,7 +124,7 @@ function MangaCatalog() {
         )}
 
         {/* Filter Type Tabs & Catalog */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div id="katalog-komik" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 scroll-mt-20">
           <div className="flex items-center justify-between pb-3 mb-5 border-b border-white/5">
             <div className="flex items-center gap-2">
               {(["all", "Manhwa", "Manhua", "Manga"] as const).map((t) => (
@@ -170,6 +198,11 @@ function MangaCatalog() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Light Novel Section */}
+        <div id="katalog-novel" className="scroll-mt-20">
+          <NovelSection items={novelList} />
         </div>
       </main>
 

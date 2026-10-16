@@ -19,10 +19,10 @@ import { NetShortItem } from "@/lib/services/netshortService";
 import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
 import DracinReelsSkeleton from "@/components/skeletons/DracinReelsSkeleton";
 
-type ShortDramaProvider = "asiabox" | "reelshort" | "netshort";
+type ShortDramaProvider = "all" | "asiabox" | "reelshort" | "netshort";
 
 function DracinHubContent() {
-  const [provider, setProvider] = useState<ShortDramaProvider>("asiabox");
+  const [provider, setProvider] = useState<ShortDramaProvider>("all");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // AsiaBox State
@@ -32,18 +32,18 @@ function DracinHubContent() {
   // ReelShort State
   const [reelShortCategory, setReelShortCategory] = useState("Billionaire");
   const [reelShortDramas, setReelShortDramas] = useState<ReelShortItem[]>([]);
-  const [loadingReelShort, setLoadingReelShort] = useState(false);
+  const [loadingReelShort, setLoadingReelShort] = useState(true);
 
   // NetShort State
   const [netShortDramas, setNetShortDramas] = useState<NetShortItem[]>([]);
-  const [loadingNetShort, setLoadingNetShort] = useState(false);
+  const [loadingNetShort, setLoadingNetShort] = useState(true);
 
   // Read URL query params
   useEffect(() => {
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
       const prov = sp.get("provider") as ShortDramaProvider;
-      if (prov && ["asiabox", "reelshort", "netshort"].includes(prov)) {
+      if (prov && ["all", "asiabox", "reelshort", "netshort"].includes(prov)) {
         setProvider(prov);
       }
     }
@@ -64,45 +64,41 @@ function DracinHubContent() {
 
   // 2. Fetch ReelShort Data
   useEffect(() => {
-    if (provider === "reelshort") {
-      setLoadingReelShort(true);
-      fetch(`/api/reelshort?action=popular&category=${encodeURIComponent(reelShortCategory)}`)
-        .then((r) => r.json())
-        .then((data) => {
-          if (data.items && Array.isArray(data.items)) {
-            setReelShortDramas(data.items);
-          } else {
-            setReelShortDramas([]);
-          }
-        })
-        .catch((err) => {
-          console.error("ReelShort fetch error:", err);
+    setLoadingReelShort(true);
+    fetch(`/api/reelshort?action=popular&category=${encodeURIComponent(reelShortCategory)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.items && Array.isArray(data.items)) {
+          setReelShortDramas(data.items);
+        } else {
           setReelShortDramas([]);
-        })
-        .finally(() => setLoadingReelShort(false));
-    }
-  }, [provider, reelShortCategory]);
+        }
+      })
+      .catch((err) => {
+        console.error("ReelShort fetch error:", err);
+        setReelShortDramas([]);
+      })
+      .finally(() => setLoadingReelShort(false));
+  }, [reelShortCategory]);
 
   // 3. Fetch NetShort Data
   useEffect(() => {
-    if (provider === "netshort") {
-      setLoadingNetShort(true);
-      fetch("/api/netshort?action=list")
-        .then((r) => r.json())
-        .then((data) => {
-          if (data.items && Array.isArray(data.items)) {
-            setNetShortDramas(data.items);
-          } else {
-            setNetShortDramas([]);
-          }
-        })
-        .catch((err) => {
-          console.error("NetShort fetch error:", err);
+    setLoadingNetShort(true);
+    fetch("/api/netshort?action=list")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.items && Array.isArray(data.items)) {
+          setNetShortDramas(data.items);
+        } else {
           setNetShortDramas([]);
-        })
-        .finally(() => setLoadingNetShort(false));
-    }
-  }, [provider]);
+        }
+      })
+      .catch((err) => {
+        console.error("NetShort fetch error:", err);
+        setNetShortDramas([]);
+      })
+      .finally(() => setLoadingNetShort(false));
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-rose-500 selection:text-white">
@@ -118,45 +114,54 @@ function DracinHubContent() {
               <span>Short Drama Hub (9:16 Vertikal)</span>
             </h1>
             <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-2xl leading-relaxed">
-              Nonton drama pendek rasio 9:16 ala TikTok/Reels dari 3 platform: AsiaBox, ReelShort, dan NetShort. Pilih drama untuk mulai menonton.
+              Semua drama pendek rasio 9:16 dari 3 platform (AsiaBox, ReelShort, NetShort) tergabung dalam 1 halaman. Pilih drama untuk mulai menonton.
             </p>
           </div>
 
-          {/* Provider Tabs */}
+          {/* Quick Jump Anchor Tabs */}
           <div className="flex items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0 w-full lg:w-auto overflow-x-auto no-scrollbar">
             <button
-              onClick={() => setProvider("asiabox")}
+              onClick={() => {
+                setProvider("all");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
-                provider === "asiabox"
-                  ? "bg-rose-600 text-white shadow-lg shadow-rose-600/30"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              <Play className="w-3.5 h-3.5 fill-current" />
-              <span>AsiaBox</span>
-            </button>
-
-            <button
-              onClick={() => setProvider("reelshort")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
-                provider === "reelshort"
+                provider === "all"
                   ? "bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-lg shadow-rose-500/30"
                   : "text-gray-400 hover:text-white"
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
+              <span>Semua Drama</span>
+            </button>
+
+            <button
+              onClick={() => {
+                document.getElementById("asiabox")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+            >
+              <Play className="w-3.5 h-3.5 fill-current text-rose-500" />
+              <span>AsiaBox</span>
+            </button>
+
+            <button
+              onClick={() => {
+                document.getElementById("reelshort")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>ReelShort</span>
             </button>
 
             <button
-              onClick={() => setProvider("netshort")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
-                provider === "netshort"
-                  ? "bg-purple-600 text-white shadow-lg shadow-purple-600/30"
-                  : "text-gray-400 hover:text-white"
-              }`}
+              onClick={() => {
+                document.getElementById("netshort")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap"
             >
-              <Layers className="w-3.5 h-3.5" />
+              <Layers className="w-3.5 h-3.5 text-purple-400" />
               <span>NetShort</span>
             </button>
           </div>
@@ -164,8 +169,8 @@ function DracinHubContent() {
       </div>
 
       {/* VIEW 1: ASIABOX CATALOG */}
-      {provider === "asiabox" && (
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full">
+      {(provider === "all" || provider === "asiabox") && (
+        <div id="asiabox" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full scroll-mt-20">
           {/* AsiaBox Catalog Grid */}
           <div className="space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
@@ -240,8 +245,17 @@ function DracinHubContent() {
       )}
 
       {/* VIEW 2: REELSHORT CATALOG */}
-      {provider === "reelshort" && (
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full">
+      {(provider === "all" || provider === "reelshort") && (
+        <div id="reelshort" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full scroll-mt-20">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10">
+            <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-amber-400" />
+              <span>Koleksi ReelShort (Serial Pendek Romantis &amp; Billionaire)</span>
+            </h2>
+            <span className="text-xs text-gray-400">
+              {loadingReelShort ? "Memuat..." : `${reelShortDramas.length} Judul`}
+            </span>
+          </div>
           {/* Category Filter Pills (Compact without duplicate search input) */}
           <div className="rounded-xl sm:rounded-2xl bg-[#121218] border border-white/10 p-2.5 sm:p-3 shadow-xl">
             <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar">
@@ -344,8 +358,17 @@ function DracinHubContent() {
       )}
 
       {/* VIEW 3: NETSHORT CATALOG */}
-      {provider === "netshort" && (
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full">
+      {(provider === "all" || provider === "netshort") && (
+        <div id="netshort" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full scroll-mt-20">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10">
+            <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+              <Layers className="w-5 h-5 text-purple-400" />
+              <span>Koleksi NetShort (Drama Vertikal HD)</span>
+            </h2>
+            <span className="text-xs text-gray-400">
+              {loadingNetShort ? "Memuat..." : `${netShortDramas.length} Judul`}
+            </span>
+          </div>
           {/* Loading */}
           {loadingNetShort && (
             <div className="py-12 flex justify-center items-center">

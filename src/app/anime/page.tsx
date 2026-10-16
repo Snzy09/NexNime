@@ -21,11 +21,11 @@ import { AnimeSailCard } from "@/lib/services/animesailService";
 import { AnimeXinItem } from "@/lib/services/animexinService";
 import { DonghuaFilmItem } from "@/lib/services/donghuaFilmService";
 
-type AnimeSource = "samehadaku" | "donghuafilm" | "animesail" | "animexin" | "animeindo";
+type AnimeSource = "all" | "samehadaku" | "donghuafilm" | "animesail" | "animexin" | "animeindo";
 
 export default function AnimePage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [source, setSource] = useState<AnimeSource>("samehadaku");
+  const [source, setSource] = useState<AnimeSource>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Samehadaku Live State
@@ -34,27 +34,27 @@ export default function AnimePage() {
 
   // DonghuaFilm Live State
   const [donghuaFilmItems, setDonghuaFilmItems] = useState<DonghuaFilmItem[]>([]);
-  const [loadingDonghuaFilm, setLoadingDonghuaFilm] = useState(false);
+  const [loadingDonghuaFilm, setLoadingDonghuaFilm] = useState(true);
 
   // AnimeSail Live State
   const [animesailItems, setAnimesailItems] = useState<AnimeSailCard[]>([]);
-  const [loadingAnimeSail, setLoadingAnimeSail] = useState(false);
+  const [loadingAnimeSail, setLoadingAnimeSail] = useState(true);
 
   // AnimeXin Donghua Live State
   const [animexinItems, setAnimexinItems] = useState<AnimeXinItem[]>([]);
-  const [loadingAnimeXin, setLoadingAnimeXin] = useState(false);
+  const [loadingAnimeXin, setLoadingAnimeXin] = useState(true);
 
   // AnimeIndo & AniChin State
   const [animeList, setAnimeList] = useState<AnimeItem[]>([]);
   const [scheduleList, setScheduleList] = useState<ScheduleDay[]>([]);
-  const [loadingAnimeIndo, setLoadingAnimeIndo] = useState(false);
+  const [loadingAnimeIndo, setLoadingAnimeIndo] = useState(true);
 
   // Read URL query params on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
       const src = sp.get("source") as AnimeSource;
-      if (src && ["samehadaku", "donghuafilm", "animesail", "animexin", "animeindo"].includes(src)) {
+      if (src && ["all", "samehadaku", "donghuafilm", "animesail", "animexin", "animeindo"].includes(src)) {
         setSource(src);
       }
       const q = sp.get("q");
@@ -66,108 +66,105 @@ export default function AnimePage() {
 
   // Fetch Samehadaku Data
   useEffect(() => {
-    if (source === "samehadaku") {
-      setLoadingSamehadaku(true);
-      const url = searchQuery.trim()
-        ? `/api/samehadaku?action=search&q=${encodeURIComponent(searchQuery.trim())}`
-        : `/api/samehadaku?action=popular`;
+    setLoadingSamehadaku(true);
+    const url = searchQuery.trim()
+      ? `/api/samehadaku?action=search&q=${encodeURIComponent(searchQuery.trim())}`
+      : `/api/samehadaku?action=popular`;
 
-      fetch(url)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.items && Array.isArray(d.items)) {
-            setSamehadakuItems(d.items);
-          }
-        })
-        .catch((e) => console.error("Error fetching Samehadaku:", e))
-        .finally(() => setLoadingSamehadaku(false));
-    }
-  }, [source, searchQuery]);
+    fetch(url)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.items && Array.isArray(d.items)) {
+          setSamehadakuItems(d.items);
+        }
+      })
+      .catch((e) => console.error("Error fetching Samehadaku:", e))
+      .finally(() => setLoadingSamehadaku(false));
+  }, [searchQuery]);
 
   // Fetch DonghuaFilm Data
   useEffect(() => {
-    if (source === "donghuafilm") {
-      setLoadingDonghuaFilm(true);
-      const url = searchQuery.trim()
-        ? `/api/donghuafilm?action=search&q=${encodeURIComponent(searchQuery.trim())}`
-        : `/api/donghuafilm?action=latest`;
+    setLoadingDonghuaFilm(true);
+    const url = searchQuery.trim()
+      ? `/api/donghuafilm?action=search&q=${encodeURIComponent(searchQuery.trim())}`
+      : `/api/donghuafilm?action=latest`;
 
-      fetch(url)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.items && Array.isArray(d.items)) {
-            setDonghuaFilmItems(d.items);
-          }
-        })
-        .catch((e) => console.error("Error fetching DonghuaFilm:", e))
-        .finally(() => setLoadingDonghuaFilm(false));
-    }
-  }, [source, searchQuery]);
+    fetch(url)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.items && Array.isArray(d.items)) {
+          setDonghuaFilmItems(d.items);
+        }
+      })
+      .catch((e) => console.error("Error fetching DonghuaFilm:", e))
+      .finally(() => setLoadingDonghuaFilm(false));
+  }, [searchQuery]);
 
   // Fetch AnimeSail Data
   useEffect(() => {
-    if (source === "animesail") {
-      setLoadingAnimeSail(true);
-      const url = searchQuery.trim()
-        ? `/api/animesail?action=search&q=${encodeURIComponent(searchQuery.trim())}`
-        : `/api/animesail?action=latest`;
+    setLoadingAnimeSail(true);
+    const url = searchQuery.trim()
+      ? `/api/animesail?action=search&q=${encodeURIComponent(searchQuery.trim())}`
+      : `/api/animesail?action=latest`;
 
-      fetch(url)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.items && Array.isArray(d.items)) {
-            setAnimesailItems(d.items);
-          }
-        })
-        .catch((e) => console.error("Error fetching AnimeSail:", e))
-        .finally(() => setLoadingAnimeSail(false));
-    }
-  }, [source, searchQuery]);
+    fetch(url)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.items && Array.isArray(d.items)) {
+          setAnimesailItems(d.items);
+        }
+      })
+      .catch((e) => console.error("Error fetching AnimeSail:", e))
+      .finally(() => setLoadingAnimeSail(false));
+  }, [searchQuery]);
 
   // Fetch AnimeXin Donghua Data
   useEffect(() => {
-    if (source === "animexin") {
-      setLoadingAnimeXin(true);
-      fetch("/api/animexin?action=latest")
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.items && Array.isArray(d.items)) {
-            setAnimexinItems(d.items);
-          }
-        })
-        .catch((e) => console.error("Error fetching AnimeXin:", e))
-        .finally(() => setLoadingAnimeXin(false));
-    }
-  }, [source]);
+    setLoadingAnimeXin(true);
+    fetch("/api/animexin?action=latest")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.items && Array.isArray(d.items)) {
+          setAnimexinItems(d.items);
+        }
+      })
+      .catch((e) => console.error("Error fetching AnimeXin:", e))
+      .finally(() => setLoadingAnimeXin(false));
+  }, []);
 
   // Fetch AnimeIndo / Schedule Data
   useEffect(() => {
-    if (source === "animeindo" && animeList.length === 0) {
-      setLoadingAnimeIndo(true);
-      Promise.all([
-        fetch("/api/anime?action=popular").then((r) => r.json()),
-        fetch("/api/anime?action=schedule").then((r) => r.json()),
-      ])
-        .then(([animeRes, schedRes]) => {
-          if (animeRes.items) setAnimeList(animeRes.items);
-          if (schedRes.schedule) setScheduleList(schedRes.schedule);
-        })
-        .catch((e) => console.error("Error fetching anime page:", e))
-        .finally(() => setLoadingAnimeIndo(false));
-    }
-  }, [source, animeList.length]);
+    setLoadingAnimeIndo(true);
+    Promise.all([
+      fetch("/api/anime?action=popular").then((r) => r.json()),
+      fetch("/api/anime?action=schedule").then((r) => r.json()),
+    ])
+      .then(([animeRes, schedRes]) => {
+        if (animeRes.items) setAnimeList(animeRes.items);
+        if (schedRes.schedule) setScheduleList(schedRes.schedule);
+      })
+      .catch((e) => console.error("Error fetching anime page:", e))
+      .finally(() => setLoadingAnimeIndo(false));
+  }, []);
 
   const filteredDonghua = animexinItems.filter((item) => {
     if (!searchQuery.trim()) return true;
     return item.title.toLowerCase().includes(searchQuery.toLowerCase().trim());
   });
 
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#09090D] text-white flex flex-col selection:bg-amber-400 selection:text-black">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-      <main className="flex-1 py-4 space-y-6">
+      <main className="flex-1 py-4 space-y-8">
         {/* Top Header Banner */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
           <div className="rounded-2xl bg-gradient-to-r from-amber-950/50 via-[#161420] to-[#0D0D14] p-6 border border-amber-500/20 shadow-xl">
@@ -178,84 +175,64 @@ export default function AnimePage() {
                   <span>Anime Hub - Streaming Multi-Provider Sub Indo</span>
                 </h1>
                 <p className="text-xs sm:text-sm text-gray-300 mt-2">
-                  Akses 5 sumber streaming anime &amp; donghua dalam 1 tempat: Samehadaku, DonghuaFilm, AnimeSail, AnimeXin Donghua, dan Jadwal AnimeIndo. 100% data real hasil live scrape.
+                  Semua sumber anime &amp; donghua tergabung dalam 1 halaman: Samehadaku, DonghuaFilm, AnimeSail, AnimeXin, dan Jadwal AnimeIndo. Bebas gonta-ganti tab!
                 </p>
               </div>
 
-              {/* 5-in-1 Source Switcher Tabs */}
+              {/* Multi-Provider Quick Jump Navigation */}
               <div className="flex flex-wrap items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0">
                 <button
                   onClick={() => {
-                    setSource("samehadaku");
-                    setSearchQuery("");
+                    setSource("all");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                    source === "samehadaku"
+                    source === "all"
                       ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-lg shadow-amber-500/20"
                       : "text-gray-400 hover:text-white"
                   }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Semua Provider</span>
+                </button>
+
+                <button
+                  onClick={() => scrollToSection("samehadaku")}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
                 >
                   <span className="w-2 h-2 rounded-full bg-amber-400" />
                   <span>Samehadaku</span>
                 </button>
 
                 <button
-                  onClick={() => {
-                    setSource("donghuafilm");
-                    setSearchQuery("");
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                    source === "donghuafilm"
-                      ? "bg-amber-400 text-black shadow-lg shadow-amber-400/20"
-                      : "text-gray-400 hover:text-white"
-                  }`}
+                  onClick={() => scrollToSection("donghuafilm")}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
                 >
-                  <Tv className="w-3.5 h-3.5" />
+                  <Tv className="w-3.5 h-3.5 text-amber-400" />
                   <span>DonghuaFilm</span>
                 </button>
 
                 <button
-                  onClick={() => {
-                    setSource("animesail");
-                    setSearchQuery("");
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                    source === "animesail"
-                      ? "bg-sky-500 text-black shadow-lg shadow-sky-500/20"
-                      : "text-gray-400 hover:text-white"
-                  }`}
+                  onClick={() => scrollToSection("animesail")}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
                 >
-                  <Compass className="w-3.5 h-3.5" />
+                  <Compass className="w-3.5 h-3.5 text-sky-400" />
                   <span>AnimeSail</span>
                 </button>
 
                 <button
-                  onClick={() => {
-                    setSource("animexin");
-                    setSearchQuery("");
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                    source === "animexin"
-                      ? "bg-cyan-500 text-black shadow-lg shadow-cyan-500/20"
-                      : "text-gray-400 hover:text-white"
-                  }`}
+                  onClick={() => scrollToSection("animexin")}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
                 >
-                  <Layers className="w-3.5 h-3.5" />
+                  <Layers className="w-3.5 h-3.5 text-cyan-400" />
                   <span>Donghua (AnimeXin)</span>
                 </button>
 
                 <button
-                  onClick={() => {
-                    setSource("animeindo");
-                    setSearchQuery("");
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                    source === "animeindo"
-                      ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-lg shadow-amber-500/20"
-                      : "text-gray-400 hover:text-white"
-                  }`}
+                  onClick={() => scrollToSection("animeindo")}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                   <span>AnimeIndo &amp; Jadwal</span>
                 </button>
               </div>
@@ -286,8 +263,8 @@ export default function AnimePage() {
         </div>
 
         {/* PROVIDER 1: SAMEHADAKU */}
-        {source === "samehadaku" && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {(source === "all" || source === "samehadaku") && (
+          <div id="samehadaku" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
                 <Tv className="w-5 h-5 text-amber-400" />
@@ -363,8 +340,8 @@ export default function AnimePage() {
         )}
 
         {/* PROVIDER 2: DONGHUAFILM */}
-        {source === "donghuafilm" && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {(source === "all" || source === "donghuafilm") && (
+          <div id="donghuafilm" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
                 <Tv className="w-5 h-5 text-amber-400" />
@@ -440,8 +417,8 @@ export default function AnimePage() {
         )}
 
         {/* PROVIDER 3: ANIMESAIL */}
-        {source === "animesail" && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {(source === "all" || source === "animesail") && (
+          <div id="animesail" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
                 <Compass className="w-5 h-5 text-sky-400" />
@@ -517,8 +494,8 @@ export default function AnimePage() {
         )}
 
         {/* PROVIDER 4: ANIMEXIN DONGHUA */}
-        {source === "animexin" && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {(source === "all" || source === "animexin") && (
+          <div id="animexin" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
                 <Layers className="w-5 h-5 text-cyan-400" />
@@ -598,8 +575,8 @@ export default function AnimePage() {
         )}
 
         {/* PROVIDER 5: ANIMEINDO & JADWAL */}
-        {source === "animeindo" && (
-          <div className="space-y-6">
+        {(source === "all" || source === "animeindo") && (
+          <div id="animeindo" className="space-y-6 scroll-mt-20">
             {/* Top Populer Anime Ranking */}
             {loadingAnimeIndo ? <RankingCardsSkeleton /> : <PopularRankingSection items={animeList} />}
 

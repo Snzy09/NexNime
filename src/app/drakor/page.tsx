@@ -11,11 +11,11 @@ import CatalogGridSkeleton from "@/components/skeletons/CatalogGridSkeleton";
 import { DrakorItem } from "@/lib/services/drakorService";
 import { OppaDramaCard } from "@/lib/services/oppadramaService";
 
-type DrakorProvider = "drakorid" | "oppadrama";
+type DrakorProvider = "all" | "drakorid" | "oppadrama";
 
 export default function DrakorHubPage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [provider, setProvider] = useState<DrakorProvider>("drakorid");
+  const [provider, setProvider] = useState<DrakorProvider>("all");
   const [activeTab, setActiveTab] = useState<"trending" | "ongoing">("trending");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -25,54 +25,50 @@ export default function DrakorHubPage() {
 
   // OppaDrama State
   const [oppaList, setOppaList] = useState<OppaDramaCard[]>([]);
-  const [loadingOppa, setLoadingOppa] = useState(false);
+  const [loadingOppa, setLoadingOppa] = useState(true);
 
   // Fetch DrakorID data
   useEffect(() => {
-    if (provider === "drakorid") {
-      setLoadingDrakorId(true);
-      fetch(`/api/drakor?action=${activeTab}`)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.items) setDrakorList(d.items);
-        })
-        .catch((e) => console.error("Drakor page fetch error:", e))
-        .finally(() => setLoadingDrakorId(false));
-    }
-  }, [provider, activeTab]);
+    setLoadingDrakorId(true);
+    fetch(`/api/drakor?action=${activeTab}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.items) setDrakorList(d.items);
+      })
+      .catch((e) => console.error("Drakor page fetch error:", e))
+      .finally(() => setLoadingDrakorId(false));
+  }, [activeTab]);
 
   // Fetch OppaDrama data
   useEffect(() => {
-    if (provider === "oppadrama") {
-      setLoadingOppa(true);
-      const url = searchQuery.trim()
-        ? `/api/oppadrama?action=search&q=${encodeURIComponent(searchQuery.trim())}`
-        : `/api/oppadrama?action=latest&page=1`;
+    setLoadingOppa(true);
+    const url = searchQuery.trim()
+      ? `/api/oppadrama?action=search&q=${encodeURIComponent(searchQuery.trim())}`
+      : `/api/oppadrama?action=latest&page=1`;
 
-      fetch(url)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.items && Array.isArray(d.items)) {
-            // Filter to drama / series
-            const seriesOnly = d.items.filter(
-              (i: OppaDramaCard) => !i.type?.toLowerCase().includes("movie")
-            );
-            setOppaList(seriesOnly.length > 0 ? seriesOnly : d.items);
-          } else {
-            setOppaList([]);
-          }
-        })
-        .catch((e) => console.error("OppaDrama fetch error:", e))
-        .finally(() => setLoadingOppa(false));
-    }
-  }, [provider, searchQuery]);
+    fetch(url)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.items && Array.isArray(d.items)) {
+          // Filter to drama / series
+          const seriesOnly = d.items.filter(
+            (i: OppaDramaCard) => !i.type?.toLowerCase().includes("movie")
+          );
+          setOppaList(seriesOnly.length > 0 ? seriesOnly : d.items);
+        } else {
+          setOppaList([]);
+        }
+      })
+      .catch((e) => console.error("OppaDrama fetch error:", e))
+      .finally(() => setLoadingOppa(false));
+  }, [searchQuery]);
 
   return (
     <div className="min-h-screen bg-[#09090D] text-white flex flex-col selection:bg-blue-500 selection:text-white">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-      <main className="flex-1 py-4 space-y-6">
+      <main className="flex-1 py-4 space-y-8">
         {/* Banner Top */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
           <div className="rounded-2xl bg-gradient-to-r from-blue-950/40 via-[#101420] to-[#0D0D14] p-6 border border-blue-500/20 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
@@ -82,48 +78,53 @@ export default function DrakorHubPage() {
                 <span>Drakor Hub - Streaming Serial Drama Korea &amp; Asia</span>
               </h1>
               <p className="text-xs sm:text-sm text-gray-300 mt-2 max-w-2xl">
-                Akses koleksi serial Drama Korea lengkap dari 2 provider utama: DrakorID dan OppaDrama. Didukung multi-server cepat dan subtitle Indonesia.
+                Semua serial drama Korea &amp; Asia dari DrakorID dan OppaDrama tergabung dalam 1 halaman. Subtitle Indonesia &amp; server cepat tanpa harus ganti tab.
               </p>
             </div>
 
-            {/* Provider Switcher */}
+            {/* Provider Switcher / Quick Jump */}
             <div className="flex items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0">
               <button
                 onClick={() => {
-                  setProvider("drakorid");
-                  setSearchQuery("");
+                  setProvider("all");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  provider === "drakorid"
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30"
+                  provider === "all"
+                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30"
                     : "text-gray-400 hover:text-white"
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5" />
+                <span>Semua Drakor</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  document.getElementById("drakorid")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
                 <span>DrakorID</span>
               </button>
 
               <button
                 onClick={() => {
-                  setProvider("oppadrama");
-                  setSearchQuery("");
+                  document.getElementById("oppadrama")?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  provider === "oppadrama"
-                    ? "bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30"
-                    : "text-gray-400 hover:text-white"
-                }`}
+                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
               >
-                <Heart className="w-3.5 h-3.5" />
-                <span>OppaDrama (K-Drama)</span>
+                <Heart className="w-3.5 h-3.5 text-fuchsia-400" />
+                <span>OppaDrama</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* PROVIDER 1: DRAKORID */}
-        {provider === "drakorid" && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {(provider === "all" || provider === "drakorid") && (
+          <div id="drakorid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
             {/* Tab Controls for DrakorID */}
             <div className="flex items-center gap-2 pb-3 border-b border-white/5">
               <button
@@ -208,8 +209,17 @@ export default function DrakorHubPage() {
         )}
 
         {/* PROVIDER 2: OPPADRAMA */}
-        {provider === "oppadrama" && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {(provider === "all" || provider === "oppadrama") && (
+          <div id="oppadrama" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
+            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+                <Heart className="w-5 h-5 text-fuchsia-400" />
+                <span>OppaDrama - Serial Drama Korea &amp; Asia Sub Indo</span>
+              </h2>
+              <span className="text-xs text-gray-400">
+                {loadingOppa ? "Memuat live data..." : `${oppaList.length} Judul Real`}
+              </span>
+            </div>
 
 
             {loadingOppa && <CatalogGridSkeleton count={12} />}
