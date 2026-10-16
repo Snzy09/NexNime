@@ -761,7 +761,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     {results.dracin.map((item, idx) => (
                       <Link
                         key={idx}
-                        href={`/dracin?drama=${item.slug}`}
+                        href={`/dracin/watch?slug=${encodeURIComponent(item.slug)}&title=${encodeURIComponent(item.title)}`}
                         onClick={onClose}
                         className="flex items-center gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group"
                       >

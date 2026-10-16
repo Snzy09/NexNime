@@ -9,7 +9,6 @@ import {
   Play,
   Sparkles,
   Video,
-  Search,
   Flame,
   Layers,
   Heart,
@@ -25,7 +24,6 @@ type ShortDramaProvider = "asiabox" | "reelshort" | "netshort";
 function DracinHubContent() {
   const [provider, setProvider] = useState<ShortDramaProvider>("asiabox");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   // AsiaBox State
   const [dramaList, setDramaList] = useState<DracinItem[]>(REAL_DRACIN_SHORTS);
@@ -68,11 +66,7 @@ function DracinHubContent() {
   useEffect(() => {
     if (provider === "reelshort") {
       setLoadingReelShort(true);
-      const url = searchQuery.trim()
-        ? `/api/reelshort?action=search&q=${encodeURIComponent(searchQuery.trim())}`
-        : `/api/reelshort?action=popular&category=${encodeURIComponent(reelShortCategory)}`;
-
-      fetch(url)
+      fetch(`/api/reelshort?action=popular&category=${encodeURIComponent(reelShortCategory)}`)
         .then((r) => r.json())
         .then((data) => {
           if (data.items && Array.isArray(data.items)) {
@@ -87,7 +81,7 @@ function DracinHubContent() {
         })
         .finally(() => setLoadingReelShort(false));
     }
-  }, [provider, reelShortCategory, searchQuery]);
+  }, [provider, reelShortCategory]);
 
   // 3. Fetch NetShort Data
   useEffect(() => {
@@ -110,18 +104,6 @@ function DracinHubContent() {
     }
   }, [provider]);
 
-  // Filter AsiaBox dramas by search query
-  const filteredAsiaList = dramaList.filter((item) => {
-    if (!searchQuery.trim()) return true;
-    return item.title.toLowerCase().includes(searchQuery.toLowerCase().trim());
-  });
-
-  // Filter NetShort dramas by search query
-  const filteredNetShort = netShortDramas.filter((item) => {
-    if (!searchQuery.trim()) return true;
-    return item.title.toLowerCase().includes(searchQuery.toLowerCase().trim());
-  });
-
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-rose-500 selection:text-white">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
@@ -143,10 +125,7 @@ function DracinHubContent() {
           {/* Provider Tabs */}
           <div className="flex items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0 w-full lg:w-auto overflow-x-auto no-scrollbar">
             <button
-              onClick={() => {
-                setProvider("asiabox");
-                setSearchQuery("");
-              }}
+              onClick={() => setProvider("asiabox")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                 provider === "asiabox"
                   ? "bg-rose-600 text-white shadow-lg shadow-rose-600/30"
@@ -158,10 +137,7 @@ function DracinHubContent() {
             </button>
 
             <button
-              onClick={() => {
-                setProvider("reelshort");
-                setSearchQuery("");
-              }}
+              onClick={() => setProvider("reelshort")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                 provider === "reelshort"
                   ? "bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-lg shadow-rose-500/30"
@@ -173,10 +149,7 @@ function DracinHubContent() {
             </button>
 
             <button
-              onClick={() => {
-                setProvider("netshort");
-                setSearchQuery("");
-              }}
+              onClick={() => setProvider("netshort")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                 provider === "netshort"
                   ? "bg-purple-600 text-white shadow-lg shadow-purple-600/30"
@@ -192,21 +165,7 @@ function DracinHubContent() {
 
       {/* VIEW 1: ASIABOX CATALOG */}
       {provider === "asiabox" && (
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 w-full">
-          {/* Search Bar */}
-          <div className="rounded-xl sm:rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl">
-            <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Cari drama AsiaBox (contoh: Keluar dari Tim, Lelaki Biasa)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2 sm:py-2.5 border border-white/5 focus:border-rose-500/40 focus:outline-none"
-              />
-            </div>
-          </div>
-
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full">
           {/* AsiaBox Catalog Grid */}
           <div className="space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
@@ -215,19 +174,15 @@ function DracinHubContent() {
                 <span>Koleksi Serial AsiaBox (Klik untuk Nonton)</span>
               </h2>
               <span className="text-xs text-gray-400">
-                {loadingAsiaList ? "Memuat katalog..." : `${filteredAsiaList.length} Judul`}
+                {loadingAsiaList ? "Memuat katalog..." : `${dramaList.length} Judul`}
               </span>
             </div>
 
             {loadingAsiaList ? (
               <DracinReelsSkeleton />
-            ) : filteredAsiaList.length === 0 ? (
-              <div className="text-center py-12 text-gray-400 text-sm">
-                Tidak ada drama yang cocok dengan pencarian "{searchQuery}"
-              </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-                {filteredAsiaList.map((drama, idx) => (
+                {dramaList.map((drama, idx) => (
                   <Link
                     key={idx}
                     href={`/dracin/watch?slug=${encodeURIComponent(drama.slug)}&title=${encodeURIComponent(drama.title)}`}
@@ -286,21 +241,10 @@ function DracinHubContent() {
 
       {/* VIEW 2: REELSHORT CATALOG */}
       {provider === "reelshort" && (
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 w-full">
-          {/* Search Bar & Genres */}
-          <div className="rounded-xl sm:rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl space-y-2.5">
-            <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Cari drama ReelShort (contoh: CEO, Revenge, Billionaire, Secret Wife)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2 sm:py-2.5 border border-white/5 focus:border-rose-500/40 focus:outline-none"
-              />
-            </div>
-
-            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pt-1">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full">
+          {/* Category Filter Pills (Compact without duplicate search input) */}
+          <div className="rounded-xl sm:rounded-2xl bg-[#121218] border border-white/10 p-2.5 sm:p-3 shadow-xl">
+            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar">
               <span className="text-xs text-gray-400 font-medium shrink-0 flex items-center gap-1 mr-1">
                 <Layers className="w-3.5 h-3.5 text-rose-400" /> Kategori:
               </span>
@@ -316,12 +260,9 @@ function DracinHubContent() {
               ].map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => {
-                    setReelShortCategory(cat);
-                    setSearchQuery("");
-                  }}
+                  onClick={() => setReelShortCategory(cat)}
                   className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-                    reelShortCategory === cat && !searchQuery
+                    reelShortCategory === cat
                       ? "bg-rose-500 text-white shadow-md shadow-rose-500/30 scale-105"
                       : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10"
                   }`}
@@ -404,21 +345,7 @@ function DracinHubContent() {
 
       {/* VIEW 3: NETSHORT CATALOG */}
       {provider === "netshort" && (
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 w-full">
-          {/* Search Bar */}
-          <div className="rounded-xl sm:rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl">
-            <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Cari drama NetShort (contoh: Destiny, Alpha, Revenge)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2 sm:py-2.5 border border-white/5 focus:border-purple-500/40 focus:outline-none"
-              />
-            </div>
-          </div>
-
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full">
           {/* Loading */}
           {loadingNetShort && (
             <div className="py-12 flex justify-center items-center">
@@ -426,10 +353,10 @@ function DracinHubContent() {
             </div>
           )}
 
-          {/* NetShort Grid */}
-          {!loadingNetShort && filteredNetShort.length > 0 && (
+          {/* NetShort Grid (Directly under banner, saving maximum space) */}
+          {!loadingNetShort && netShortDramas.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-              {filteredNetShort.map((item, idx) => (
+              {netShortDramas.map((item, idx) => (
                 <Link
                   key={idx}
                   href={`/netshort/watch?slug=${item.slug}&title=${encodeURIComponent(item.title)}`}
