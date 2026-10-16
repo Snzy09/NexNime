@@ -54,19 +54,49 @@ export default function NovelSection({ items }: NovelSectionProps) {
             className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-emerald-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-950/40"
           >
             <div className="relative aspect-[3/4] w-full overflow-hidden bg-black/60">
-              {item.thumbnail ? (
+              {item.thumbnail &&
+              !item.thumbnail.includes("image-placeholder.png") &&
+              !item.thumbnail.includes("flip-8496325764.png") ? (
                 <img
-                  src={item.thumbnail}
+                  src={
+                    item.thumbnail.startsWith("http")
+                      ? `/api/novel?action=image&url=${encodeURIComponent(item.thumbnail)}`
+                      : item.thumbnail
+                  }
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
-                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display = "none";
+                    const fb = e.currentTarget.parentElement?.querySelector(
+                      ".custom-cover-fallback"
+                    );
+                    if (fb) (fb as HTMLElement).style.display = "flex";
+                  }}
                 />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-emerald-950/20 text-emerald-300 text-xs text-center p-3">
-                  {item.title}
+              ) : null}
+
+              {/* Custom Cover Fallback */}
+              <div
+                className={`custom-cover-fallback w-full h-full flex flex-col items-center justify-between p-3.5 bg-gradient-to-b from-[#0F2922] via-[#091C16] to-[#06100D] border border-emerald-500/20 text-center relative overflow-hidden ${
+                  item.thumbnail &&
+                  !item.thumbnail.includes("image-placeholder.png") &&
+                  !item.thumbnail.includes("flip-8496325764.png")
+                    ? "hidden"
+                    : "flex"
+                }`}
+              >
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mt-2 shadow-sm">
+                  <BookOpen className="w-4 h-4" />
                 </div>
-              )}
+                <p className="text-xs font-bold text-emerald-100 line-clamp-3 leading-snug drop-shadow-md px-1 z-10">
+                  {item.title}
+                </p>
+                <span className="text-[10px] font-semibold text-emerald-400/80 uppercase tracking-widest z-10">
+                  LIGHT NOVEL
+                </span>
+                <div className="absolute -bottom-6 -right-6 w-24 h-24 rounded-full bg-emerald-500/5 blur-xl pointer-events-none" />
+              </div>
 
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 

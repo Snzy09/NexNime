@@ -124,16 +124,19 @@ function NovelReaderContent() {
           if (data.success && data.chapter) {
             setChapterData(data.chapter);
 
-            // Attempt to derive series slug from chapter URL
-            const slug = data.chapter.slug.replace(
-              /-(?:chapter|ch|bagian)-\d+.*$/i,
-              ""
-            );
-            if (slug) {
+            // Fetch novel detail using exact seriesUrl or derived slug
+            const targetSeries =
+              data.chapter.seriesUrl ||
+              (data.chapter.slug
+                ? `https://bacaln.com/series/${data.chapter.slug.replace(
+                    /-(?:chapter|ch|bagian)-\d+.*$/i,
+                    ""
+                  )}/`
+                : null);
+
+            if (targetSeries) {
               fetch(
-                `/api/novel?action=detail&url=${encodeURIComponent(
-                  `https://bacaln.com/series/${slug}/`
-                )}`
+                `/api/novel?action=detail&url=${encodeURIComponent(targetSeries)}`
               )
                 .then((sR) => sR.json())
                 .then((sD) => {
@@ -355,14 +358,65 @@ function NovelReaderContent() {
           </div>
         ) : (
           <article className="space-y-6">
-            {/* Header info */}
-            <div className="text-center space-y-2 border-b border-white/10 pb-6">
-              <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight">
-                {chapterData.title || initialTitle}
-              </h1>
-              <p className="text-xs opacity-75">
-                {chapterData.totalParagraphs} Paragraf • Terjemahan Bahasa Indonesia
-              </p>
+            {/* Header info with Novel Poster Card */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 p-4 sm:p-6 rounded-2xl bg-white/[0.03] border border-white/10 shadow-xl backdrop-blur-sm">
+              {/* Novel Poster Cover */}
+              <div className="relative w-24 sm:w-28 md:w-32 aspect-[3/4] rounded-xl overflow-hidden border border-emerald-500/30 shadow-xl shrink-0 bg-black/60">
+                {novelDetail?.thumbnail &&
+                !novelDetail.thumbnail.includes("image-placeholder.png") &&
+                !novelDetail.thumbnail.includes("flip-8496325764.png") ? (
+                  <img
+                    src={
+                      novelDetail.thumbnail.startsWith("http")
+                        ? `/api/novel?action=image&url=${encodeURIComponent(novelDetail.thumbnail)}`
+                        : novelDetail.thumbnail
+                    }
+                    alt={novelDetail.title || chapterData.title}
+                    className="w-full h-full object-cover"
+                    loading="eager"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-between p-2.5 bg-gradient-to-b from-[#0F2922] via-[#091C16] to-[#06100D] text-center border border-emerald-500/20">
+                    <BookOpen className="w-6 h-6 text-emerald-400 mt-1" />
+                    <span className="text-[10px] font-bold text-emerald-200 line-clamp-3 leading-tight px-1">
+                      {novelDetail?.title || initialTitle}
+                    </span>
+                    <span className="text-[9px] font-bold text-emerald-400/80 uppercase">
+                      NOVEL
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Title & Metadata */}
+              <div className="flex-1 text-center sm:text-left space-y-2 min-w-0">
+                {novelDetail?.title && (
+                  <p className="text-xs font-bold text-emerald-400 tracking-wide uppercase flex items-center justify-center sm:justify-start gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span className="truncate">{novelDetail.title}</span>
+                  </p>
+                )}
+                <h1 className="text-lg sm:text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
+                  {chapterData.title || initialTitle}
+                </h1>
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                  <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-gray-300 text-[11px] font-medium border border-white/10">
+                    {chapterData.totalParagraphs} Paragraf
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-medium border border-emerald-500/30">
+                    Terjemahan Indonesia
+                  </span>
+                  {novelDetail?.totalChapters && (
+                    <button
+                      onClick={() => setIsDrawerOpen(true)}
+                      className="px-2.5 py-0.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black text-[11px] font-bold transition-colors shadow-sm flex items-center gap-1"
+                    >
+                      <ListOrdered className="w-3 h-3" />
+                      <span>{novelDetail.totalChapters} Chapter</span>
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Chapters Drawer / Modal if opened */}
@@ -372,14 +426,17 @@ function NovelReaderContent() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 min-w-0">
-                    {novelDetail.thumbnail && (
+                    {novelDetail.thumbnail ? (
                       <img
-                        src={novelDetail.thumbnail}
+                        src={
+                          novelDetail.thumbnail.startsWith("http")
+                            ? `/api/novel?action=image&url=${encodeURIComponent(novelDetail.thumbnail)}`
+                            : novelDetail.thumbnail
+                        }
                         alt={novelDetail.title}
                         className="w-10 h-14 object-cover rounded-lg border border-white/10 shrink-0"
-                        referrerPolicy="no-referrer"
                       />
-                    )}
+                    ) : null}
                     <div className="min-w-0">
                       <h3 className="text-sm font-bold flex items-center gap-2 truncate">
                         <ListOrdered className="w-4 h-4 text-emerald-500 shrink-0" />

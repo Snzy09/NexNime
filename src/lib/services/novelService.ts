@@ -38,6 +38,9 @@ export interface NovelChapterRead {
   title: string;
   slug: string;
   url: string;
+  seriesUrl?: string | null;
+  seriesTitle?: string | null;
+  thumbnail?: string | null;
   navigation: {
     prev: string | null;
     next: string | null;
@@ -64,9 +67,15 @@ function extractImageUrl($el: cheerio.Cheerio<any>): string {
   const $img = $el.is("img") ? $el : $el.find("img").first();
   if (!$img || $img.length === 0) return "";
 
+  const isPlaceholder = (val: string | undefined): boolean =>
+    !val ||
+    val.includes("image-placeholder.png") ||
+    val.includes("flip-8496325764.png") ||
+    val.includes("placeholder");
+
   // 1. Check data-sxrx (used by BacaLN lazyload)
   const sxrx = $img.attr("data-sxrx");
-  if (sxrx) {
+  if (sxrx && !isPlaceholder(sxrx)) {
     if (/^https?:\/\//i.test(sxrx)) return sxrx;
     if (sxrx.startsWith("/")) return `${BASE_URL}${sxrx}`;
     return `${BASE_URL}/wp-content/uploads/${sxrx}`;
@@ -77,7 +86,7 @@ function extractImageUrl($el: cheerio.Cheerio<any>): string {
     $img.attr("data-src") ||
     $img.attr("data-lazy-src") ||
     $img.attr("data-original");
-  if (lazy && !lazy.includes("image-placeholder.png")) {
+  if (lazy && !isPlaceholder(lazy)) {
     if (/^https?:\/\//i.test(lazy)) return lazy;
     if (lazy.startsWith("/")) return `${BASE_URL}${lazy}`;
     return `${BASE_URL}/wp-content/uploads/${lazy}`;
@@ -85,7 +94,7 @@ function extractImageUrl($el: cheerio.Cheerio<any>): string {
 
   // 3. Check regular src
   const src = $img.attr("src");
-  if (src && !src.includes("image-placeholder.png")) {
+  if (src && !isPlaceholder(src)) {
     return src;
   }
 
@@ -93,7 +102,7 @@ function extractImageUrl($el: cheerio.Cheerio<any>): string {
   const srcset = $img.attr("srcset");
   if (srcset) {
     const firstCandidate = srcset.split(",")[0]?.trim()?.split(" ")[0];
-    if (firstCandidate && !firstCandidate.includes("image-placeholder.png")) {
+    if (firstCandidate && !isPlaceholder(firstCandidate)) {
       return firstCandidate;
     }
   }
@@ -233,11 +242,10 @@ export async function getNovelDetail(
   const title = cleanText($("h1").first().text());
   if (!title) throw new Error("Series novel tidak ditemukan");
 
-  const thumbnail = extractImageUrl(
-    $(
-      ".series-thumb, .series-image, .thumb, .entry-content, img.wp-post-image"
-    ).first()
-  );
+  const $thumbEl = $(
+    ".imgprop img, .thumb img, img.wp-post-image, .series-thumb img, .series-image img, article img"
+  ).first();
+  const thumbnail = extractImageUrl($thumbEl);
   const synopsis = cleanText(
     $(".series-synops, .synopsis, .entry-content p, .entry-content")
       .first()
@@ -335,10 +343,17 @@ export async function readNovelChapter(
     }
   });
 
+  const seriesEl = $("a[href*='/series/']").first();
+  const seriesUrl = seriesEl.attr("href") || null;
+  const seriesTitle =
+    cleanText(seriesEl.text().replace(/Semua Chapter/i, "").trim()) || null;
+
   return {
     title,
     slug: extractSlug(targetUrl),
     url: targetUrl,
+    seriesUrl,
+    seriesTitle,
     navigation: {
       prev: prevUrl,
       next: nextUrl,
