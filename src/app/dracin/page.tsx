@@ -421,25 +421,25 @@ export default function DracinHubPage() {
 
       {/* Header Hub Banner with Provider Switcher */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 w-full">
-        <div className="rounded-2xl bg-gradient-to-r from-rose-950/50 via-[#181014] to-[#0D0D14] p-5 sm:p-6 border border-rose-500/20 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <div className="rounded-2xl bg-gradient-to-r from-rose-950/50 via-[#181014] to-[#0D0D14] p-4 sm:p-6 border border-rose-500/20 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2">
-              <Video className="w-8 h-8 text-rose-500" />
+            <h1 className="text-xl sm:text-3xl font-black text-white flex items-center gap-2">
+              <Video className="w-6 h-6 sm:w-8 sm:h-8 text-rose-500 shrink-0" />
               <span>Short Drama Hub (9:16 Vertikal)</span>
             </h1>
-            <p className="text-xs sm:text-sm text-gray-300 mt-1.5 max-w-2xl">
+            <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-2xl leading-relaxed">
               Nonton drama pendek rasio 9:16 ala TikTok/Reels dari 3 platform: AsiaBox, ReelShort, dan NetShort. 100% data real hasil live scrape.
             </p>
           </div>
 
           {/* Provider Tabs */}
-          <div className="flex items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0">
+          <div className="flex items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0 w-full lg:w-auto overflow-x-auto no-scrollbar">
             <button
               onClick={() => {
                 setProvider("asiabox");
                 setSearchQuery("");
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                 provider === "asiabox"
                   ? "bg-rose-600 text-white shadow-lg shadow-rose-600/30"
                   : "text-gray-400 hover:text-white"
@@ -454,7 +454,7 @@ export default function DracinHubPage() {
                 setProvider("reelshort");
                 setSearchQuery("");
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                 provider === "reelshort"
                   ? "bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-lg shadow-rose-500/30"
                   : "text-gray-400 hover:text-white"
@@ -469,7 +469,7 @@ export default function DracinHubPage() {
                 setProvider("netshort");
                 setSearchQuery("");
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                 provider === "netshort"
                   ? "bg-purple-600 text-white shadow-lg shadow-purple-600/30"
                   : "text-gray-400 hover:text-white"
@@ -484,7 +484,7 @@ export default function DracinHubPage() {
 
       {/* VIEW 1: ASIABOX TIKTOK/REELS PLAYER */}
       {provider === "asiabox" && (
-        <main className="flex-1 flex flex-col items-center justify-center p-2 sm:p-4 relative my-4">
+        <main className="flex-1 flex flex-col items-center justify-center p-2 sm:p-4 relative my-2 sm:my-4">
           {/* Drama Selector Horizontal Bar with Thumbnail & Episodes */}
           <div className="w-full max-w-xl flex items-center gap-2 overflow-x-auto no-scrollbar py-2 mb-3 px-1">
             {loadingAsiaList
@@ -524,7 +524,7 @@ export default function DracinHubPage() {
 
           {/* Mobile Fullscreen Banner Button (when minimized on phone) */}
           {!isMobileFullscreen && (
-            <div className="sm:hidden w-full max-w-[380px] mb-2 px-1">
+            <div className="sm:hidden w-full max-w-[340px] mb-2 px-1">
               <button
                 onClick={() => setIsMobileFullscreen(true)}
                 className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30"
@@ -546,7 +546,7 @@ export default function DracinHubPage() {
             className={`overflow-hidden bg-black flex items-center justify-center group select-none transition-all cursor-grab active:cursor-grabbing ${
               isMobileFullscreen
                 ? "max-sm:fixed max-sm:inset-0 max-sm:z-50 max-sm:w-full max-sm:h-[100dvh] max-sm:max-w-none max-sm:rounded-none max-sm:border-0 sm:relative sm:w-full sm:max-w-[400px] sm:aspect-[9/16] sm:rounded-3xl sm:border sm:border-white/10 sm:shadow-2xl sm:shadow-rose-950/20"
-                : "relative w-full max-w-[380px] sm:max-w-[400px] aspect-[9/16] rounded-3xl border border-white/10 shadow-2xl shadow-rose-950/20"
+                : "relative w-full max-w-[320px] sm:max-w-[380px] md:max-w-[400px] aspect-[9/16] rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl shadow-rose-950/20"
             }`}
           >
             {/* Animated Swipe Toast Notification Feedback */}
@@ -845,7 +845,7 @@ export default function DracinHubPage() {
                         setIsMobileFullscreen(true);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className={`group relative rounded-2xl overflow-hidden bg-[#13131A] border transition-all duration-300 flex flex-col cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-rose-950/40 ${
+                      className={`group relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#13131A] border transition-all duration-300 flex flex-col cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-rose-950/40 ${
                         isSelected
                           ? "border-rose-500 ring-2 ring-rose-500/50"
                           : "border-white/5 hover:border-rose-500/40"
@@ -868,8 +868,8 @@ export default function DracinHubPage() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
-                          <div className="w-12 h-12 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-xl shadow-rose-600/50">
-                            <Play className="w-5 h-5 fill-white ml-0.5" />
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-xl shadow-rose-600/50">
+                            <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-white ml-0.5" />
                           </div>
                         </div>
 
@@ -905,9 +905,9 @@ export default function DracinHubPage() {
 
       {/* VIEW 2: REELSHORT CATALOG */}
       {provider === "reelshort" && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
           {/* Search Bar & Genres */}
-          <div className="rounded-2xl bg-[#121218] border border-white/10 p-4 shadow-xl space-y-3">
+          <div className="rounded-xl sm:rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl space-y-2.5">
             <div className="relative">
               <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
@@ -915,11 +915,11 @@ export default function DracinHubPage() {
                 placeholder="Cari drama ReelShort (contoh: CEO, Revenge, Billionaire, Secret Wife)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2.5 border border-white/5 focus:border-rose-500/40 focus:outline-none"
+                className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2 sm:py-2.5 border border-white/5 focus:border-rose-500/40 focus:outline-none"
               />
             </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pt-1">
               <span className="text-xs text-gray-400 font-medium shrink-0 flex items-center gap-1 mr-1">
                 <Layers className="w-3.5 h-3.5 text-rose-400" /> Kategori:
               </span>
@@ -951,16 +951,16 @@ export default function DracinHubPage() {
             </div>
           )}
 
-          {/* ReelShort 9:16 Grid */}
+          {/* ReelShort Grid */}
           {!loadingReelShort && reelShortDramas.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {reelShortDramas.map((item, idx) => (
                 <Link
                   key={idx}
                   href={`/reelshort/watch?id=${item.book_id}&title=${encodeURIComponent(item.title)}`}
-                  className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-rose-500/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-rose-950/40"
+                  className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-rose-500/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-rose-950/40"
                 >
-                  <div className="relative aspect-[9/16] w-full overflow-hidden bg-black/70">
+                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/70">
                     {item.cover ? (
                       <img
                         src={item.cover}
@@ -983,8 +983,8 @@ export default function DracinHubPage() {
                       </div>
                     )}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="w-12 h-12 rounded-full bg-rose-500/90 text-white flex items-center justify-center shadow-lg shadow-rose-500/50 scale-90 group-hover:scale-100 transition-transform">
-                        <Play className="w-5 h-5 fill-white ml-0.5" />
+                      <span className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-500/90 text-white flex items-center justify-center shadow-lg shadow-rose-500/50 scale-90 group-hover:scale-100 transition-transform">
+                        <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-white ml-0.5" />
                       </span>
                     </div>
                     <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] text-gray-300">
@@ -994,6 +994,7 @@ export default function DracinHubPage() {
                           {(item.read_count / 1000000).toFixed(1)}M
                         </span>
                       ) : null}
+
                       {item.collect_count ? (
                         <span className="flex items-center gap-1 bg-black/60 px-1.5 py-0.5 rounded text-amber-300">
                           <Heart className="w-3 h-3 fill-amber-400 text-amber-400" />
@@ -1002,8 +1003,8 @@ export default function DracinHubPage() {
                       ) : null}
                     </div>
                   </div>
-                  <div className="p-3 flex flex-col justify-between flex-1 space-y-1.5">
-                    <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-rose-300">
+                  <div className="p-2.5 sm:p-3 flex flex-col justify-between flex-1 space-y-1">
+                    <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-rose-300 transition-colors leading-snug">
                       {item.title}
                     </h3>
                   </div>
@@ -1016,9 +1017,9 @@ export default function DracinHubPage() {
 
       {/* VIEW 3: NETSHORT CATALOG */}
       {provider === "netshort" && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
           {/* Search Bar */}
-          <div className="rounded-2xl bg-[#121218] border border-white/10 p-4 shadow-xl">
+          <div className="rounded-xl sm:rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl">
             <div className="relative">
               <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
@@ -1026,7 +1027,7 @@ export default function DracinHubPage() {
                 placeholder="Cari drama NetShort (contoh: Destiny, Alpha, Revenge)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2.5 border border-white/5 focus:border-purple-500/40 focus:outline-none"
+                className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2 sm:py-2.5 border border-white/5 focus:border-purple-500/40 focus:outline-none"
               />
             </div>
           </div>
@@ -1043,16 +1044,16 @@ export default function DracinHubPage() {
             </div>
           )}
 
-          {/* NetShort 9:16 Grid */}
+          {/* NetShort Grid */}
           {!loadingNetShort && filteredNetShort.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {filteredNetShort.map((item, idx) => (
                 <Link
                   key={idx}
                   href={`/netshort/watch?slug=${item.slug}&title=${encodeURIComponent(item.title)}`}
-                  className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-purple-500/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-950/40"
+                  className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-purple-500/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-950/40"
                 >
-                  <div className="relative aspect-[9/16] w-full overflow-hidden bg-black/70">
+                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/70">
                     {item.cover ? (
                       <img
                         src={item.cover}
@@ -1069,13 +1070,13 @@ export default function DracinHubPage() {
                       NETSHORT
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="w-12 h-12 rounded-full bg-purple-600/90 text-white flex items-center justify-center shadow-lg shadow-purple-600/50 scale-90 group-hover:scale-100 transition-transform">
-                        <Play className="w-5 h-5 fill-white ml-0.5" />
+                      <span className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-purple-600/90 text-white flex items-center justify-center shadow-lg shadow-purple-600/50 scale-90 group-hover:scale-100 transition-transform">
+                        <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-white ml-0.5" />
                       </span>
                     </div>
                   </div>
-                  <div className="p-3 flex flex-col justify-between flex-1 space-y-1.5">
-                    <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-purple-300">
+                  <div className="p-2.5 sm:p-3 flex flex-col justify-between flex-1 space-y-1">
+                    <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-purple-300 transition-colors leading-snug">
                       {item.title}
                     </h3>
                   </div>
