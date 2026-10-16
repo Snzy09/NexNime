@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NexNime — Streaming & Manga Hub
 
-## Getting Started
+Platform streaming modern all-in-one untuk Anime, Donghua, Manga/Manhwa, Drama Korea (Drakor), dan Drama Pendek Vertikal China (Dracin 9:16 Reels).
 
-First, run the development server:
+![NexNime Preview](https://github.com/Snzy09/NexNime/raw/main/public/preview.png)
+
+## 🌟 Fitur Utama
+
+- **Hero Carousel Realtime**: Banner interaktif di beranda dengan background dinamis dan metadata langsung dari anime, donghua, manga, drakor, dan dracin terpopuler.
+- **Anime & Donghua Hub**: Multi-server streaming (AnimeIndo, AnimeXin, AnimeSail) kualitas hingga 1080p FHD dan 4K Donghua dengan subtitle Indonesia.
+- **Manga & Manhwa Reader**: Pembaca komik online interaktif (MangaDex) dengan dukungan mode strip, zoom, dan chapter update harian.
+- **Drakor Streaming**: Serial drama Korea trending (DrakorID, OppaDrama) lengkap dengan rating, sinopsis, dan episode player.
+- **Dracin Short Reels 9:16**: Pemutar drama pendek vertikal native ponsel dan PC (AsiaBox, ReelShort, NetShort) dengan swipe/momentum navigation.
+- **Mouse Draggable Carousel**: Seluruh carousel rekomendasi dapat digeser halus menggunakan klik dan drag mouse.
+- **Symmetrical Header & Quick Search**: Navigasi responsif dengan modal pencarian global instan (`Ctrl + K`).
+- **Autentikasi Pengguna**: Halaman Login dan Register dengan dark-gold glassmorphism dan persistensi sesi lokal.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router, React 18, TypeScript)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) dengan Dark & Gold Palette
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Scraping & Data Processing**: Cheerio, Axios, Node.js HTTPS
+
+## 🚀 Memulai (Local Development)
 
 ```bash
+# Clone repositori
+git clone https://github.com/Snzy09/NexNime.git
+cd NexNime
+
+# Install dependencies
+npm install
+
+# Jalankan server development
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📦 Production Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+## 📄 Lisensi
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Proyek ini dibuat untuk tujuan edukasi dan eksplorasi teknologi streaming media.
