@@ -54,7 +54,7 @@ export default function PopularRankingSection({ items }: PopularRankingSectionPr
             <Link
               key={`${anime.slug}-${index}`}
               href={`/anime/${anime.slug}`}
-              className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-amber-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/50 w-[155px] sm:w-[190px] md:w-[210px] shrink-0"
+              className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-amber-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/50 w-[145px] sm:w-[180px] md:w-[200px] shrink-0"
             >
               {/* Poster Container */}
               <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/40">

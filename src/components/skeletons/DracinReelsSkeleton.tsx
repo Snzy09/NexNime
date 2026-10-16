@@ -14,9 +14,9 @@ export default function DracinReelsSkeleton() {
         <div className="h-4 w-28 rounded bg-white/5" />
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="aspect-[9/16] rounded-2xl bg-[#13131A] border border-white/5 relative p-4 flex flex-col justify-between overflow-hidden">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="aspect-[2/3] rounded-2xl bg-[#13131A] border border-white/5 relative p-4 flex flex-col justify-between overflow-hidden">
             <div className="flex justify-between">
               <div className="h-4 w-16 rounded-full bg-rose-500/20" />
               <div className="h-4 w-12 rounded-full bg-white/10" />

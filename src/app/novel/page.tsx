@@ -185,7 +185,7 @@ export default function NovelCatalogPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {items.map((item, idx) => {
                 const readHref = `/novel/read?url=${encodeURIComponent(
                   item.url
@@ -198,7 +198,7 @@ export default function NovelCatalogPage() {
                     className="group relative flex flex-col rounded-xl overflow-hidden bg-[#12121A] border border-white/5 hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300"
                   >
                     {/* Cover */}
-                    <div className="aspect-[3/4] relative overflow-hidden bg-black/40">
+                    <div className="aspect-[2/3] relative overflow-hidden bg-black/40">
                       {item.thumbnail &&
                       !item.thumbnail.includes("image-placeholder.png") &&
                       !item.thumbnail.includes("flip-8496325764.png") ? (

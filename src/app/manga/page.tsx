@@ -179,14 +179,14 @@ function MangaCatalog() {
           {loading ? (
             <CatalogGridSkeleton count={10} />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {filteredManga.map((manga, idx) => (
                 <Link
                   key={idx}
                   href={`/manga/${manga.id}`}
                   className="group relative rounded-xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-emerald-400/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60"
                 >
-                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-black/50">
+                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/50">
                     {manga.coverUrl ? (
                       <img
                         src={

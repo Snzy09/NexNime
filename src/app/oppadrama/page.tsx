@@ -225,7 +225,7 @@ export default function OppaDramaCatalogPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {filteredItems.map((item, idx) => {
                 const watchHref = `/oppadrama/watch?url=${encodeURIComponent(
                   item.url
@@ -238,7 +238,7 @@ export default function OppaDramaCatalogPage() {
                     className="group relative flex flex-col rounded-xl overflow-hidden bg-[#12121A] border border-white/5 hover:border-fuchsia-500/40 hover:shadow-xl hover:shadow-fuchsia-500/10 transition-all duration-300"
                   >
                     {/* Poster */}
-                    <div className="aspect-[3/4] relative overflow-hidden bg-black/40">
+                    <div className="aspect-[2/3] relative overflow-hidden bg-black/40">
                       {item.thumbnail ? (
                         <img
                           src={item.thumbnail}

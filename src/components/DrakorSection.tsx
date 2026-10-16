@@ -52,7 +52,7 @@ export default function DrakorSection({ items }: DrakorSectionProps) {
           <Link
             key={`${drama.slug}-${idx}`}
             href={`/drakor/${drama.slug}`}
-            className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-blue-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/50 w-[150px] sm:w-[185px] md:w-[200px] shrink-0"
+            className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-blue-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/50 w-[145px] sm:w-[180px] md:w-[200px] shrink-0"
           >
             <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/40">
               <img

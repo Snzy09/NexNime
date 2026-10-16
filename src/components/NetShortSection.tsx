@@ -56,10 +56,10 @@ export default function NetShortSection({ items }: NetShortSectionProps) {
           <Link
             key={drama.slug}
             href={`/netshort/watch?slug=${drama.slug}&title=${encodeURIComponent(drama.title)}`}
-            className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-purple-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-950/40 w-[160px] sm:w-[200px] md:w-[220px] shrink-0"
+            className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-purple-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-950/40 w-[145px] sm:w-[180px] md:w-[200px] shrink-0"
           >
-            {/* 9:16 Aspect Ratio container */}
-            <div className="relative aspect-[9/16] w-full overflow-hidden bg-black/60">
+            {/* Standard Aspect Ratio container */}
+            <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
               {drama.cover ? (
                 <img
                   src={drama.cover}

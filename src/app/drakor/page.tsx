@@ -157,7 +157,7 @@ export default function DrakorHubPage() {
                 <h3 className="text-base font-bold text-white">Tidak ada drama ditemukan</h3>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                 {drakorList.map((drama, idx) => (
                   <Link
                     key={idx}
@@ -251,7 +251,7 @@ export default function DrakorHubPage() {
             )}
 
             {!loadingOppa && oppaList.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                 {oppaList.map((item, idx) => (
                   <Link
                     key={idx}

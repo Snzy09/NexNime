@@ -189,14 +189,14 @@ export default function DonghuaFilmCatalogPage() {
           )}
 
           {!loading && items.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {items.map((item, idx) => (
                 <Link
                   key={idx}
                   href={`/donghuafilm/watch?slug=${item.slug}`}
                   className="group relative rounded-xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-amber-400/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60"
                 >
-                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-black/60">
+                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
                     {item.poster || item.cover ? (
                       <img
                         src={item.poster || item.cover}

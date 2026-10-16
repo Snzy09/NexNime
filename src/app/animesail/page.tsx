@@ -222,7 +222,7 @@ export default function AnimeSailCatalogPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {items.map((item, idx) => {
                 const watchHref = `/animesail/watch?url=${encodeURIComponent(
                   item.url
@@ -235,7 +235,7 @@ export default function AnimeSailCatalogPage() {
                     className="group relative flex flex-col rounded-xl overflow-hidden bg-[#12121A] border border-white/5 hover:border-sky-500/40 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300"
                   >
                     {/* Poster */}
-                    <div className="aspect-[3/4] relative overflow-hidden bg-black/40">
+                    <div className="aspect-[2/3] relative overflow-hidden bg-black/40">
                       <img
                         src={item.thumbnail}
                         alt={item.title}

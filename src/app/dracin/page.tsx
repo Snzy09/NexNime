@@ -851,7 +851,7 @@ export default function DracinHubPage() {
                           : "border-white/5 hover:border-rose-500/40"
                       }`}
                     >
-                      <div className="relative aspect-[9/16] w-full overflow-hidden bg-black/60">
+                      <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
                         {drama.image ? (
                           <img
                             src={drama.image}

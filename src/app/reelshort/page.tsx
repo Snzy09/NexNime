@@ -167,7 +167,7 @@ export default function ReelShortPage() {
                   href={`/reelshort/watch?id=${item.book_id}&title=${encodeURIComponent(item.title)}`}
                   className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-rose-500/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-rose-950/40"
                 >
-                  <div className="relative aspect-[9/16] w-full overflow-hidden bg-black/70">
+                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/70">
                     {item.cover ? (
                       <img
                         src={item.cover}

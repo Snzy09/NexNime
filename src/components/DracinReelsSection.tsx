@@ -55,10 +55,10 @@ export default function DracinReelsSection({ items }: DracinReelsSectionProps) {
           <Link
             key={`${dracin.slug}-${idx}`}
             href={`/dracin?drama=${dracin.slug}`}
-            className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-rose-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-rose-950/30 w-[170px] sm:w-[220px] md:w-[240px] shrink-0"
+            className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-rose-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-rose-950/30 w-[145px] sm:w-[180px] md:w-[200px] shrink-0"
           >
-            {/* 9:16 Aspect Ratio container */}
-            <div className="relative aspect-[9/16] w-full overflow-hidden bg-black/60">
+            {/* Standard Aspect Ratio container */}
+            <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
               <img
                 src={dracin.image || "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&q=80"}
                 alt={dracin.title}

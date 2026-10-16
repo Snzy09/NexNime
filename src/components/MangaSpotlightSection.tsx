@@ -208,13 +208,13 @@ export default function MangaSpotlightSection({ items }: MangaSpotlightSectionPr
             <div
               key={`${item.id}-${idx}`}
               onClick={() => setSelectedIndex(idx)}
-              className={`group relative rounded-2xl overflow-hidden bg-[#13131A] border transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-xl w-[140px] sm:w-[170px] md:w-[185px] shrink-0 cursor-pointer ${
+              className={`group relative rounded-2xl overflow-hidden bg-[#13131A] border transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-xl w-[145px] sm:w-[180px] md:w-[200px] shrink-0 cursor-pointer ${
                 isSelected
                   ? "border-amber-400 shadow-lg shadow-amber-500/20 ring-1 ring-amber-400"
                   : "border-white/5 hover:border-amber-400/40"
               }`}
             >
-              <div className="relative aspect-[3/4] w-full overflow-hidden bg-black/40">
+              <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/40">
                 {cover ? (
                   <img
                     src={cover}

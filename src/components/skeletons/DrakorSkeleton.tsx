@@ -14,7 +14,7 @@ export default function DrakorSkeleton() {
         <div className="h-4 w-20 rounded bg-white/5" />
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="rounded-xl overflow-hidden bg-[#13131A] border border-white/5 flex flex-col">
             <div className="aspect-[2/3] w-full bg-[#181822] relative">

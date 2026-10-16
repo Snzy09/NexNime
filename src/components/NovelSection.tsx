@@ -53,7 +53,7 @@ export default function NovelSection({ items }: NovelSectionProps) {
             )}&title=${encodeURIComponent(item.title)}`}
             className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-emerald-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-950/40"
           >
-            <div className="relative aspect-[3/4] w-full overflow-hidden bg-black/60">
+            <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
               {item.thumbnail &&
               !item.thumbnail.includes("image-placeholder.png") &&
               !item.thumbnail.includes("flip-8496325764.png") ? (
