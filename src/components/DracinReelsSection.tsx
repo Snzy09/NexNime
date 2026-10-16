@@ -54,7 +54,7 @@ export default function DracinReelsSection({ items }: DracinReelsSectionProps) {
         {items.map((dracin, idx) => (
           <Link
             key={`${dracin.slug}-${idx}`}
-            href={`/dracin?drama=${dracin.slug}`}
+            href={`/dracin/watch?slug=${encodeURIComponent(dracin.slug)}&title=${encodeURIComponent(dracin.title)}`}
             className="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-rose-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-rose-950/30 w-[145px] sm:w-[180px] md:w-[200px] shrink-0"
           >
             {/* Standard Aspect Ratio container */}
