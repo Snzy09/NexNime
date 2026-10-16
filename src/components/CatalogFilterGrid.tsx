@@ -137,22 +137,10 @@ export default function CatalogFilterGrid({ items }: CatalogFilterGridProps) {
         </div>
       </div>
 
-      {/* Second Filter Bar: Search + Dropdowns */}
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-6 bg-[#121218] p-3 rounded-xl border border-white/5">
-        {/* Search Input */}
-        <div className="sm:col-span-5 relative">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Cari judul anime..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#181822] text-sm text-white placeholder-gray-500 rounded-lg pl-9 pr-3 py-2 border border-white/5 focus:border-amber-400/40 focus:outline-none"
-          />
-        </div>
-
+      {/* Second Filter Bar: Dropdowns */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 bg-[#121218] p-3 rounded-xl border border-white/5">
         {/* Genre Dropdown */}
-        <div className="sm:col-span-3 relative">
+        <div className="relative">
           <select
             value={selectedGenre}
             onChange={(e) => setSelectedGenre(e.target.value)}
@@ -168,7 +156,7 @@ export default function CatalogFilterGrid({ items }: CatalogFilterGridProps) {
         </div>
 
         {/* Status Dropdown */}
-        <div className="sm:col-span-2 relative">
+        <div className="relative">
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value as any)}
@@ -182,7 +170,7 @@ export default function CatalogFilterGrid({ items }: CatalogFilterGridProps) {
         </div>
 
         {/* Sort Dropdown */}
-        <div className="sm:col-span-2 relative">
+        <div className="relative">
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}

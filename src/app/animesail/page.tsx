@@ -161,35 +161,7 @@ export default function AnimeSailCatalogPage() {
               </button>
             </div>
 
-            {/* Direct Scraper Search */}
-            <form
-              onSubmit={handleSearchSubmit}
-              className="relative flex items-center min-w-[260px] sm:min-w-[320px]"
-            >
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5" />
-              <input
-                type="text"
-                placeholder="Cari anime di AnimeSail..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#181824] border border-white/10 rounded-xl pl-10 pr-20 py-2 text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-sky-500 transition-colors"
-              />
-              {submittedQuery && (
-                <button
-                  type="button"
-                  onClick={handleClearSearch}
-                  className="absolute right-14 text-[10px] text-gray-400 hover:text-white px-1.5 py-0.5 rounded bg-white/10"
-                >
-                  Reset
-                </button>
-              )}
-              <button
-                type="submit"
-                className="absolute right-1.5 px-3 py-1 bg-sky-500 hover:bg-sky-400 text-black text-xs font-bold rounded-lg transition-colors"
-              >
-                Cari
-              </button>
-            </form>
+
           </div>
 
           {/* Active Search / Category Indicator */}

@@ -210,35 +210,7 @@ export default function DrakorHubPage() {
         {/* PROVIDER 2: OPPADRAMA */}
         {provider === "oppadrama" && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            {/* Search Bar for OppaDrama */}
-            <div className="relative rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                }}
-                className="flex items-center gap-2"
-              >
-                <div className="relative flex-1">
-                  <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    placeholder="Cari serial drama di OppaDrama (contoh: Queen of Tears, Marry My Husband, Taxi Driver)..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2.5 border border-white/5 focus:border-fuchsia-400/40 focus:outline-none"
-                  />
-                </div>
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="px-4 py-2 text-xs text-gray-400 hover:text-white"
-                  >
-                    Reset
-                  </button>
-                )}
-              </form>
-            </div>
+
 
             {loadingOppa && <CatalogGridSkeleton count={12} />}
 

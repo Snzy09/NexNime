@@ -263,48 +263,10 @@ export default function AnimePage() {
           </div>
         </div>
 
-        {/* Big Search Bar for Anime */}
+        {/* Popular Tags for Anime */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-              }}
-              className="flex flex-col sm:flex-row items-center gap-2"
-            >
-              <div className="relative flex-1 w-full">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder={
-                    source === "samehadaku"
-                      ? "Cari anime Samehadaku (contoh: Solo Leveling, Bleach, Jujutsu Kaisen)..."
-                      : source === "donghuafilm"
-                      ? "Cari donghua di DonghuaFilm (contoh: Battle Through The Heavens, Soul Land)..."
-                      : source === "animesail"
-                      ? "Cari anime di server AnimeSail (contoh: One Piece, Naruto, Frieren)..."
-                      : source === "animexin"
-                      ? "Cari donghua AnimeXin (contoh: Soul Land, Battle Through The Heavens, Perfect World)..."
-                      : "Cari judul anime atau donghua di jadwal..."
-                  }
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2.5 sm:py-3 border border-white/5 focus:border-amber-400/40 focus:outline-none"
-                />
-              </div>
-
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="px-4 py-2 text-xs text-gray-400 hover:text-white"
-                >
-                  Reset
-                </button>
-              )}
-            </form>
-
-            <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-white/5 text-xs">
+          <div className="relative rounded-2xl bg-[#121218] border border-white/10 p-2.5 sm:p-3 shadow-xl">
+            <div className="flex flex-wrap items-center gap-1.5 text-xs">
               <span className="font-bold text-amber-400 flex items-center gap-1 mr-1">
                 <Flame className="w-3.5 h-3.5" /> POPULER:
               </span>

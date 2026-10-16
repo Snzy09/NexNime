@@ -103,41 +103,10 @@ export default function DonghuaFilmCatalogPage() {
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* Popular Tags */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl">
-            <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-center gap-2">
-              <div className="relative flex-1 w-full">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Cari donghua di DonghuaFilm (contoh: Battle Through The Heavens, Soul Land, Shrouding the Heavens)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2.5 sm:py-3 border border-white/5 focus:border-amber-400/40 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto px-5 py-2.5 sm:py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-black text-xs sm:text-sm font-bold shadow-md shadow-amber-500/20 transition-all"
-                >
-                  Cari Donghua
-                </button>
-                {submittedQuery && (
-                  <button
-                    type="button"
-                    onClick={handleClearSearch}
-                    className="px-3 py-2.5 sm:py-3 text-xs text-gray-400 hover:text-white"
-                  >
-                    Reset
-                  </button>
-                )}
-              </div>
-            </form>
-
-            <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-white/5 text-xs">
+          <div className="relative rounded-2xl bg-[#121218] border border-white/10 p-2.5 sm:p-3 shadow-xl">
+            <div className="flex flex-wrap items-center gap-1.5 text-xs">
               <span className="font-bold text-amber-400 flex items-center gap-1 mr-1">
                 <Flame className="w-3.5 h-3.5" /> REKOMENDASI DONGHUA:
               </span>

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Search, Star, BookOpen, Flame, MoveHorizontal } from "lucide-react";
+import { Star, BookOpen, Flame, MoveHorizontal } from "lucide-react";
 import { MangaItem } from "@/lib/services/mangaTypes";
 import DraggableCarousel from "@/components/DraggableCarousel";
 
@@ -12,45 +12,15 @@ interface MangaSpotlightSectionProps {
 
 export default function MangaSpotlightSection({ items }: MangaSpotlightSectionProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [searchInput, setSearchInput] = useState("");
 
   if (!items || items.length === 0) return null;
   const currentManga = items[selectedIndex] || items[0];
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Manga Big Search Input */}
+      {/* Popular Tags */}
       <div className="relative rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 mb-4 shadow-xl">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (searchInput.trim()) {
-              window.location.href = `/manga?q=${encodeURIComponent(searchInput)}`;
-            }
-          }}
-          className="flex flex-col sm:flex-row items-center gap-2"
-        >
-          <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Cari manhwa, manhua, manga (contoh: Solo Leveling, Magic Emperor, Nano Machine)..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2.5 sm:py-3 border border-white/5 focus:border-amber-400/40 focus:outline-none"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full sm:w-auto px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 hover:from-amber-400 hover:to-amber-600 font-extrabold text-xs sm:text-sm text-black tracking-wide shrink-0 transition-transform hover:scale-[1.02]"
-          >
-            CARI KOMIK
-          </button>
-        </form>
-
-        {/* Popular Tags */}
-        <div className="flex flex-wrap items-center justify-between gap-2 mt-3 pt-3 border-t border-white/5 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar">
             <span className="font-bold text-amber-400 flex items-center gap-1 mr-1">
               <Flame className="w-3.5 h-3.5" /> REKOMENDASI:

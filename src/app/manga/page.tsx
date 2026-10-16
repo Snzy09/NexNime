@@ -7,7 +7,7 @@ import SearchModal from "@/components/SearchModal";
 import MangaSpotlightSection from "@/components/MangaSpotlightSection";
 import Footer from "@/components/Footer";
 import Link from "next/link";
-import { BookOpen, Star, Search, Flame } from "lucide-react";
+import { BookOpen, Star } from "lucide-react";
 import MangaSpotlightSkeleton from "@/components/skeletons/MangaSpotlightSkeleton";
 import CatalogGridSkeleton from "@/components/skeletons/CatalogGridSkeleton";
 import { MangaItem } from "@/lib/services/mangaTypes";
@@ -86,64 +86,7 @@ function MangaCatalog() {
           </div>
         </div>
 
-        {/* Big Search Input */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-              }}
-              className="flex flex-col sm:flex-row items-center gap-2"
-            >
-              <div className="relative flex-1 w-full">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Cari manhwa, manhua, manga (contoh: Solo Leveling, Magic Emperor, Nano Machine)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#181824] text-xs sm:text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2.5 sm:py-3 border border-white/5 focus:border-emerald-400/40 focus:outline-none"
-                />
-              </div>
 
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="px-4 py-2 text-xs text-gray-400 hover:text-white"
-                >
-                  Reset
-                </button>
-              )}
-            </form>
-
-            <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-white/5 text-xs">
-              <span className="font-bold text-emerald-400 flex items-center gap-1 mr-1">
-                <Flame className="w-3.5 h-3.5" /> REKOMENDASI KOMIK:
-              </span>
-              {[
-                "Solo Leveling",
-                "Chainsaw Man",
-                "Dandadan",
-                "Jujutsu Kaisen",
-                "Frieren",
-                "One Piece",
-                "Magic Emperor",
-                "Nano Machine",
-                "Lookism",
-                "Return of Mount Hua Sect",
-              ].map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => setSearchQuery(tag)}
-                  className="px-2.5 py-0.5 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-emerald-300 transition-colors"
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
 
         {/* Manga Spotlight Section */}
         {loading && mangaList.length === 0 ? (
