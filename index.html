@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="id" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexNime — Streaming Anime, Donghua, Manga, Drakor & Dracin</title>
+  <meta name="description" content="Platform streaming terlengkap NexNime dengan ribuan judul Anime, Donghua, Manga, Drakor, dan Dracin kualitas Full HD 1080p audio jernih.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F59E0B'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            dark: '#09090D',
+            surface: '#13131A',
+            card: '#181824',
+            gold: {
+              300: '#FDE68A',
+              400: '#FBBF24',
+              500: '#F59E0B',
+              600: '#D97706'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      background-color: #09090D;
+      color: #FFFFFF;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .carousel-container {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-amber-400 selection:text-black">
+
+  <!-- TOP NAVBAR -->
+  <header class="sticky top-0 z-50 bg-[#0B0B12]/95 backdrop-blur-md border-b border-white/[0.08] transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 xl:gap-6">
+      <!-- Left: Logo & Nav items -->
+      <div class="flex items-center gap-3 xl:gap-6 shrink-0">
+        <a href="#home" class="flex items-center gap-2.5 group shrink-0">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-200 flex items-center justify-center p-0.5 shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
+            <div class="w-full h-full bg-[#0E0E14] rounded-[10px] flex items-center justify-center font-black text-amber-400 text-xs tracking-tighter">
+              NN
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent group-hover:opacity-90 leading-tight">
+              Nex<span class="text-white font-light text-sm">Nime</span>
+            </span>
+            <span class="text-[8px] tracking-widest uppercase text-amber-400/70 font-semibold -mt-0.5">
+              Streaming &amp; Manga
+            </span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Pill Tabs -->
+        <nav class="hidden lg:flex items-center gap-1 xl:gap-1.5 text-xs xl:text-sm font-medium shrink-0">
+          <a href="#home" class="h-9 px-3 rounded-xl flex items-center gap-1.5 bg-amber-400/15 text-amber-300 font-semibold border border-amber-400/30">
+            <i data-lucide="home" class="w-4 h-4"></i> Beranda
+          </a>
+          <a href="#anime" class="h-9 px-3 rounded-xl flex items-center gap-1.5 text-gray-300 hover:text-white hover:bg-white/[0.06] transition-colors">
+            <i data-lucide="tv" class="w-4 h-4"></i> Anime
+          </a>
+          <a href="#drakor" class="h-9 px-3 rounded-xl flex items-center gap-1.5 text-gray-300 hover:text-white hover:bg-white/[0.06] transition-colors">
+            <i data-lucide="clapperboard" class="w-4 h-4"></i> Drakor
+          </a>
+          <a href="#dracin" class="h-9 px-3 rounded-xl flex items-center gap-1.5 text-gray-300 hover:text-white hover:bg-white/[0.06] transition-colors">
+            <i data-lucide="video" class="w-4 h-4"></i> Short Drama
+          </a>
+          <a href="#manga" class="h-9 px-3 rounded-xl flex items-center gap-1.5 text-gray-300 hover:text-white hover:bg-white/[0.06] transition-colors">
+            <i data-lucide="book-open" class="w-4 h-4"></i> Manga
+          </a>
+          <a href="#jadwal" class="h-9 px-3 rounded-xl flex items-center gap-1.5 text-gray-300 hover:text-white hover:bg-white/[0.06] transition-colors">
+            <i data-lucide="calendar" class="w-4 h-4"></i> Jadwal
+          </a>
+        </nav>
+      </div>
+
+      <!-- Right: Search Bar & Auth Buttons -->
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <!-- Quick Search Trigger -->
+        <button onclick="openSearchModal()" class="flex items-center gap-2 bg-[#14141F] hover:bg-[#181826] border border-white/10 hover:border-amber-400/40 text-gray-400 hover:text-gray-200 px-3 py-1.5 rounded-xl text-xs transition-all w-36 sm:w-56 md:w-64">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span class="truncate">Cari anime, film, komik...</span>
+          <kbd class="hidden sm:inline-block ml-auto text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-gray-400 border border-white/5">Ctrl K</kbd>
+        </button>
+
+        <button onclick="openAuthModal('login')" class="h-9 px-3.5 rounded-xl font-bold text-xs text-gray-300 hover:text-white hover:bg-white/10 border border-white/10 transition-colors">
+          Masuk
+        </button>
+        <button onclick="openAuthModal('register')" class="h-9 px-4 rounded-xl font-extrabold text-xs text-black bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-600 shadow-md shadow-amber-500/25 transition-transform hover:scale-105">
+          Daftar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main id="home" class="flex-1 space-y-8 pb-16">
+
+    <!-- 1. HERO BANNER CAROUSEL REALTIME -->
+    <section class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+      <div id="hero-card" class="relative rounded-3xl overflow-hidden min-h-[440px] md:min-h-[500px] border border-white/10 shadow-2xl flex flex-col justify-between p-6 sm:p-10 md:p-12 select-none">
+        
+        <!-- Background Image with Ambient Zoom & Soft Blur -->
+        <div id="hero-bg" class="absolute inset-0 bg-cover bg-center transition-all duration-1000 scale-110 filter blur-[3px] brightness-[0.55]" style="background-image: url('https://static.anipop.xyz/poster/anime/T0bzH5l6X.jpg?h=400');"></div>
+
+        <!-- Ambient Color Tint -->
+        <div id="hero-gradient" class="absolute inset-0 bg-gradient-to-r from-amber-950/90 via-black/85 to-[#09090D] opacity-90 transition-all duration-700"></div>
+
+        <!-- Dark Scrim Overlays for Sharp Legibility -->
+        <div class="absolute inset-0 bg-gradient-to-r from-[#09090D] via-[#09090D]/85 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0E] via-transparent to-black/40"></div>
+
+        <!-- Top Badges -->
+        <div class="relative z-10 flex flex-wrap items-center gap-2.5">
+          <span id="hero-badge" class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-amber-300 bg-amber-400/10 border border-amber-400/30 flex items-center gap-1.5 backdrop-blur-sm shadow-sm">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span id="hero-badge-text">ANIME POPULER</span>
+          </span>
+          <span class="px-3 py-1 rounded-full text-xs font-bold text-amber-300 bg-black/60 border border-white/10 flex items-center gap-1 backdrop-blur-sm">
+            <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></i>
+            <span id="hero-rating">9.8</span>
+          </span>
+          <span id="hero-quality" class="px-3 py-1 rounded-full text-xs font-bold tracking-wider text-white bg-white/10 border border-white/15 backdrop-blur-sm">
+            FULL HD 1080P
+          </span>
+          <span id="hero-status" class="px-3 py-1 rounded-full text-xs font-medium text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 backdrop-blur-sm">
+            Ongoing
+          </span>
+        </div>
+
+        <!-- Center Content -->
+        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 my-auto py-4">
+          <div class="max-w-2xl flex-1">
+            <h1 id="hero-title" class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight drop-shadow-lg">
+              Solo Leveling: Arise & Shadow Monarch
+            </h1>
+            <p id="hero-desc" class="mt-3 text-sm sm:text-base text-gray-300 line-clamp-3 leading-relaxed drop-shadow">
+              Tonton petualangan Sung Jin-woo membangkitkan prajurit bayangan dan menaklukkan Dungeon Peringkat S dalam kualitas 4K tanpa jeda iklan.
+            </p>
+
+            <div class="mt-6 flex flex-wrap items-center gap-3 sm:gap-4">
+              <button id="hero-play-btn" onclick="playCurrentHero()" class="inline-flex items-center gap-2.5 px-6 py-3 rounded-full font-bold text-sm text-black bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-600 shadow-lg shadow-amber-500/25 transition-all hover:scale-105 active:scale-95">
+                <i data-lucide="play" class="w-4 h-4 fill-black"></i>
+                <span id="hero-cta-text">Tonton Sekarang</span>
+              </button>
+              <button onclick="openHeroDetail()" class="inline-flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-sm transition-all hover:scale-105">
+                <span>Detail Info</span>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Floating Sharp Poster Card (md and above) -->
+          <div class="hidden md:flex shrink-0 items-center justify-center">
+            <div onclick="playCurrentHero()" class="group cursor-pointer relative w-[170px] lg:w-[210px] aspect-[2/3] rounded-2xl overflow-hidden border-2 border-amber-400/30 hover:border-amber-400 shadow-2xl shadow-black/90 transition-all duration-500 hover:scale-105">
+              <img id="hero-poster-img" src="https://static.anipop.xyz/poster/anime/T0bzH5l6X.jpg?h=400" alt="Poster" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent pointer-events-none"></div>
+              <div class="absolute bottom-3 left-2 right-2 text-center pointer-events-none">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-400 text-black shadow-md group-hover:scale-105 transition-transform">
+                  <i data-lucide="play" class="w-3 h-3 fill-black"></i>
+                  Lihat Detail
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Carousel Bottom Controls -->
+        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
+          <!-- Category Quick Tabs -->
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <button onclick="setHeroSlide(0)" id="cat-btn-0" class="cat-pill px-3 py-1 rounded-full text-xs font-bold tracking-wider transition-all flex items-center gap-1.5 bg-amber-400/20 text-amber-300 border border-amber-400/50 shadow-sm ring-1 ring-amber-400/30">
+              <i data-lucide="tv" class="w-3 h-3 text-amber-400"></i> ANIME
+            </button>
+            <button onclick="setHeroSlide(1)" id="cat-btn-1" class="cat-pill px-3 py-1 rounded-full text-xs font-bold tracking-wider transition-all flex items-center gap-1.5 bg-black/50 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10">
+              <i data-lucide="sparkles" class="w-3 h-3 text-rose-400"></i> DONGHUA
+            </button>
+            <button onclick="setHeroSlide(2)" id="cat-btn-2" class="cat-pill px-3 py-1 rounded-full text-xs font-bold tracking-wider transition-all flex items-center gap-1.5 bg-black/50 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10">
+              <i data-lucide="book-open" class="w-3 h-3 text-emerald-400"></i> MANHWA
+            </button>
+            <button onclick="setHeroSlide(3)" id="cat-btn-3" class="cat-pill px-3 py-1 rounded-full text-xs font-bold tracking-wider transition-all flex items-center gap-1.5 bg-black/50 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10">
+              <i data-lucide="clapperboard" class="w-3 h-3 text-blue-400"></i> DRAKOR
+            </button>
+            <button onclick="setHeroSlide(4)" id="cat-btn-4" class="cat-pill px-3 py-1 rounded-full text-xs font-bold tracking-wider transition-all flex items-center gap-1.5 bg-black/50 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10">
+              <i data-lucide="video" class="w-3 h-3 text-purple-400"></i> DRACIN 9:16
+            </button>
+          </div>
+
+          <!-- Arrow Controls & Slide Indicators -->
+          <div class="flex items-center justify-end gap-2">
+            <button onclick="prevHeroSlide()" class="w-8 h-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center border border-white/10 hover:border-amber-400/40 transition-colors">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <div id="hero-dots" class="flex items-center gap-1.5 px-2"></div>
+            <button onclick="nextHeroSlide()" class="w-8 h-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center border border-white/10 hover:border-amber-400/40 transition-colors">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. ANIME POPULER PEKAN INI (MOUSE DRAGGABLE CAROUSEL) -->
+    <section id="anime" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex items-end justify-between mb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+              <i data-lucide="flame" class="w-5 h-5 text-amber-400"></i>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white">
+              Anime Populer Pekan Ini
+            </h2>
+          </div>
+          <div class="flex items-center gap-3 mt-1">
+            <p class="text-xs sm:text-sm text-gray-400">Peringkat anime dengan rating & penonton tertinggi</p>
+            <span class="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+              <i data-lucide="move-horizontal" class="w-3 h-3 text-amber-400"></i> Geser mouse ↔
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Draggable Carousel Container -->
+      <div id="anime-carousel" class="carousel-container flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar cursor-grab active:cursor-grabbing pb-2">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- 3. JADWAL RILIS HARI INI -->
+    <section id="jadwal" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+            <i data-lucide="calendar" class="w-5 h-5 text-emerald-400"></i>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white">
+            Jadwal Rilis Episode Baru
+          </h2>
+        </div>
+      </div>
+
+      <!-- Day filter tabs -->
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 border-b border-white/5 mb-4">
+        <button onclick="filterSchedule('Senin')" class="sched-tab px-4 py-1.5 rounded-xl text-xs font-bold bg-amber-400 text-black shadow-md">Senin</button>
+        <button onclick="filterSchedule('Selasa')" class="sched-tab px-4 py-1.5 rounded-xl text-xs font-bold bg-[#14141F] text-gray-300 hover:text-white border border-white/5">Selasa</button>
+        <button onclick="filterSchedule('Rabu')" class="sched-tab px-4 py-1.5 rounded-xl text-xs font-bold bg-[#14141F] text-gray-300 hover:text-white border border-white/5">Rabu</button>
+        <button onclick="filterSchedule('Kamis')" class="sched-tab px-4 py-1.5 rounded-xl text-xs font-bold bg-[#14141F] text-gray-300 hover:text-white border border-white/5">Kamis</button>
+        <button onclick="filterSchedule('Jumat')" class="sched-tab px-4 py-1.5 rounded-xl text-xs font-bold bg-[#14141F] text-gray-300 hover:text-white border border-white/5">Jumat</button>
+        <button onclick="filterSchedule('Sabtu')" class="sched-tab px-4 py-1.5 rounded-xl text-xs font-bold bg-[#14141F] text-gray-300 hover:text-white border border-white/5">Sabtu</button>
+        <button onclick="filterSchedule('Minggu')" class="sched-tab px-4 py-1.5 rounded-xl text-xs font-bold bg-[#14141F] text-gray-300 hover:text-white border border-white/5">Minggu</button>
+      </div>
+
+      <div id="schedule-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- 4. MANGA & MANHWA SPOTLIGHT -->
+    <section id="manga" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+            <i data-lucide="book-open" class="w-5 h-5 text-emerald-400"></i>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white">
+            Manga &amp; Manhwa Spotlight
+          </h2>
+        </div>
+      </div>
+
+      <div id="manga-carousel" class="carousel-container flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar cursor-grab active:cursor-grabbing pb-2">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- 5. DRAMA KOREA (DRAKOR) TRENDING -->
+    <section id="drakor" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+            <i data-lucide="clapperboard" class="w-5 h-5 text-blue-400"></i>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white">
+            Drama Korea Populer (Drakor)
+          </h2>
+        </div>
+      </div>
+
+      <div id="drakor-carousel" class="carousel-container flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar cursor-grab active:cursor-grabbing pb-2">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- 6. DRACIN SHORT REELS 9:16 -->
+    <section id="dracin" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+            <i data-lucide="video" class="w-5 h-5 text-purple-400"></i>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white">
+            Dracin Short Drama 9:16 Reels
+          </h2>
+        </div>
+      </div>
+
+      <div id="dracin-carousel" class="carousel-container flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar cursor-grab active:cursor-grabbing pb-2">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-[#0A0A10] border-t border-white/5 py-12 mt-16 text-gray-400 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="md:col-span-2 space-y-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-200 flex items-center justify-center p-0.5">
+            <div class="w-full h-full bg-[#0E0E14] rounded-[10px] flex items-center justify-center font-black text-amber-400 text-xs">
+              NN
+            </div>
+          </div>
+          <span class="font-extrabold text-lg text-white">NexNime</span>
+        </div>
+        <p class="text-xs text-gray-400 max-w-md leading-relaxed">
+          Platform streaming terlengkap Anime, Donghua, Manga, Drakor, dan Dracin Short Reels kualitas Full HD 1080p dengan subtitle Indonesia lengkap tanpa iklan terganggu.
+        </p>
+        <p class="text-[11px] text-gray-500">© 2026 NexNime. All rights reserved.</p>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Kategori</h4>
+        <ul class="space-y-2">
+          <li><a href="#anime" class="hover:text-amber-400 transition-colors">Anime Ongoing & Tamat</a></li>
+          <li><a href="#anime" class="hover:text-amber-400 transition-colors">Donghua Kultivasi 3D</a></li>
+          <li><a href="#manga" class="hover:text-amber-400 transition-colors">Manga, Manhwa & Manhua</a></li>
+          <li><a href="#drakor" class="hover:text-amber-400 transition-colors">Drama Korea (Drakor)</a></li>
+          <li><a href="#dracin" class="hover:text-amber-400 transition-colors">Dracin Short Video 9:16</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Hosting</h4>
+        <ul class="space-y-2">
+          <li><span class="text-emerald-400 font-semibold">● Hosted on GitHub Pages</span></li>
+          <li><a href="https://github.com/Snzy09/NexNime" target="_blank" class="hover:text-amber-400 transition-colors">GitHub Repository</a></li>
+          <li><span class="text-gray-500">Fast Static Edge CDN</span></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL VIDEO PLAYER -->
+  <div id="video-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="relative w-full max-w-4xl bg-[#111118] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-4 border-b border-white/10 bg-[#161622]">
+        <div class="flex items-center gap-2">
+          <i data-lucide="play-circle" class="w-5 h-5 text-amber-400"></i>
+          <h3 id="modal-video-title" class="font-bold text-sm sm:text-base text-white truncate max-w-md">Pemutar NexNime</h3>
+        </div>
+        <button onclick="closeVideoModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Video Screen Area -->
+      <div class="relative aspect-video w-full bg-black flex items-center justify-center">
+        <iframe id="modal-iframe" class="w-full h-full border-0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+      </div>
+
+      <!-- Controls & Server selection -->
+      <div class="p-4 bg-[#14141F] flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-gray-400 font-medium">Server:</span>
+          <button class="px-2.5 py-1 rounded-lg bg-amber-400 text-black font-bold">Server 1 (VIP HD)</button>
+          <button class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300">Server 2 (Fast)</button>
+        </div>
+        <span class="text-amber-400 font-semibold flex items-center gap-1">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Kualitas: 1080p FHD
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH MODAL (CTRL+K) -->
+  <div id="search-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-start justify-center pt-20 p-4 hidden">
+    <div class="w-full max-w-xl bg-[#14141F] border border-white/15 rounded-2xl p-4 shadow-2xl">
+      <div class="flex items-center gap-2 pb-3 border-b border-white/10">
+        <i data-lucide="search" class="w-5 h-5 text-amber-400"></i>
+        <input id="search-input" oninput="handleSearch(this.value)" type="text" placeholder="Ketik judul anime, donghua, manga, drakor..." class="w-full bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none">
+        <button onclick="closeSearchModal()" class="text-gray-400 hover:text-white text-xs bg-white/5 px-2 py-1 rounded">ESC</button>
+      </div>
+      <div id="search-results" class="mt-3 max-h-80 overflow-y-auto space-y-2 text-xs">
+        <p class="text-gray-500 text-center py-4">Ketik nama untuk mencari...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-md bg-[#111118] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center p-0.5 shadow-md mb-2">
+          <div class="w-full h-full bg-[#0E0E14] rounded-[9px] flex items-center justify-center font-black text-amber-400 text-xs">NN</div>
+        </div>
+        <h3 id="auth-title" class="text-xl font-black text-white">Masuk ke NexNime</h3>
+        <p class="text-xs text-gray-400 mt-1">Lanjutkan streaming dan membaca tanpa batas</p>
+      </div>
+
+      <form onsubmit="handleAuthSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-gray-300 mb-1 font-semibold">Email atau Username</label>
+          <input type="text" required placeholder="user@nexnime.com" class="w-full bg-[#181824] border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block text-gray-300 mb-1 font-semibold">Kata Sandi</label>
+          <input type="password" required placeholder="••••••••" class="w-full bg-[#181824] border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 text-black font-extrabold shadow-lg shadow-amber-500/20 hover:scale-[1.01] transition-transform">
+          Lanjutkan
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT DATA & LOGIC -->
+  <script>
+    // 1. DATA REPOSITORY
+    const HERO_SLIDES = [
+      {
+        category: "ANIME",
+        typeBadge: "ANIME POPULER",
+        rating: "9.85",
+        quality: "1080P FULL HD",
+        badgeStatus: "Ongoing",
+        title: "Solo Leveling: Arise & Shadow Monarch",
+        desc: "Tonton petualangan Sung Jin-woo membangkitkan prajurit bayangan dan menaklukkan Dungeon Peringkat S dalam kualitas 4K tanpa hambatan.",
+        image: "https://static.anipop.xyz/poster/anime/ore-dake-level-up-na-ken.jpg?h=500",
+        bgGradient: "from-amber-950/90 via-black/85 to-[#09090D]",
+        videoUrl: "https://www.youtube.com/embed/9g_hK8h187U?autoplay=1"
+      },
+      {
+        category: "DONGHUA",
+        typeBadge: "DONGHUA PILIHAN",
+        rating: "9.50",
+        quality: "4K DONGHUA 3D",
+        badgeStatus: "Ep 162",
+        title: "Renegade Immortal",
+        desc: "Petualangan kultivasi 3D spektakuler dengan visual grafis kelas atas, aksi silat memukau dan audio jernih.",
+        image: "https://animexin.dev/wp-content/uploads/2023/09/Renegade-Immortal-Ascendant.jpg",
+        bgGradient: "from-rose-950/90 via-black/85 to-[#09090D]",
+        videoUrl: "https://www.youtube.com/embed/5BqJ2gEszA8?autoplay=1"
+      },
+      {
+        category: "MANHWA",
+        typeBadge: "MANHWA POPULER",
+        rating: "9.90",
+        quality: "HD FULL COLOR",
+        badgeStatus: "COMPLETED",
+        title: "Na Honjaman Level-Up",
+        desc: "Baca komik dan manhwa berwarna terpopuler dengan bab update tercepat dalam bahasa Indonesia.",
+        image: "https://uploads.mangadex.org/covers/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/e90bdc47-c8b9-4df7-b2c0-17641b645ee1.jpg.512.jpg",
+        bgGradient: "from-emerald-950/90 via-black/85 to-[#09090D]",
+        videoUrl: "https://www.youtube.com/embed/9g_hK8h187U?autoplay=1"
+      },
+      {
+        category: "DRAKOR",
+        typeBadge: "DRAKOR TRENDING",
+        rating: "9.30",
+        quality: "1080P HD",
+        badgeStatus: "Serial Pilihan",
+        title: "Make Me Tingle (2026)",
+        desc: "Serial drama Korea terpopuler dan terupdate dengan subtitle Indonesia lengkap, server kencang tanpa lag.",
+        image: "https://assets.d-cdn.me/img/2026/10/408-makemetingle-p.jpg",
+        bgGradient: "from-blue-950/90 via-black/85 to-[#09090D]",
+        videoUrl: "https://www.youtube.com/embed/gq3K-oD3xek?autoplay=1"
+      },
+      {
+        category: "DRACIN 9:16",
+        typeBadge: "DRACIN REELS 9:16",
+        rating: "9.70",
+        quality: "VERTICAL 60FPS",
+        badgeStatus: "60+ Episode",
+        title: "Master sakti pelindung CEO",
+        desc: "Sensasi menonton drama pendek vertikal kilat dengan alur cepat, konflik intens, dan pergantian episode instan.",
+        image: "https://eu2.contabostorage.com/4f114786b23142088dd7adc82f4e687b:asiaboxdrama/films/posters/01M4YV2WRPFYCCP38P9Z4FZ3HQ.jpeg",
+        bgGradient: "from-purple-950/90 via-black/85 to-[#09090D]",
+        videoUrl: "https://www.youtube.com/embed/kJQP7kiw5Fk?autoplay=1"
+      }
+    ];
+
+    const ANIME_LIST = [
+      { title: "Solo Leveling Season 2", poster: "https://static.anipop.xyz/poster/anime/ore-dake-level-up-na-ken.jpg?h=400", ep: "Ep 12", rating: "9.85", status: "Ongoing" },
+      { title: "Jujutsu Kaisen S2", poster: "https://static.anipop.xyz/poster/anime/jujutsu-kaisen-2nd-season.jpg?h=400", ep: "Ep 24", rating: "9.65", status: "Tamat" },
+      { title: "Bleach Thousand-Year War", poster: "https://static.anipop.xyz/poster/anime/bleach-sennen-kessen-hen.jpg?h=400", ep: "Ep 13", rating: "9.50", status: "Tamat" },
+      { title: "Akame ga Kill!", poster: "https://static.anipop.xyz/poster/anime/akame-ga-kill.jpg?h=400", ep: "Ep 24", rating: "9.49", status: "Tamat" },
+      { title: "Frieren: Beyond Journey", poster: "https://static.anipop.xyz/poster/anime/sousou-no-frieren.jpg?h=400", ep: "Ep 28", rating: "9.40", status: "Tamat" },
+      { title: "Chainsaw Man", poster: "https://static.anipop.xyz/poster/anime/chainsaw-man.jpg?h=400", ep: "Ep 12", rating: "9.30", status: "Tamat" },
+      { title: "Dandadan", poster: "https://static.anipop.xyz/poster/anime/dandadan.jpg?h=400", ep: "Ep 12", rating: "9.25", status: "Ongoing" },
+      { title: "One Piece", poster: "https://static.anipop.xyz/poster/anime/one-piece.jpg?h=400", ep: "Ep 1120", rating: "9.20", status: "Ongoing" }
+    ];
+
+    const DRAKOR_LIST = [
+      { title: "Make Me Tingle (2026)", poster: "https://assets.d-cdn.me/img/2026/10/408-makemetingle-p.jpg", ep: "Ep 8", rating: "9.2" },
+      { title: "Queen of Tears", poster: "https://assets.d-cdn.me/img/2024/03/queen-of-tears.jpg", ep: "Ep 16", rating: "9.4" },
+      { title: "Lovely Runner", poster: "https://assets.d-cdn.me/img/2024/04/lovely-runner.jpg", ep: "Ep 16", rating: "9.3" },
+      { title: "Vincenzo", poster: "https://assets.d-cdn.me/img/2021/02/vincenzo.jpg", ep: "Ep 20", rating: "9.5" }
+    ];
+
+    const DRACIN_LIST = [
+      { title: "Master sakti pelindung CEO", image: "https://eu2.contabostorage.com/4f114786b23142088dd7adc82f4e687b:asiaboxdrama/films/posters/01M4YV2WRPFYCCP38P9Z4FZ3HQ.jpeg", ep: "60 Episode" },
+      { title: "Kembalinya Pewaris Tahta Naga", image: "https://eu2.contabostorage.com/4f114786b23142088dd7adc82f4e687b:asiaboxdrama/films/posters/01M4Z9X0XRFYCCP38P9Z4FZ3HQ.jpeg", ep: "80 Episode" },
+      { title: "Menantu Rahasia Sang Miliarder", image: "https://eu2.contabostorage.com/4f114786b23142088dd7adc82f4e687b:asiaboxdrama/films/posters/01M5A1B2CRFYCCP38P9Z4FZ3HQ.jpeg", ep: "75 Episode" },
+      { title: "Balas Dendam Sang Ratu Bisnis", image: "https://eu2.contabostorage.com/4f114786b23142088dd7adc82f4e687b:asiaboxdrama/films/posters/01M5B3C4DRFYCCP38P9Z4FZ3HQ.jpeg", ep: "65 Episode" }
+    ];
+
+    const MANGA_LIST = [
+      { title: "Solo Leveling: Ragnarok", cover: "https://uploads.mangadex.org/covers/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/e90bdc47-c8b9-4df7-b2c0-17641b645ee1.jpg.512.jpg", tag: "MANHWA", ch: "Ch 42" },
+      { title: "Magic Emperor", cover: "https://uploads.mangadex.org/covers/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/e90bdc47-c8b9-4df7-b2c0-17641b645ee1.jpg.512.jpg", tag: "MANHUA", ch: "Ch 580" },
+      { title: "Jujutsu Kaisen", cover: "https://static.anipop.xyz/poster/anime/jujutsu-kaisen-2nd-season.jpg?h=400", tag: "MANGA", ch: "Ch 271" },
+      { title: "Nano Machine", cover: "https://static.anipop.xyz/poster/anime/ore-dake-level-up-na-ken.jpg?h=400", tag: "MANHWA", ch: "Ch 210" }
+    ];
+
+    // 2. HERO CAROUSEL CONTROLLER
+    let currentHeroIndex = 0;
+    let heroTimer = null;
+
+    function renderHero() {
+      const s = HERO_SLIDES[currentHeroIndex];
+      document.getElementById('hero-bg').style.backgroundImage = `url('${s.image}')`;
+      document.getElementById('hero-poster-img').src = s.image;
+      document.getElementById('hero-title').innerText = s.title;
+      document.getElementById('hero-desc').innerText = s.desc;
+      document.getElementById('hero-badge-text').innerText = s.typeBadge;
+      document.getElementById('hero-rating').innerText = s.rating;
+      document.getElementById('hero-quality').innerText = s.quality;
+      document.getElementById('hero-status').innerText = s.badgeStatus;
+
+      // Update Category pills glow
+      document.querySelectorAll('.cat-pill').forEach((btn, idx) => {
+        if (idx === currentHeroIndex) {
+          btn.className = "cat-pill px-3 py-1 rounded-full text-xs font-bold tracking-wider transition-all flex items-center gap-1.5 bg-amber-400/20 text-amber-300 border border-amber-400/50 shadow-sm ring-1 ring-amber-400/30";
+        } else {
+          btn.className = "cat-pill px-3 py-1 rounded-full text-xs font-bold tracking-wider transition-all flex items-center gap-1.5 bg-black/50 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10";
+        }
+      });
+
+      // Update Dots
+      const dotsCont = document.getElementById('hero-dots');
+      dotsCont.innerHTML = HERO_SLIDES.map((_, i) => `
+        <button onclick="setHeroSlide(${i})" class="h-1.5 rounded-full transition-all duration-300 ${i === currentHeroIndex ? 'w-6 bg-amber-400' : 'w-2 bg-white/20 hover:bg-white/40'}"></button>
+      `).join('');
+    }
+
+    function setHeroSlide(idx) {
+      currentHeroIndex = idx;
+      renderHero();
+      resetHeroTimer();
+    }
+
+    function nextHeroSlide() {
+      currentHeroIndex = (currentHeroIndex + 1) % HERO_SLIDES.length;
+      renderHero();
+      resetHeroTimer();
+    }
+
+    function prevHeroSlide() {
+      currentHeroIndex = (currentHeroIndex - 1 + HERO_SLIDES.length) % HERO_SLIDES.length;
+      renderHero();
+      resetHeroTimer();
+    }
+
+    function resetHeroTimer() {
+      clearInterval(heroTimer);
+      heroTimer = setInterval(nextHeroSlide, 6500);
+    }
+
+    function playCurrentHero() {
+      const s = HERO_SLIDES[currentHeroIndex];
+      openVideoModal(s.title, s.videoUrl);
+    }
+
+    function openHeroDetail() {
+      playCurrentHero();
+    }
+
+    // 3. RENDER ANIME CAROUSEL
+    function renderAnimeCarousel() {
+      const el = document.getElementById('anime-carousel');
+      el.innerHTML = ANIME_LIST.map((anime, i) => `
+        <div onclick="openVideoModal('${anime.title}', 'https://www.youtube.com/embed/9g_hK8h187U?autoplay=1')" class="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-amber-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/50 w-[155px] sm:w-[190px] md:w-[210px] shrink-0 cursor-pointer">
+          <div class="relative aspect-[2/3] w-full overflow-hidden bg-black/40">
+            <img src="${anime.poster}" alt="${anime.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/60 pointer-events-none"></div>
+            <div class="absolute top-2 left-2 right-2 flex items-center justify-between z-10">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded ${anime.status === 'Ongoing' ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-500/40' : 'bg-indigo-600/40 text-indigo-200 border border-indigo-400/30'}">${anime.status}</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-black/60 text-amber-300 border border-white/10 flex items-center gap-1">★ ${anime.rating}</span>
+            </div>
+            <div class="absolute bottom-1 left-2 z-10">
+              <span class="text-3xl sm:text-4xl font-black italic bg-gradient-to-b from-amber-200 via-amber-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-md">#${i + 1}</span>
+            </div>
+          </div>
+          <div class="p-3">
+            <h3 class="font-bold text-xs sm:text-sm text-white line-clamp-1 group-hover:text-amber-400 transition-colors">${anime.title}</h3>
+            <p class="text-[11px] text-gray-400 mt-0.5">${anime.ep} • Sub Indo</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 4. RENDER JADWAL
+    function filterSchedule(day) {
+      document.querySelectorAll('.sched-tab').forEach(b => {
+        if (b.innerText === day) {
+          b.className = "sched-tab px-4 py-1.5 rounded-xl text-xs font-bold bg-amber-400 text-black shadow-md";
+        } else {
+          b.className = "sched-tab px-4 py-1.5 rounded-xl text-xs font-bold bg-[#14141F] text-gray-300 hover:text-white border border-white/5";
+        }
+      });
+      const grid = document.getElementById('schedule-grid');
+      grid.innerHTML = ANIME_LIST.slice(0, 6).map(anime => `
+        <div onclick="openVideoModal('${anime.title}', 'https://www.youtube.com/embed/9g_hK8h187U?autoplay=1')" class="group relative rounded-xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-amber-400/40 p-2 cursor-pointer transition-transform hover:-translate-y-1">
+          <div class="relative aspect-[3/4] rounded-lg overflow-hidden mb-2">
+            <img src="${anime.poster}" class="w-full h-full object-cover">
+          </div>
+          <h4 class="font-bold text-xs text-white truncate">${anime.title}</h4>
+          <span class="text-[10px] text-emerald-400 font-semibold">18:30 WIB • ${anime.ep}</span>
+        </div>
+      `).join('');
+    }
+
+    // 5. RENDER MANGA & DRAKOR & DRACIN
+    function renderManga() {
+      const el = document.getElementById('manga-carousel');
+      el.innerHTML = MANGA_LIST.map(m => `
+        <div onclick="openVideoModal('Baca Komik: ${m.title}', 'https://www.youtube.com/embed/9g_hK8h187U?autoplay=1')" class="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-emerald-400/40 transition-all w-[155px] sm:w-[190px] shrink-0 cursor-pointer">
+          <div class="aspect-[2/3] w-full overflow-hidden">
+            <img src="${m.cover}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div class="p-3">
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">${m.tag}</span>
+            <h3 class="font-bold text-xs text-white line-clamp-1 mt-1 group-hover:text-emerald-400">${m.title}</h3>
+            <span class="text-[10px] text-gray-400">${m.ch}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderDrakor() {
+      const el = document.getElementById('drakor-carousel');
+      el.innerHTML = DRAKOR_LIST.map(d => `
+        <div onclick="openVideoModal('${d.title}', 'https://www.youtube.com/embed/gq3K-oD3xek?autoplay=1')" class="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-blue-400/40 transition-all w-[150px] sm:w-[185px] shrink-0 cursor-pointer">
+          <div class="aspect-[2/3] w-full overflow-hidden">
+            <img src="${d.poster}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div class="p-3">
+            <h3 class="font-bold text-xs text-white line-clamp-1 group-hover:text-blue-400">${d.title}</h3>
+            <span class="text-[10px] text-amber-400">★ ${d.rating} • ${d.ep}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderDracin() {
+      const el = document.getElementById('dracin-carousel');
+      el.innerHTML = DRACIN_LIST.map(dr => `
+        <div onclick="openVideoModal('${dr.title}', 'https://www.youtube.com/embed/kJQP7kiw5Fk?autoplay=1')" class="group relative rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-purple-400/40 transition-all w-[160px] sm:w-[200px] shrink-0 cursor-pointer">
+          <div class="aspect-[9/16] w-full overflow-hidden relative">
+            <img src="${dr.image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+            <div class="absolute bottom-2 left-2 right-2">
+              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-500/40 text-purple-200">9:16 REELS</span>
+              <h3 class="font-bold text-xs text-white line-clamp-2 mt-1">${dr.title}</h3>
+              <span class="text-[10px] text-gray-300">${dr.ep}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 6. DRAGGABLE CAROUSEL LOGIC WITH MOUSE
+    function setupDrag(elementId) {
+      const slider = document.getElementById(elementId);
+      if (!slider) return;
+      let isDown = false;
+      let startX, scrollLeft;
+
+      slider.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+      });
+      slider.addEventListener('mouseleave', () => isDown = false);
+      slider.addEventListener('mouseup', () => isDown = false);
+      slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        slider.scrollLeft = scrollLeft - walk;
+      });
+    }
+
+    // 7. MODALS LOGIC
+    function openVideoModal(title, url) {
+      document.getElementById('modal-video-title').innerText = title;
+      document.getElementById('modal-iframe').src = url;
+      document.getElementById('video-modal').classList.remove('hidden');
+    }
+
+    function closeVideoModal() {
+      document.getElementById('modal-iframe').src = '';
+      document.getElementById('video-modal').classList.add('hidden');
+    }
+
+    function openSearchModal() {
+      document.getElementById('search-modal').classList.remove('hidden');
+      document.getElementById('search-input').focus();
+    }
+
+    function closeSearchModal() {
+      document.getElementById('search-modal').classList.add('hidden');
+    }
+
+    function handleSearch(val) {
+      const q = val.toLowerCase().trim();
+      const res = document.getElementById('search-results');
+      if (!q) {
+        res.innerHTML = '<p class="text-gray-500 text-center py-4">Ketik nama untuk mencari...</p>';
+        return;
+      }
+      const matches = [...ANIME_LIST, ...DRAKOR_LIST, ...DRACIN_LIST, ...MANGA_LIST].filter(item => 
+        item.title.toLowerCase().includes(q)
+      );
+      if (matches.length === 0) {
+        res.innerHTML = '<p class="text-gray-500 text-center py-4">Tidak ada judul yang cocok.</p>';
+        return;
+      }
+      res.innerHTML = matches.map(m => `
+        <div onclick="openVideoModal('${m.title}', 'https://www.youtube.com/embed/9g_hK8h187U?autoplay=1'); closeSearchModal()" class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 cursor-pointer">
+          <img src="${m.poster || m.cover || m.image}" class="w-10 h-14 object-cover rounded-lg">
+          <div>
+            <h4 class="font-bold text-white text-xs">${m.title}</h4>
+            <span class="text-[10px] text-amber-400">Tonton Sekarang</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openAuthModal(mode) {
+      document.getElementById('auth-title').innerText = mode === 'login' ? 'Masuk ke NexNime' : 'Daftar Akun NexNime';
+      document.getElementById('auth-modal').classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      alert('Berhasil masuk ke NexNime!');
+      closeAuthModal();
+    }
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        openSearchModal();
+      }
+      if (e.key === 'Escape') {
+        closeSearchModal();
+        closeVideoModal();
+        closeAuthModal();
+      }
+    });
+
+    // INIT ON LOAD
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderHero();
+      renderAnimeCarousel();
+      filterSchedule('Senin');
+      renderManga();
+      renderDrakor();
+      renderDracin();
+      setupDrag('anime-carousel');
+      setupDrag('manga-carousel');
+      setupDrag('drakor-carousel');
+      setupDrag('dracin-carousel');
+      resetHeroTimer();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
