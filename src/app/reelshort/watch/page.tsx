@@ -193,7 +193,8 @@ function ReelShortWatchContent() {
   };
 
   const handleNextEpisode = () => {
-    if (currentEpisodeIndex < (episodes.length > 0 ? episodes.length - 1 : 70)) {
+    const maxEp = episodes.length > 0 ? episodes.length : (detail?.total_episodes || 70);
+    if (currentEpisodeIndex < maxEp - 1) {
       setCurrentEpisodeIndex((prev) => prev + 1);
     }
   };
@@ -202,6 +203,122 @@ function ReelShortWatchContent() {
     if (currentEpisodeIndex > 0) {
       setCurrentEpisodeIndex((prev) => prev - 1);
     }
+  };
+
+  // Mobile Vertical Swipe & PC Scroll / Drag to change episodes
+  const touchStartYRef = useRef<number | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
+  const isSwipingRef = useRef(false);
+  const [swipeToast, setSwipeToast] = useState<{
+    type: "next" | "prev";
+    text: string;
+  } | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartYRef.current = e.touches[0].clientY;
+    touchStartXRef.current = e.touches[0].clientX;
+    isSwipingRef.current = false;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartYRef.current === null || touchStartXRef.current === null) return;
+    const diffY = touchStartYRef.current - e.changedTouches[0].clientY;
+    const diffX = touchStartXRef.current - e.changedTouches[0].clientX;
+    const maxEp = episodes.length > 0 ? episodes.length : (detail?.total_episodes || 70);
+
+    // Predominantly vertical swipe and distance > 45px
+    if (Math.abs(diffY) > 45 && Math.abs(diffY) > Math.abs(diffX) * 1.2) {
+      isSwipingRef.current = true;
+      if (diffY > 0) {
+        // Swiped UP -> Next Episode
+        if (currentEpisodeIndex < maxEp - 1) {
+          setSwipeToast({
+            type: "next",
+            text: `Episode ${currentEpisodeIndex + 2}`,
+          });
+          handleNextEpisode();
+        }
+      } else {
+        // Swiped DOWN -> Previous Episode
+        if (currentEpisodeIndex > 0) {
+          setSwipeToast({
+            type: "prev",
+            text: `Episode ${currentEpisodeIndex}`,
+          });
+          handlePrevEpisode();
+        }
+      }
+      setTimeout(() => setSwipeToast(null), 850);
+    }
+    touchStartYRef.current = null;
+    touchStartXRef.current = null;
+  };
+
+  // Mouse wheel and drag navigation on PC
+  const lastWheelTimeRef = useRef<number>(0);
+  const mouseStartYRef = useRef<number | null>(null);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest("button, a, input, select")) return;
+    mouseStartYRef.current = e.clientY;
+    isSwipingRef.current = false;
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (mouseStartYRef.current === null) return;
+    const diffY = mouseStartYRef.current - e.clientY;
+    const maxEp = episodes.length > 0 ? episodes.length : (detail?.total_episodes || 70);
+
+    if (Math.abs(diffY) > 50) {
+      isSwipingRef.current = true;
+      if (diffY > 0 && currentEpisodeIndex < maxEp - 1) {
+        setSwipeToast({
+          type: "next",
+          text: `Episode ${currentEpisodeIndex + 2}`,
+        });
+        handleNextEpisode();
+      } else if (diffY < 0 && currentEpisodeIndex > 0) {
+        setSwipeToast({
+          type: "prev",
+          text: `Episode ${currentEpisodeIndex}`,
+        });
+        handlePrevEpisode();
+      }
+      setTimeout(() => setSwipeToast(null), 850);
+    }
+    mouseStartYRef.current = null;
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    const now = Date.now();
+    if (now - lastWheelTimeRef.current < 650) return;
+    const maxEp = episodes.length > 0 ? episodes.length : (detail?.total_episodes || 70);
+
+    if (Math.abs(e.deltaY) > 35) {
+      lastWheelTimeRef.current = now;
+      if (e.deltaY > 0 && currentEpisodeIndex < maxEp - 1) {
+        setSwipeToast({
+          type: "next",
+          text: `Episode ${currentEpisodeIndex + 2}`,
+        });
+        handleNextEpisode();
+      } else if (e.deltaY < 0 && currentEpisodeIndex > 0) {
+        setSwipeToast({
+          type: "prev",
+          text: `Episode ${currentEpisodeIndex}`,
+        });
+        handlePrevEpisode();
+      }
+      setTimeout(() => setSwipeToast(null), 850);
+    }
+  };
+
+  const handleVideoClick = () => {
+    if (isSwipingRef.current) {
+      isSwipingRef.current = false;
+      return;
+    }
+    togglePlayPause();
   };
 
   const togglePlayPause = () => {
@@ -317,8 +434,37 @@ function ReelShortWatchContent() {
         {!loading && detail && (
           <div
             ref={playerContainerRef}
-            className="max-sm:fixed max-sm:inset-0 max-sm:z-50 max-sm:w-full max-sm:h-[100dvh] max-sm:max-w-none max-sm:rounded-none max-sm:border-0 sm:relative sm:w-full sm:max-w-[390px] sm:aspect-[9/16] sm:rounded-3xl sm:border sm:border-white/15 overflow-hidden bg-black shadow-2xl shadow-rose-950/50 group select-none flex flex-col justify-between transition-all"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onWheel={handleWheel}
+            className="max-sm:fixed max-sm:inset-0 max-sm:z-50 max-sm:w-full max-sm:h-[100dvh] max-sm:max-w-none max-sm:rounded-none max-sm:border-0 sm:relative sm:w-full sm:max-w-[390px] sm:aspect-[9/16] sm:rounded-3xl sm:border sm:border-white/15 overflow-hidden bg-black shadow-2xl shadow-rose-950/50 group select-none flex flex-col justify-between transition-all cursor-grab active:cursor-grabbing"
           >
+            {/* Animated Swipe Toast Notification Feedback */}
+            {swipeToast && (
+              <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none animate-in fade-in zoom-in-90 duration-200">
+                <div className="px-5 py-3 rounded-2xl bg-black/85 backdrop-blur-md border border-rose-500/50 text-white flex items-center gap-2.5 shadow-2xl shadow-rose-950/50">
+                  {swipeToast.type === "next" ? (
+                    <ChevronUp className="w-5 h-5 text-rose-400 animate-bounce" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-rose-400 animate-bounce" />
+                  )}
+                  <span className="font-extrabold text-sm tracking-wide">
+                    {swipeToast.text}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Mobile swipe hint */}
+            <div className="sm:hidden absolute bottom-20 left-4 right-4 z-20 pointer-events-none text-center">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold text-rose-200 bg-black/60 backdrop-blur-md border border-white/10 opacity-70">
+                <span>Geser ke atas untuk episode berikutnya</span>
+                <ChevronUp className="w-3 h-3 text-rose-400" />
+              </span>
+            </div>
+
             {/* Video Element with Decrypted CDN Stream URL */}
             {activeStream?.stream_url ? (
               <>
@@ -328,7 +474,7 @@ function ReelShortWatchContent() {
                   loop
                   autoPlay
                   playsInline
-                  onClick={togglePlayPause}
+                  onClick={handleVideoClick}
                   onTimeUpdate={handleTimeUpdate}
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}

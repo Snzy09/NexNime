@@ -81,12 +81,12 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-200 flex items-center justify-center p-0.5 shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
               <div className="w-full h-full bg-[#0E0E14] rounded-[10px] flex items-center justify-center font-black text-amber-400 text-xs tracking-tighter">
-                NN
+                LV
               </div>
             </div>
             <div className="flex flex-col">
               <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent group-hover:opacity-90 leading-tight">
-                Nex<span className="text-white font-light text-sm">Nime</span>
+                LuoyiV<span className="text-white font-light text-sm">Bond</span>
               </span>
               <span className="text-[8px] tracking-widest uppercase text-amber-400/70 font-semibold -mt-0.5">
                 Streaming &amp; Manga

@@ -12,18 +12,18 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-2 group">
               <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-200 flex items-center justify-center p-0.5">
                 <div className="w-full h-full bg-[#0E0E14] rounded-full flex items-center justify-center font-black text-amber-400 text-xs">
-                  NN
+                  LV
                 </div>
               </div>
               <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
-                Nex<span className="text-white font-light text-sm">Nime</span>
+                LuoyiV<span className="text-white font-light text-sm">Bond</span>
               </span>
             </Link>
             <p className="mt-3 text-xs text-gray-400 leading-relaxed max-w-sm">
               Platform hiburan streaming Anime Jepang, Donghua, K-Drama (Drakor), Dracin Short Video vertikal 9:16, serta baca komik Manga, Manhwa &amp; Manhua dengan subtitle Indonesia berkualitas HD 1080p.
             </p>
             <div className="flex items-center gap-3 mt-4 text-xs text-gray-500">
-              <span>© {new Date().getFullYear()} NexNime. All rights reserved.</span>
+              <span>© {new Date().getFullYear()} LuoyiVBond. All rights reserved.</span>
             </div>
           </div>
 
