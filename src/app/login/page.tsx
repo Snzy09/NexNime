@@ -84,11 +84,11 @@ export default function LoginPage() {
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center p-0.5 shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
             <div className="w-full h-full bg-[#0E0E14] rounded-[9px] flex items-center justify-center font-black text-amber-400 text-xs">
-              LV
+              NN
             </div>
           </div>
           <span className="font-extrabold text-base tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
-            LuoyiV<span className="text-white font-light">Bond</span>
+            Nex<span className="text-white font-light">Nime</span>
           </span>
         </Link>
       </header>
@@ -285,7 +285,7 @@ export default function LoginPage() {
 
       {/* Footer minimal */}
       <footer className="text-center py-4 text-[11px] text-gray-500 border-t border-white/5">
-        © 2026 LuoyiVBond Streaming &amp; Manga • Hak Cipta Dilindungi
+        © 2026 NexNime Streaming &amp; Manga • Hak Cipta Dilindungi
       </footer>
     </div>
   );

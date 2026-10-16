@@ -100,11 +100,11 @@ export default function RegisterPage() {
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center p-0.5 shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
             <div className="w-full h-full bg-[#0E0E14] rounded-[9px] flex items-center justify-center font-black text-amber-400 text-xs">
-              LV
+              NN
             </div>
           </div>
           <span className="font-extrabold text-base tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
-            LuoyiV<span className="text-white font-light">Bond</span>
+            Nex<span className="text-white font-light">Nime</span>
           </span>
         </Link>
       </header>
@@ -116,7 +116,7 @@ export default function RegisterPage() {
           <div className="text-center mb-6">
             <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-300 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 mb-2">
               <Sparkles className="w-3 h-3 text-emerald-400" />
-              Gabung Komunitas LuoyiV
+              Gabung Komunitas NexNime
             </span>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               Daftar Akun Baru
@@ -236,7 +236,7 @@ export default function RegisterPage() {
                 className="w-4 h-4 mt-0.5 rounded bg-[#181824] border-white/20 text-amber-500 focus:ring-amber-400/30 accent-amber-500"
               />
               <label htmlFor="terms" className="text-[11px] text-gray-400 leading-tight select-none cursor-pointer">
-                Saya menyetujui <span className="text-gray-300 underline">Syarat Layanan</span> dan <span className="text-gray-300 underline">Kebijakan Privasi</span> LuoyiVBond
+                Saya menyetujui <span className="text-gray-300 underline">Syarat Layanan</span> dan <span className="text-gray-300 underline">Kebijakan Privasi</span> NexNime
               </label>
             </div>
 
@@ -332,7 +332,7 @@ export default function RegisterPage() {
 
       {/* Footer minimal */}
       <footer className="text-center py-4 text-[11px] text-gray-500 border-t border-white/5">
-        © 2026 LuoyiVBond Streaming &amp; Manga • Hak Cipta Dilindungi
+        © 2026 NexNime Streaming &amp; Manga • Hak Cipta Dilindungi
       </footer>
     </div>
   );
