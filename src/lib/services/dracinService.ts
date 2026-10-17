@@ -245,7 +245,18 @@ function findEpisodes(text: string) {
   return all.sort((a, b) => b.length - a.length)[0] || [];
 }
 
-export async function getDracinDetail(slug: string): Promise<DracinDetail | null> {
+function cleanSlug(slug: string): string {
+  if (!slug) return "";
+  let s = slug.trim();
+  s = s.replace(/^https?:\/\/[^\/]+\/(id\/)?(movie|watch)\//, "");
+  s = s.replace(/\/episode\/\d+.*$/, "");
+  s = s.replace(/\/+$/, "");
+  return s;
+}
+
+export async function getDracinDetail(rawSlug: string): Promise<DracinDetail | null> {
+  const slug = cleanSlug(rawSlug);
+  if (!slug) return null;
   try {
     const text = flight(await get(`${BASE}/${LANG}/movie/${slug}`));
     const film = findFilm(text, slug);
@@ -253,6 +264,10 @@ export async function getDracinDetail(slug: string): Promise<DracinDetail | null
     if (!eps.length) {
       const t2 = flight(await get(`${BASE}/${LANG}/episode-list/${slug}`));
       eps = findEpisodes(t2);
+    }
+    if (!eps.length) {
+      const t3 = flight(await get(watchUrl(slug, 1)));
+      eps = findEpisodes(t3);
     }
     return {
       film: film ? item(film) : { slug, title: slug.replace(/-/g, " "), url: `${BASE}/${LANG}/movie/${slug}` },
@@ -273,20 +288,23 @@ export async function getDracinDetail(slug: string): Promise<DracinDetail | null
   }
 }
 
-export async function getDracinEpisode(slug: string, num: number, id?: string): Promise<DracinEpisode | null> {
+export async function getDracinEpisode(rawSlug: string, num: number, id?: string): Promise<DracinEpisode | null> {
+  const slug = cleanSlug(rawSlug);
+  if (!slug) return null;
   try {
     const cookie = id ? "movie=" + encodeURIComponent(JSON.stringify({ id, slug })) : undefined;
     const text = flight(await get(watchUrl(slug, num), cookie));
+    const allEps = findEpisodes(text);
     const cur =
       grab(text, "currentEpisode")[0] ||
-      findEpisodes(text).find((e) => String(e.number) === String(num)) ||
+      allEps.find((e) => String(e.number) === String(num)) ||
       null;
     const files = cur
       ? []
       : [...new Set(text.match(/https?:\/\/[^"\\\s]+?\.(?:mp4|m3u8|vtt|srt|ass)[^"\\\s]*/gi) || [])];
     const direct = cur ? null : (text.match(/"video":"([^"]+)"/) || [])[1];
     let video = (cur && cur.video) || direct || files.find((u: string) => /\.(mp4|m3u8)/i.test(u)) || null;
-    const subtitle =
+    let subtitle =
       (cur && (cur.subtitle || cur.subtitle_url || cur.sub)) ||
       files.find((u: string) => /\.(vtt|srt|ass)/i.test(u)) ||
       null;
@@ -296,6 +314,7 @@ export async function getDracinEpisode(slug: string, num: number, id?: string): 
       const epHit = detail?.episodes?.find((e) => e.number === Number(num));
       if (epHit?.video) {
         video = epHit.video;
+        if (!subtitle && epHit.subtitle) subtitle = epHit.subtitle;
       }
     }
 

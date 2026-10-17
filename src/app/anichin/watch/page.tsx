@@ -34,6 +34,7 @@ function AnichinWatchContent() {
   const [episodes, setEpisodes] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [currentUrl, setCurrentUrl] = useState(rawUrl);
+  const [selectedServerIndex, setSelectedServerIndex] = useState<number>(0);
 
   useEffect(() => {
     if (rawUrl) {
@@ -46,6 +47,7 @@ function AnichinWatchContent() {
     if (!currentUrl) return;
     setLoading(true);
     setError(null);
+    setSelectedServerIndex(0);
 
     // 1. Fetch stream/embed
     fetch(`/api/anichin?action=stream&url=${encodeURIComponent(currentUrl)}`)
@@ -83,7 +85,14 @@ function AnichinWatchContent() {
       .finally(() => setLoading(false));
   }, [currentUrl]);
 
-  const streamSrc = stream?.iframe || stream?.stream_url || stream?.embed_url || "";
+  const activeServer = stream?.streams?.[selectedServerIndex];
+  const streamSrc =
+    activeServer?.embed_url ||
+    activeServer?.url_stream ||
+    stream?.iframe ||
+    stream?.stream_url ||
+    stream?.embed_url ||
+    "";
 
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-rose-500 selection:text-white">
@@ -120,23 +129,70 @@ function AnichinWatchContent() {
             <div className="h-4 bg-white/5 rounded-lg w-3/4" />
           </div>
         ) : error && !streamSrc ? (
-          <div className="p-8 rounded-2xl bg-rose-950/20 border border-rose-500/30 text-center my-12">
-            <AlertCircle className="w-12 h-12 text-rose-400 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-white mb-2">Gagal Memutar Donghua</h3>
-            <p className="text-xs text-gray-300 mb-4">{error || "Data stream tidak ditemukan"}</p>
-            <Link
-              href="/anichin"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-colors"
-            >
-              Lihat Donghua Lainnya
-            </Link>
+          <div className="p-8 rounded-2xl bg-rose-950/20 border border-rose-500/30 text-center my-12 space-y-4">
+            <AlertCircle className="w-12 h-12 text-rose-400 mx-auto" />
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-white">Gagal Memutar Donghua</h3>
+              <p className="text-xs text-gray-300">{error || "Data stream tidak ditemukan"}</p>
+            </div>
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <button
+                onClick={() => {
+                  setLoading(true);
+                  setError(null);
+                  fetch(`/api/anichin?action=stream&url=${encodeURIComponent(currentUrl)}`)
+                    .then((r) => r.json())
+                    .then((d) => {
+                      if (d.success && d.stream) setStream(d.stream);
+                      else setError(d.error || "Gagal memuat video stream episode AniChin.");
+                    })
+                    .catch((err) => setError(err.message))
+                    .finally(() => setLoading(false));
+                }}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-colors"
+              >
+                Coba Lagi
+              </button>
+              <Link
+                href="/anichin"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-colors"
+              >
+                Lihat Donghua Lainnya
+              </Link>
+            </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4">
+            {/* Server Selector Pills */}
+            {stream?.streams && stream.streams.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                <span className="text-xs text-gray-400 flex items-center gap-1 shrink-0 font-semibold px-1">
+                  <Server className="w-3.5 h-3.5 text-rose-400" /> Server:
+                </span>
+                <div className="flex items-center gap-2">
+                  {stream.streams.map((srv, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedServerIndex(idx)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                        selectedServerIndex === idx
+                          ? "bg-rose-500 text-white shadow-md shadow-rose-500/30 font-bold"
+                          : "bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/5"
+                      }`}
+                    >
+                      <Play className="w-2.5 h-2.5" />
+                      <span>{srv.server || `Server ${idx + 1}`}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Player Container */}
             <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl">
               {streamSrc ? (
                 <iframe
+                  key={streamSrc}
                   src={streamSrc}
                   className="w-full h-full border-0"
                   allowFullScreen

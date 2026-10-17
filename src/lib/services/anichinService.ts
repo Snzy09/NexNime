@@ -10,7 +10,7 @@ if (typeof process !== "undefined") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-import { getDonghuaLatest, searchDonghua } from "./donghuaFilmService";
+import { getDonghuaLatest, searchDonghua, getDonghuaEpisode } from "./donghuaFilmService";
 
 const BASE = "https://anichin.moe";
 const UA =
@@ -553,6 +553,26 @@ function parseAnime(html: string, url: string): AnichinDetail {
   };
 }
 
+function decodeMirrorValue(val: string): string {
+  if (!val) return "";
+  try {
+    let decoded = val;
+    if (!val.startsWith("http") && !val.startsWith("<")) {
+      decoded = Buffer.from(val, "base64").toString("utf-8");
+    }
+    const match = decoded.match(/src=["']([^"']+)["']/i);
+    if (match) {
+      let src = match[1];
+      if (src.startsWith("//")) src = "https:" + src;
+      return src;
+    }
+    if (decoded.startsWith("http")) return decoded;
+    return "";
+  } catch {
+    return "";
+  }
+}
+
 function parseEpisode(html: string, url: string): AnichinStream {
   const title =
     (html.match(/<title>([\s\S]*?)<\/title>/) || [])[1] ||
@@ -575,6 +595,44 @@ function parseEpisode(html: string, url: string): AnichinStream {
     if (m2 && m2[1] && m2[1] !== "about:blank") iframe = m2[1];
   }
   iframe = iframe ? decodeEntities(iframe).trim() : "";
+
+  // Extract all mirror servers from <select class="mirror"> and <option> tags
+  const streams: { server: string; url_stream: string; embed_url: string }[] = [];
+  const optRe = /<option[^>]*value=["']([^"']+)["'][^>]*>([\s\S]*?)<\/option>/gi;
+  let optM: RegExpExecArray | null;
+  while ((optM = optRe.exec(html))) {
+    const val = optM[1].trim();
+    const label = decodeEntities(stripTags(optM[2])).trim();
+    if (!val || val === "0" || label.toLowerCase().includes("pilih server")) continue;
+    const embedUrl = decodeMirrorValue(val);
+    if (embedUrl) {
+      streams.push({
+        server: label,
+        url_stream: embedUrl,
+        embed_url: embedUrl,
+      });
+    }
+  }
+
+  // If iframe wasn't found or was about:blank, use the first mirror
+  if (!iframe && streams.length > 0) {
+    iframe = streams[0].embed_url;
+  } else if (iframe && !streams.some((s) => s.embed_url === iframe)) {
+    streams.unshift({ server: "Server Utama", url_stream: iframe, embed_url: iframe });
+  }
+
+  // Prioritize clean players (like ok.ru, turbovid, mega) if nunadrama is first
+  let streamUrl = iframe;
+  const okruServer = streams.find(
+    (s) =>
+      s.server.toLowerCase().includes("okru") ||
+      s.server.toLowerCase().includes("ok.ru") ||
+      s.server.toLowerCase().includes("mega")
+  );
+  if (okruServer && (!iframe || iframe.includes("nunadrama.sbs"))) {
+    streamUrl = okruServer.embed_url;
+  }
+
   const download: { quality: string; href: string; url: string; label: string }[] = [];
   const soraRe =
     /<div class="soraurlx">\s*<strong>\s*([^<]+)\s*<\/strong>\s*<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g;
@@ -625,10 +683,7 @@ function parseEpisode(html: string, url: string): AnichinStream {
       /<a itemprop="item" href="(\/[^"]+)"><span itemprop="name">([^<]+)<\/span><\/a>[\s\S]*?<a itemprop="item" href="(\/[^"]+)"><span itemprop="name">([^<]+)<\/span><\/a>/
     ) || [])[2] || "";
   if (breadcrumb && !animeInfo.title) animeInfo.title = decodeEntities(stripTags(breadcrumb));
-  const streamUrl = iframe;
-  const embedUrl = iframe;
-  const streams: { server: string; url_stream: string; embed_url: string }[] = [];
-  if (iframe) streams.push({ server: "Server Utama", url_stream: iframe, embed_url: iframe });
+
   return {
     source: canonical,
     type: "episode",
@@ -636,7 +691,7 @@ function parseEpisode(html: string, url: string): AnichinStream {
     thumbnail: thumb ? absUrl(thumb) : "",
     iframe,
     stream_url: streamUrl,
-    embed_url: embedUrl,
+    embed_url: streamUrl,
     video_embed: iframe,
     current_stream: streamUrl,
     streams,
@@ -949,19 +1004,114 @@ export async function getAnichinEpisodes(raw: string): Promise<{
 export async function getAnichinStream(raw: string): Promise<AnichinStream | null> {
   let url = (raw || "").trim();
   if (!url) return null;
+
+  // 1. Handle DonghuaFilm links directly if routed through Anichin
+  if (url.includes("donghuafilm") || url.includes("hcgi/platform")) {
+    try {
+      const idMatch = url.match(/id=([^&]+)/) || url.match(/\/anime\/([^/?#]+)/);
+      const epMatch = url.match(/ep=(\d+)/);
+      const targetId = idMatch ? idMatch[1] : normalizeSlug(url);
+      const epNum = epMatch ? parseInt(epMatch[1], 10) : 1;
+      const dhData: any = await getDonghuaEpisode(targetId, epNum);
+      if (dhData && dhData.status && dhData.episode) {
+        const embed = dhData.episode.embed_src || dhData.episode.stream_url || "";
+        return {
+          source: url,
+          type: "episode",
+          title: `${dhData.anime?.title || targetId} - Episode ${epNum}`,
+          thumbnail: dhData.anime?.poster || dhData.anime?.cover || "",
+          iframe: embed,
+          stream_url: dhData.episode.stream_url || embed,
+          embed_url: embed,
+          video_embed: embed,
+          current_stream: dhData.episode.stream_url || embed,
+          streams: [
+            { server: "Server Donghua HD", url_stream: embed, embed_url: embed },
+            ...(dhData.episode.stream_url && dhData.episode.stream_url !== embed
+              ? [{ server: "Direct Stream", url_stream: dhData.episode.stream_url, embed_url: dhData.episode.stream_url }]
+              : []),
+          ],
+          download: dhData.episode.download_url
+            ? [{ quality: "HD", href: dhData.episode.download_url, url: dhData.episode.download_url, label: "Unduh HD" }]
+            : [],
+          navigation: {},
+          anime: { title: dhData.anime?.title, rating: dhData.anime?.rating, anime_url: `/donghuafilm/watch?id=${targetId}` },
+        };
+      }
+    } catch {}
+  }
+
+  // 2. Normalize relative or slug URL
   if (!url.startsWith("http")) {
     let slug = normalizeSlug(url);
     if (!slug.includes("episode")) slug = slug + "-episode-1-subtitle-indonesia";
     url = BASE + "/" + slug + (slug.endsWith("/") ? "" : "/");
   }
+
   try {
-    const { text, status } = await fetchText(url);
-    if (status === 403 || text.includes("403 Forbidden")) return null;
-    return parseEpisode(text, url);
+    let { text, status } = await fetchText(url);
+    if (status !== 403 && !text.includes("403 Forbidden")) {
+      // If an anime series page was passed instead of an episode page
+      if (!text.includes("player-embed") && !text.includes('id="embed_holder"') && text.includes("eplister")) {
+        const epMatch = text.match(/<li[^>]*>[\s\S]*?<a[^>]*href="([^"]+)"[^>]*>/i);
+        if (epMatch && epMatch[1]) {
+          const realEpUrl = absUrl(epMatch[1]);
+          const epRes = await fetchText(realEpUrl);
+          if (epRes.status !== 403 && (epRes.text.includes("player-embed") || epRes.text.includes('id="embed_holder"'))) {
+            text = epRes.text;
+            url = realEpUrl;
+          }
+        }
+      }
+
+      const parsed = parseEpisode(text, url);
+      if (parsed && (parsed.iframe || (parsed.streams && parsed.streams.length > 0))) {
+        return parsed;
+      }
+    }
   } catch (err) {
-    console.error("getAnichinStream error:", err);
-    return null;
+    console.error("getAnichinStream upstream error:", err);
   }
+
+  // 3. Fallback: Search title on DonghuaFilm to provide live stream
+  try {
+    const slug = normalizeSlug(url).replace(/-episode-\d+.*$/, "").replace(/^anime\//, "");
+    const titleKeywords = slug.replace(/-/g, " ");
+    const searchRes = await searchDonghua(titleKeywords, 1, 3);
+    if (searchRes && searchRes.results && searchRes.results.length > 0) {
+      const firstHit = searchRes.results[0];
+      const epMatch = url.match(/-episode-(\d+)/);
+      const epNum = epMatch ? parseInt(epMatch[1], 10) : 1;
+      const dhData: any = await getDonghuaEpisode(firstHit.id, epNum);
+      if (dhData && dhData.status && dhData.episode) {
+        const embed = dhData.episode.embed_src || dhData.episode.stream_url || "";
+        return {
+          source: url,
+          type: "episode",
+          title: `${firstHit.title} - Episode ${epNum}`,
+          thumbnail: firstHit.poster || firstHit.cover || "",
+          iframe: embed,
+          stream_url: dhData.episode.stream_url || embed,
+          embed_url: embed,
+          video_embed: embed,
+          current_stream: dhData.episode.stream_url || embed,
+          streams: [
+            { server: "Server Donghua HD", url_stream: embed, embed_url: embed },
+            ...(dhData.episode.stream_url && dhData.episode.stream_url !== embed
+              ? [{ server: "Direct Stream", url_stream: dhData.episode.stream_url, embed_url: dhData.episode.stream_url }]
+              : []),
+          ],
+          download: dhData.episode.download_url
+            ? [{ quality: "HD", href: dhData.episode.download_url, url: dhData.episode.download_url, label: "Unduh HD" }]
+            : [],
+          navigation: {},
+          anime: { title: firstHit.title, rating: String(firstHit.rating || "9.0"), anime_url: `/donghuafilm/watch?id=${firstHit.id}` },
+        };
+      }
+    }
+  } catch {}
+
+  return null;
 }
 
 export async function getAnichinJadwal(dayRaw?: string): Promise<AnichinJadwal> {

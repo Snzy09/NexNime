@@ -189,8 +189,25 @@ function DracinWatchContent() {
           }
         } else {
           // AsiaBox
-          if (d.episode?.video) {
-            setVideoUrl(d.episode.video);
+          const epVideo =
+            d.episode?.video ||
+            detail?.episodes?.find((e: any) => e.number === currentEpisodeNum)?.video;
+          if (epVideo) {
+            setVideoUrl(epVideo);
+            const sub =
+              d.episode?.subtitle ||
+              detail?.episodes?.find((e: any) => e.number === currentEpisodeNum)?.subtitle;
+            if (sub) {
+              const proxiedSub = `/api/dracin?action=subtitle&url=${encodeURIComponent(sub)}`;
+              setSubtitles([
+                {
+                  language: "id-ID",
+                  name: "Bahasa Indonesia",
+                  vtt_url: proxiedSub,
+                },
+              ]);
+              setSelectedSubLang("id-ID");
+            }
           } else {
             setErrorMsg("Gagal memuat video episode AsiaBox.");
           }
@@ -198,10 +215,15 @@ function DracinWatchContent() {
       })
       .catch((err) => {
         console.error("Failed to load episode stream:", err);
-        setErrorMsg("Gagal menghubungi server stream drama.");
+        const epVideo = detail?.episodes?.find((e: any) => e.number === currentEpisodeNum)?.video;
+        if (epVideo) {
+          setVideoUrl(epVideo);
+        } else {
+          setErrorMsg("Gagal menghubungi server stream drama.");
+        }
       })
       .finally(() => setLoadingVideo(false));
-  }, [rawId, currentEpisodeNum, provider, selectedLang]);
+  }, [rawId, currentEpisodeNum, provider, selectedLang, detail]);
 
   // 3. Attach HLS or direct stream to video element
   useEffect(() => {
@@ -538,7 +560,6 @@ function DracinWatchContent() {
               <video
                 ref={videoRef}
                 playsInline
-                crossOrigin="anonymous"
                 className="w-full h-full object-cover sm:object-contain bg-black"
                 onTimeUpdate={() => {
                   if (videoRef.current) {
@@ -549,6 +570,9 @@ function DracinWatchContent() {
                 onEnded={handleNextEp}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
+                onError={() => {
+                  setErrorMsg("Stream video episode ini bermasalah atau sedang diproses. Silakan coba episode lain.");
+                }}
               >
                 {selectedSub && selectedSub.vtt_url && (
                   <track
