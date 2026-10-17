@@ -97,6 +97,22 @@ async function fetchDramox(endpoint: string) {
   return await res.json();
 }
 
+function extractArray<T>(data: any): T[] {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.items)) return data.items;
+  if (Array.isArray(data.series_list)) return data.series_list;
+  if (Array.isArray(data.trending)) return data.trending;
+  if (typeof data === "object") {
+    return Object.keys(data)
+      .filter((k) => /^\d+$/.test(k))
+      .sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
+      .map((k) => data[k])
+      .filter((v: any) => v && typeof v === "object" && (v.id || v.title || v.name || v.key));
+  }
+  return [];
+}
+
 // -------------------------------------------------------------
 // FreeReels API Methods
 // -------------------------------------------------------------
@@ -104,7 +120,7 @@ async function fetchDramox(endpoint: string) {
 export async function getFreeReelsFeed(limit = 12): Promise<FreeReelsItem[]> {
   try {
     const data = await fetchDramox(`/api/freereels/feed?limit=${limit}`);
-    return data.items || [];
+    return extractArray<FreeReelsItem>(data);
   } catch (e) {
     console.error("FreeReels feed error:", e);
     return [];
@@ -114,12 +130,7 @@ export async function getFreeReelsFeed(limit = 12): Promise<FreeReelsItem[]> {
 export async function getFreeReelsPopular(limit = 12): Promise<FreeReelsItem[]> {
   try {
     const data = await fetchDramox(`/api/freereels/popular?limit=${limit}`);
-    if (Array.isArray(data)) return data;
-    if (data.items) return data.items;
-    // Normalized dictionary {"0": {...}, "1": {...}}
-    return Object.values(data).filter(
-      (v: any) => v && typeof v === "object" && (v.id || v.title)
-    ) as FreeReelsItem[];
+    return extractArray<FreeReelsItem>(data);
   } catch (e) {
     console.error("FreeReels popular error:", e);
     return [];
@@ -129,11 +140,7 @@ export async function getFreeReelsPopular(limit = 12): Promise<FreeReelsItem[]> 
 export async function getFreeReelsSoon(limit = 12): Promise<FreeReelsItem[]> {
   try {
     const data = await fetchDramox(`/api/freereels/soon?limit=${limit}`);
-    if (Array.isArray(data)) return data;
-    if (data.items) return data.items;
-    return Object.values(data).filter(
-      (v: any) => v && typeof v === "object" && (v.id || v.title)
-    ) as FreeReelsItem[];
+    return extractArray<FreeReelsItem>(data);
   } catch (e) {
     console.error("FreeReels soon error:", e);
     return [];
@@ -143,11 +150,7 @@ export async function getFreeReelsSoon(limit = 12): Promise<FreeReelsItem[]> {
 export async function getFreeReelsFreeSoon(limit = 12): Promise<FreeReelsItem[]> {
   try {
     const data = await fetchDramox(`/api/freereels/freesoon?limit=${limit}`);
-    if (Array.isArray(data)) return data;
-    if (data.items) return data.items;
-    return Object.values(data).filter(
-      (v: any) => v && typeof v === "object" && (v.id || v.title)
-    ) as FreeReelsItem[];
+    return extractArray<FreeReelsItem>(data);
   } catch (e) {
     console.error("FreeReels freesoon error:", e);
     return [];
@@ -170,11 +173,7 @@ export async function getFreeReelsCategory(
 ): Promise<FreeReelsItem[]> {
   try {
     const data = await fetchDramox(`/api/freereels/category/${encodeURIComponent(id)}?limit=${limit}`);
-    if (Array.isArray(data)) return data;
-    if (data.items) return data.items;
-    return Object.values(data).filter(
-      (v: any) => v && typeof v === "object" && (v.id || v.title)
-    ) as FreeReelsItem[];
+    return extractArray<FreeReelsItem>(data);
   } catch (e) {
     console.error("FreeReels category error:", e);
     return [];
@@ -184,7 +183,7 @@ export async function getFreeReelsCategory(
 export async function getFreeReelsTrending(): Promise<any[]> {
   try {
     const data = await fetchDramox("/api/freereels/trending");
-    return data.trending || [];
+    return extractArray<any>(data);
   } catch (e) {
     console.error("FreeReels trending error:", e);
     return [];
@@ -194,7 +193,7 @@ export async function getFreeReelsTrending(): Promise<any[]> {
 export async function searchFreeReels(q: string, limit = 15): Promise<FreeReelsItem[]> {
   try {
     const data = await fetchDramox(`/api/freereels/search?q=${encodeURIComponent(q)}&limit=${limit}`);
-    return data.items || [];
+    return extractArray<FreeReelsItem>(data);
   } catch (e) {
     console.error("FreeReels search error:", e);
     return [];
@@ -224,7 +223,32 @@ export async function getFreeReelsEpisodes(id: string) {
 export async function getFreeReelsStream(id: string, ep: string | number): Promise<FreeReelsStream | null> {
   try {
     const data = await fetchDramox(`/api/freereels/stream/${encodeURIComponent(id)}/${encodeURIComponent(ep)}`);
-    return data;
+    if (!data) return null;
+
+    const rawSubtitles = Array.isArray(data.subtitles) ? data.subtitles : [];
+    const subtitles: FreeReelsSubtitle[] = rawSubtitles.map((s: any) => {
+      const subUrl = s.vtt || s.subtitle || s.srt_url || s.vtt_url || "";
+      return {
+        language: s.language || "und",
+        name: s.display_name || s.name || s.language || "Unknown",
+        vtt_url: subUrl ? `/api/dracin?action=subtitle&url=${encodeURIComponent(subUrl)}` : "",
+        srt_url: s.subtitle || s.srt_url || "",
+      };
+    });
+
+    const stream_url = data.stream_url || data.proxy_stream_url || data.h264_stream || data.raw_stream_url || "";
+
+    return {
+      success: data.success !== false && !!stream_url,
+      series_id: data.series_id || id,
+      episode_key: String(data.episode_key || ep),
+      stream_url,
+      raw_stream_url: data.raw_stream_url,
+      proxy_stream_url: data.proxy_stream_url || data.h264_stream || stream_url,
+      subtitle_type: data.subtitle_type,
+      subtitles,
+      error: data.error,
+    };
   } catch (e) {
     console.error("FreeReels stream error:", e);
     return null;

@@ -398,10 +398,11 @@ function DracinHubContent() {
             {freeReelsItems.map((item, idx) => {
               const itemId = item.id || item.key || `fr-${idx}`;
               const itemTitle = item.title || item.name || "FreeReels Short";
+              const itemTotalEp = item.episode_count || item.total_episodes || (item as any).raw?.update_count || 60;
               return (
                 <Link
                   key={idx}
-                  href={`/dracin/watch?provider=freereels&id=${encodeURIComponent(itemId)}&title=${encodeURIComponent(itemTitle)}`}
+                  href={`/dracin/watch?provider=freereels&id=${encodeURIComponent(itemId)}&title=${encodeURIComponent(itemTitle)}&total_ep=${itemTotalEp}`}
                   className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-rose-500/40 transition-all duration-300 flex flex-col cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-rose-950/40"
                 >
                   <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">

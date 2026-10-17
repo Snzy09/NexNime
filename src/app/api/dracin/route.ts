@@ -45,6 +45,46 @@ export async function GET(request: Request) {
 
   try {
     // -------------------------------------------------------------
+    // Universal: Subtitle Proxy (SRT to WebVTT with CORS)
+    // -------------------------------------------------------------
+    if (action === "subtitle") {
+      const subUrl = searchParams.get("url");
+      if (!subUrl) {
+        return new NextResponse("Missing url parameter", { status: 400 });
+      }
+      try {
+        const subRes = await fetch(subUrl, {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          },
+        });
+        if (!subRes.ok) {
+          return new NextResponse("Failed to fetch upstream subtitle", { status: subRes.status });
+        }
+        const text = await subRes.text();
+        let vtt = text;
+        if (!text.trim().startsWith("WEBVTT")) {
+          const content = text.replace(/\r\n|\r/g, "\n").trim();
+          const converted = content.replace(
+            /(\d{2}:\d{2}:\d{2}),(\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}),(\d{3})/g,
+            "$1.$2 --> $3.$4"
+          );
+          vtt = `WEBVTT\n\n${converted}`;
+        }
+        return new NextResponse(vtt, {
+          status: 200,
+          headers: {
+            "Content-Type": "text/vtt; charset=utf-8",
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "public, max-age=86400, s-maxage=86400",
+          },
+        });
+      } catch (err: any) {
+        return new NextResponse("Error fetching subtitle: " + err?.message, { status: 500 });
+      }
+    }
+
+    // -------------------------------------------------------------
     // Provider: FreeReels
     // -------------------------------------------------------------
     if (provider === "freereels") {
@@ -83,11 +123,15 @@ export async function GET(request: Request) {
       if ((action === "detail" || action === "episodes") && id) {
         const episodes = await getFreeReelsEpisodes(id);
         const info = await getFreeReelsInfo(id);
-        return NextResponse.json({ success: true, episodes, info });
+        return NextResponse.json({
+          success: true,
+          episodes: episodes && episodes.success !== false ? episodes : null,
+          info: info && info.success !== false ? info : null,
+        });
       }
       if (action === "stream" && id) {
         const stream = await getFreeReelsStream(id, ep);
-        if (stream && stream.stream_url) {
+        if (stream && (stream.stream_url || stream.proxy_stream_url || stream.raw_stream_url)) {
           return NextResponse.json({ success: true, stream });
         }
         return NextResponse.json({ success: false, error: "Stream video FreeReels tidak tersedia." }, { status: 404 });

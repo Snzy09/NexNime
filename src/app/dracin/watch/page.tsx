@@ -44,6 +44,7 @@ function DracinWatchContent() {
   const initialTitle = searchParams.get("title") || "";
   const initialEp = parseInt(searchParams.get("ep") || "1", 10);
   const provider = (searchParams.get("provider") || "asiabox").toLowerCase();
+  const queryTotalEp = parseInt(searchParams.get("total_ep") || searchParams.get("eps") || "0", 10);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [detail, setDetail] = useState<DracinDetail | null>(null);
@@ -67,7 +68,7 @@ function DracinWatchContent() {
   const [showEpisodeDrawer, setShowEpisodeDrawer] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
-  const [totalEpisodesCount, setTotalEpisodesCount] = useState<number>(80);
+  const [totalEpisodesCount, setTotalEpisodesCount] = useState<number>(queryTotalEp > 0 ? queryTotalEp : 80);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerContainerRef = useRef<HTMLDivElement>(null);
@@ -160,17 +161,21 @@ function DracinWatchContent() {
       .then((r) => r.json())
       .then((d) => {
         if (provider === "freereels") {
-          if (d.stream?.stream_url) {
-            setVideoUrl(d.stream.stream_url);
-            if (d.stream.subtitles && Array.isArray(d.stream.subtitles)) {
-              setSubtitles(d.stream.subtitles);
-              const foundId = d.stream.subtitles.find(
-                (s: SubtitleTrack) => s.language.startsWith("id") || s.name.toLowerCase().includes("indonesia")
+          const streamData = d.stream;
+          const streamUrl = streamData?.stream_url || streamData?.proxy_stream_url || streamData?.raw_stream_url;
+          if (streamUrl) {
+            setVideoUrl(streamUrl);
+            if (streamData?.subtitles && Array.isArray(streamData.subtitles)) {
+              setSubtitles(streamData.subtitles);
+              const foundId = streamData.subtitles.find(
+                (s: SubtitleTrack) =>
+                  s.language?.toLowerCase().startsWith("id") ||
+                  (s.name && s.name.toLowerCase().includes("indonesia"))
               );
               if (foundId) {
                 setSelectedSubLang(foundId.language);
-              } else if (d.stream.subtitles.length > 0) {
-                setSelectedSubLang(d.stream.subtitles[0].language);
+              } else if (streamData.subtitles.length > 0) {
+                setSelectedSubLang(streamData.subtitles[0].language);
               }
             }
           } else {
@@ -206,12 +211,31 @@ function DracinWatchContent() {
     let hls: Hls | null = null;
     if (videoUrl.includes(".m3u8")) {
       if (Hls.isSupported()) {
-        hls = new Hls({ enableWorker: true });
+        hls = new Hls({
+          enableWorker: true,
+          lowLatencyMode: true,
+        });
         hls.loadSource(videoUrl);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           video.play().catch(() => {});
           setIsPlaying(true);
+        });
+        hls.on(Hls.Events.ERROR, (_event, data) => {
+          if (data.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                hls?.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                hls?.recoverMediaError();
+                break;
+              default:
+                hls?.destroy();
+                setErrorMsg("Gagal memutar stream video. Silakan coba episode lain.");
+                break;
+            }
+          }
         });
       } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
         video.src = videoUrl;
@@ -437,7 +461,7 @@ function DracinWatchContent() {
               >
                 {selectedSub && selectedSub.vtt_url && (
                   <track
-                    key={selectedSub.language}
+                    key={`${selectedSub.language}-${currentEpisodeNum}`}
                     kind="subtitles"
                     src={selectedSub.vtt_url}
                     srcLang={selectedSub.language}
