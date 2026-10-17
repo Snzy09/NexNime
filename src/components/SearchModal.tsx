@@ -262,18 +262,27 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                         onClick={onClose}
                         className="flex items-center gap-2.5 p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/15 transition-all group"
                       >
-                        <div className="w-10 h-14 rounded-lg overflow-hidden bg-black/60 shrink-0 relative">
+                        <div className="w-10 h-14 rounded-lg overflow-hidden bg-[#111118] shrink-0 relative">
                           {item.cover ? (
                             <img
                               src={item.cover}
                               alt={item.title}
+                              referrerPolicy="no-referrer"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).style.display = "none";
+                                const fb = e.currentTarget.parentElement?.querySelector(".modal-poster-fallback");
+                                if (fb) (fb as HTMLElement).style.display = "flex";
+                              }}
                             />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[9px] text-gray-400 p-1 text-center">
-                              NN
-                            </div>
-                          )}
+                          ) : null}
+                          <div
+                            className={`modal-poster-fallback w-full h-full ${
+                              item.cover ? "hidden" : "flex"
+                            } items-center justify-center bg-gradient-to-b from-[#181824] to-[#0A0A10] text-[9px] font-bold text-amber-400 p-1 text-center`}
+                          >
+                            {item.provider ? item.provider.slice(0, 3).toUpperCase() : "NN"}
+                          </div>
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-bold text-white truncate group-hover:text-amber-300 transition-colors">

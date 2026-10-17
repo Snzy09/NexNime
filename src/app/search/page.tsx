@@ -148,6 +148,25 @@ function SearchResultsContent() {
     }
   };
 
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case "anime":
+        return <Tv className="w-6 h-6 text-amber-400" />;
+      case "manga":
+        return <BookOpen className="w-6 h-6 text-emerald-400" />;
+      case "novel":
+        return <BookMarked className="w-6 h-6 text-amber-300" />;
+      case "dracin":
+        return <Video className="w-6 h-6 text-purple-400" />;
+      case "drakor":
+        return <Clapperboard className="w-6 h-6 text-blue-400" />;
+      case "film":
+        return <Film className="w-6 h-6 text-rose-400" />;
+      default:
+        return <Sparkles className="w-6 h-6 text-gray-400" />;
+    }
+  };
+
   const renderCard = (item: UniversalSearchItem) => {
     return (
       <Link
@@ -155,19 +174,41 @@ function SearchResultsContent() {
         href={item.href}
         className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-amber-400/40 transition-all duration-300 flex flex-col cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-950/20"
       >
-        <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
+        <div className="relative aspect-[2/3] w-full overflow-hidden bg-[#111118]">
           {item.cover ? (
             <img
               src={item.cover}
               alt={item.title}
+              referrerPolicy="no-referrer"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+                const parent = e.currentTarget.parentElement;
+                if (parent) {
+                  const fb = parent.querySelector(".search-poster-fallback");
+                  if (fb) (fb as HTMLElement).style.display = "flex";
+                }
+              }}
             />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-white/5 text-gray-400 text-xs text-center p-3">
-              {item.title}
+          ) : null}
+
+          {/* Stylized Poster Fallback for missing/failed images */}
+          <div
+            className={`search-poster-fallback absolute inset-0 ${
+              item.cover ? "hidden" : "flex"
+            } flex-col items-center justify-between p-3.5 bg-gradient-to-b from-[#181824] via-[#101018] to-[#0A0A10] text-center`}
+          >
+            <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mt-3 shadow-inner">
+              {getCategoryIcon(item.category)}
             </div>
-          )}
+            <p className="text-[11px] font-bold text-gray-200 line-clamp-3 leading-snug px-1">
+              {item.title}
+            </p>
+            <span className="text-[9px] uppercase tracking-wider text-amber-400/80 font-bold mb-1">
+              {item.provider}
+            </span>
+          </div>
 
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 

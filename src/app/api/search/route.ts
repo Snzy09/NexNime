@@ -113,10 +113,14 @@ export async function GET(request: Request) {
     const key = `ac-${item.slug || item.href}`;
     if (!seenAnime.has(key) && item.title) {
       seenAnime.add(key);
+      let cover = item.poster || item.thumb || item.thumbnail || "";
+      if (cover && !cover.startsWith("http")) {
+        cover = `https://anichin.moe/${cover.replace(/^\//, "")}`;
+      }
       animeItems.push({
         id: item.slug || item.href,
         title: item.title,
-        cover: item.poster || "",
+        cover,
         href: `/anichin/watch?url=${encodeURIComponent(item.url || item.href)}&title=${encodeURIComponent(item.title)}`,
         provider: "AniChin",
         category: "anime",
@@ -130,10 +134,11 @@ export async function GET(request: Request) {
     const key = `smh-${item.slug}`;
     if (!seenAnime.has(key) && item.title) {
       seenAnime.add(key);
+      const cover = item.thumb || item.poster || item.thumbnail || "";
       animeItems.push({
         id: item.slug,
         title: item.title,
-        cover: item.poster || "",
+        cover,
         href: `/samehadaku/${item.slug}`,
         provider: "Samehadaku",
         category: "anime",
@@ -147,10 +152,11 @@ export async function GET(request: Request) {
     const key = `as-${item.slug || item.url}`;
     if (!seenAnime.has(key) && item.title) {
       seenAnime.add(key);
+      const cover = item.thumbnail || item.poster || item.thumb || "";
       animeItems.push({
         id: item.slug || item.url,
         title: item.title,
-        cover: item.poster || "",
+        cover,
         href: `/animesail/watch?slug=${item.slug}`,
         provider: "AnimeSail",
         category: "anime",
@@ -164,10 +170,14 @@ export async function GET(request: Request) {
     const key = `ax-${item.slug || item.url}`;
     if (!seenAnime.has(key) && item.title) {
       seenAnime.add(key);
+      const raw = item.poster || item.thumbnail || item.cover || "";
+      const cover = raw.startsWith("http")
+        ? `/api/animexin?action=image&url=${encodeURIComponent(raw)}`
+        : raw;
       animeItems.push({
         id: item.slug || item.url,
         title: item.title,
-        cover: item.poster || "",
+        cover,
         href: `/animexin/watch?slug=${item.slug}`,
         provider: "AnimeXin",
         category: "anime",
@@ -181,10 +191,11 @@ export async function GET(request: Request) {
     const key = `dh-${item.slug}`;
     if (!seenAnime.has(key) && item.title) {
       seenAnime.add(key);
+      const cover = item.poster || item.cover || item.thumbnail || "";
       animeItems.push({
         id: item.slug,
         title: item.title,
-        cover: item.poster || item.cover || "",
+        cover,
         href: `/donghuafilm/watch?slug=${item.slug}`,
         provider: "DonghuaFilm",
         category: "anime",
@@ -198,10 +209,12 @@ export async function GET(request: Request) {
     const key = `otk-${item.slug}`;
     if (!seenAnime.has(key) && item.title) {
       seenAnime.add(key);
+      let cover = item.poster || item.thumbnail || "";
+      if (cover.includes("placeholder.svg")) cover = "";
       animeItems.push({
         id: item.slug,
         title: item.title,
-        cover: item.poster || "",
+        cover,
         href: `/anime/${item.slug}`,
         provider: "AnimeIndo",
         category: "anime",
@@ -368,10 +381,11 @@ export async function GET(request: Request) {
     const key = `mg-${item.id}`;
     if (!seenManga.has(key) && item.title) {
       seenManga.add(key);
+      const cover = item.coverUrl || item.cover || item.image || item.thumbnail || "";
       mangaItems.push({
         id: item.id,
         title: item.title,
-        cover: item.image || "",
+        cover,
         href: `/manga/${item.id}`,
         provider: "Komik",
         category: "manga",
@@ -394,7 +408,7 @@ export async function GET(request: Request) {
       filmItems.push({
         id: item.id,
         title: item.title,
-        cover: item.poster || "",
+        cover: item.poster || item.cover || item.thumbnail || "",
         href: `/film/watch?id=${item.id}&title=${encodeURIComponent(item.title)}`,
         provider: "VidBox",
         category: "film",
@@ -415,10 +429,17 @@ export async function GET(request: Request) {
     const key = `nv-${id}`;
     if (!seenNovel.has(key) && item.title) {
       seenNovel.add(key);
+      const rawThumb = item.thumbnail || item.cover || item.thumb || "";
+      let cover = rawThumb;
+      if (rawThumb && rawThumb.startsWith("http")) {
+        cover = `/api/novel?action=image&url=${encodeURIComponent(rawThumb)}`;
+      } else if (rawThumb) {
+        cover = `https://bacaln.com/${rawThumb.replace(/^\//, "")}`;
+      }
       novelItems.push({
         id,
         title: item.title,
-        cover: item.thumbnail || item.cover || "",
+        cover,
         href: `/novel/read?url=${encodeURIComponent(item.url || "")}`,
         provider: "BacaLN",
         category: "novel",
