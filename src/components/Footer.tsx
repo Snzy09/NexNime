@@ -4,7 +4,7 @@ import { Tv, BookOpen, Clapperboard, Video } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/5 bg-[#08080C] text-gray-400 mt-16">
+    <footer className="border-t border-white/5 bg-[#08080C] text-gray-400 mt-16 pb-20 lg:pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Brand Info */}
