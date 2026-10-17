@@ -305,6 +305,95 @@ function DracinWatchContent() {
     }
   };
 
+  // Mobile Touch Swipe to change episodes
+  const touchStartYRef = useRef<number | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
+  const isSwipingRef = useRef(false);
+  const [swipeToast, setSwipeToast] = useState<{
+    type: "next" | "prev";
+    text: string;
+  } | null>(null);
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
+
+  useEffect(() => {
+    const hintTimer = setTimeout(() => setShowSwipeHint(false), 5000);
+    return () => clearTimeout(hintTimer);
+  }, []);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length !== 1) return;
+    touchStartYRef.current = e.touches[0].clientY;
+    touchStartXRef.current = e.touches[0].clientX;
+    isSwipingRef.current = false;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartYRef.current === null || touchStartXRef.current === null) return;
+    const diffY = touchStartYRef.current - e.changedTouches[0].clientY;
+    const diffX = touchStartXRef.current - e.changedTouches[0].clientX;
+
+    // Minimum distance threshold of 45px for vertical swipe
+    if (Math.abs(diffY) > 45 && Math.abs(diffY) > Math.abs(diffX) * 1.1) {
+      isSwipingRef.current = true;
+      setShowSwipeHint(false);
+      if (diffY > 0) {
+        // Swiped UP -> Next Episode
+        if (currentEpisodeNum < totalEpisodesCount) {
+          setSwipeToast({
+            type: "next",
+            text: `Episode ${currentEpisodeNum + 1}`,
+          });
+          handleNextEp();
+        }
+      } else {
+        // Swiped DOWN -> Previous Episode
+        if (currentEpisodeNum > 1) {
+          setSwipeToast({
+            type: "prev",
+            text: `Episode ${currentEpisodeNum - 1}`,
+          });
+          handlePrevEp();
+        }
+      }
+      setTimeout(() => setSwipeToast(null), 850);
+    } else if (Math.abs(diffX) > 55 && Math.abs(diffX) > Math.abs(diffY) * 1.3) {
+      // Horizontal swipe
+      isSwipingRef.current = true;
+      setShowSwipeHint(false);
+      if (diffX > 0) {
+        // Swiped LEFT -> Next Episode
+        if (currentEpisodeNum < totalEpisodesCount) {
+          setSwipeToast({
+            type: "next",
+            text: `Episode ${currentEpisodeNum + 1}`,
+          });
+          handleNextEp();
+        }
+      } else {
+        // Swiped RIGHT -> Previous Episode
+        if (currentEpisodeNum > 1) {
+          setSwipeToast({
+            type: "prev",
+            text: `Episode ${currentEpisodeNum - 1}`,
+          });
+          handlePrevEp();
+        }
+      }
+      setTimeout(() => setSwipeToast(null), 850);
+    }
+
+    touchStartYRef.current = null;
+    touchStartXRef.current = null;
+  };
+
+  const handleVideoClick = () => {
+    if (isSwipingRef.current) {
+      isSwipingRef.current = false;
+      return;
+    }
+    togglePlay();
+  };
+
   const handleNextEp = () => {
     if (currentEpisodeNum < totalEpisodesCount) {
       setCurrentEpisodeNum((prev) => prev + 1);
@@ -328,7 +417,9 @@ function DracinWatchContent() {
       <main className="flex-1 flex flex-col items-center justify-center p-0 sm:py-6 sm:px-4">
         <div
           ref={playerContainerRef}
-          className="relative w-full sm:max-w-md h-[calc(100vh-64px)] sm:h-[84vh] bg-black sm:rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col justify-between"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="relative w-full sm:max-w-md h-[calc(100vh-64px)] sm:h-[84vh] bg-black sm:rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col justify-between touch-pan-x select-none"
         >
           {/* Top Bar Overlay */}
           <div className="absolute top-0 inset-x-0 p-4 bg-gradient-to-b from-black/90 via-black/40 to-transparent z-30 flex items-center justify-between gap-2">
@@ -422,7 +513,7 @@ function DracinWatchContent() {
           {/* Video Player Center Surface */}
           <div
             className="relative flex-1 w-full h-full flex items-center justify-center bg-black cursor-pointer overflow-hidden"
-            onClick={togglePlay}
+            onClick={handleVideoClick}
           >
             {loadingVideo ? (
               <div className="flex flex-col items-center gap-3 text-rose-400">
@@ -478,6 +569,32 @@ function DracinWatchContent() {
                 <div className="w-16 h-16 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-2xl scale-110">
                   <Play className="w-8 h-8 fill-white ml-1" />
                 </div>
+              </div>
+            )}
+
+            {/* Animated Swipe Toast Feedback */}
+            {swipeToast && (
+              <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none animate-in fade-in zoom-in-90 duration-200">
+                <div className="px-5 py-3 rounded-2xl bg-black/85 backdrop-blur-md border border-rose-500/50 text-white flex items-center gap-2.5 shadow-2xl shadow-rose-950/50">
+                  {swipeToast.type === "next" ? (
+                    <ChevronUp className="w-5 h-5 text-rose-400 animate-bounce" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-rose-400 animate-bounce" />
+                  )}
+                  <span className="font-extrabold text-sm tracking-wide">
+                    {swipeToast.text}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Swipe Hint */}
+            {showSwipeHint && (
+              <div className="sm:hidden absolute bottom-24 left-4 right-4 z-20 pointer-events-none text-center animate-in fade-in duration-300">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold text-rose-200 bg-black/60 backdrop-blur-md border border-white/10 opacity-70 animate-pulse">
+                  <span>Swipe ke atas untuk episode berikutnya</span>
+                  <ChevronUp className="w-3 h-3 text-rose-400" />
+                </span>
               </div>
             )}
           </div>

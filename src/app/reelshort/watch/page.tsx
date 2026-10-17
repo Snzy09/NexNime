@@ -249,6 +249,28 @@ function ReelShortWatchContent() {
         }
       }
       setTimeout(() => setSwipeToast(null), 850);
+    } else if (Math.abs(diffX) > 55 && Math.abs(diffX) > Math.abs(diffY) * 1.3) {
+      isSwipingRef.current = true;
+      if (diffX > 0) {
+        // Swiped LEFT -> Next Episode
+        if (currentEpisodeIndex < maxEp - 1) {
+          setSwipeToast({
+            type: "next",
+            text: `Episode ${currentEpisodeIndex + 2}`,
+          });
+          handleNextEpisode();
+        }
+      } else {
+        // Swiped RIGHT -> Previous Episode
+        if (currentEpisodeIndex > 0) {
+          setSwipeToast({
+            type: "prev",
+            text: `Episode ${currentEpisodeIndex}`,
+          });
+          handlePrevEpisode();
+        }
+      }
+      setTimeout(() => setSwipeToast(null), 850);
     }
     touchStartYRef.current = null;
     touchStartXRef.current = null;
