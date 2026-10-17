@@ -1,8 +1,21 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Search, Star, Tv, ChevronDown } from "lucide-react";
+import {
+  Search,
+  Star,
+  Tv,
+  ChevronDown,
+  Check,
+  Layers,
+  Activity,
+  ArrowUpDown,
+  Flame,
+  Clock,
+  RotateCcw,
+  Filter,
+} from "lucide-react";
 import { AnimeItem } from "@/lib/services/animeService";
 
 interface CatalogFilterGridProps {
@@ -25,14 +38,58 @@ const GENRES = [
   "Sports",
 ];
 
+const SORT_OPTIONS = [
+  { value: "updated" as const, label: "Terbaru Diupdate", icon: Clock },
+  { value: "rating" as const, label: "Rating Tertinggi", icon: Star },
+  { value: "popular" as const, label: "Paling Populer", icon: Flame },
+];
+
+const STATUS_OPTIONS = [
+  { value: "all" as const, label: "Semua Status", color: "bg-gray-400" },
+  { value: "Ongoing" as const, label: "Sedang Tayang (Ongoing)", color: "bg-emerald-400" },
+  { value: "Tamat" as const, label: "Tamat (Completed)", color: "bg-indigo-400" },
+];
+
 export default function CatalogFilterGrid({ items }: CatalogFilterGridProps) {
   const [selectedStatus, setSelectedStatus] = useState<"all" | "Ongoing" | "Tamat">("all");
   const [selectedGenre, setSelectedGenre] = useState<string>("Semua");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"updated" | "rating" | "popular">("updated");
+  const [activeDropdown, setActiveDropdown] = useState<"genre" | "status" | "sort" | null>(null);
+  const filterBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (filterBarRef.current && !filterBarRef.current.contains(event.target as Node)) {
+        setActiveDropdown(null);
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setActiveDropdown(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const hasActiveFilter =
+    selectedStatus !== "all" || selectedGenre !== "Semua" || sortBy !== "updated" || searchQuery !== "";
+
+  const resetFilters = () => {
+    setSelectedStatus("all");
+    setSelectedGenre("Semua");
+    setSortBy("updated");
+    setSearchQuery("");
+    setActiveDropdown(null);
+  };
 
   const filteredItems = useMemo(() => {
-    return items.filter((item) => {
+    const list = items.filter((item) => {
       // Status match
       if (selectedStatus === "Ongoing" && item.status !== "Ongoing") return false;
       if (selectedStatus === "Tamat" && item.status !== "Tamat") return false;
@@ -56,7 +113,23 @@ export default function CatalogFilterGrid({ items }: CatalogFilterGridProps) {
 
       return true;
     });
-  }, [items, selectedStatus, selectedGenre, searchQuery]);
+
+    if (sortBy === "rating") {
+      list.sort((a, b) => {
+        const rA = parseFloat(a.rating || "0") || 0;
+        const rB = parseFloat(b.rating || "0") || 0;
+        return rB - rA;
+      });
+    } else if (sortBy === "popular") {
+      list.sort((a, b) => {
+        const rA = parseFloat(a.rating || "0") || 0;
+        const rB = parseFloat(b.rating || "0") || 0;
+        return rB - rA || a.title.localeCompare(b.title);
+      });
+    }
+
+    return list;
+  }, [items, selectedStatus, selectedGenre, searchQuery, sortBy]);
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -75,9 +148,11 @@ export default function CatalogFilterGrid({ items }: CatalogFilterGridProps) {
           </p>
         </div>
 
-        <div className="px-3 py-1.5 rounded-full bg-[#161622] border border-white/5 text-xs text-gray-300 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400" />
-          <span>Menampilkan <strong className="text-white">{filteredItems.length}</strong> dari 2500 Judul</span>
+        <div className="px-3.5 py-1.5 rounded-full bg-[#14141e]/90 border border-white/10 text-xs text-gray-300 flex items-center gap-2 shadow-inner">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span>
+            Menampilkan <strong className="text-amber-300 font-bold">{filteredItems.length}</strong> dari 2500 Judul
+          </span>
         </div>
       </div>
 
@@ -85,32 +160,35 @@ export default function CatalogFilterGrid({ items }: CatalogFilterGridProps) {
       <div className="flex flex-wrap items-center gap-2 pb-3 mb-3 border-b border-white/5">
         {/* Status Pills */}
         <button
+          type="button"
           onClick={() => setSelectedStatus("all")}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
             selectedStatus === "all"
-              ? "bg-amber-400 text-black shadow-md shadow-amber-400/20"
-              : "bg-[#161622] text-gray-300 hover:bg-[#20202F]"
+              ? "bg-amber-400 text-black shadow-md shadow-amber-400/20 font-bold"
+              : "bg-[#161622] text-gray-300 hover:bg-[#20202F] hover:text-white"
           }`}
         >
           Semua Anime
         </button>
         <button
+          type="button"
           onClick={() => setSelectedStatus("Ongoing")}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
             selectedStatus === "Ongoing"
-              ? "bg-amber-400 text-black shadow-md shadow-amber-400/20"
-              : "bg-[#161622] text-gray-300 hover:bg-[#20202F]"
+              ? "bg-amber-400 text-black shadow-md shadow-amber-400/20 font-bold"
+              : "bg-[#161622] text-gray-300 hover:bg-[#20202F] hover:text-white"
           }`}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           <span>Sedang Tayang (Ongoing)</span>
         </button>
         <button
+          type="button"
           onClick={() => setSelectedStatus("Tamat")}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
             selectedStatus === "Tamat"
-              ? "bg-amber-400 text-black shadow-md shadow-amber-400/20"
-              : "bg-[#161622] text-gray-300 hover:bg-[#20202F]"
+              ? "bg-amber-400 text-black shadow-md shadow-amber-400/20 font-bold"
+              : "bg-[#161622] text-gray-300 hover:bg-[#20202F] hover:text-white"
           }`}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
@@ -124,10 +202,11 @@ export default function CatalogFilterGrid({ items }: CatalogFilterGridProps) {
           {GENRES.map((g) => (
             <button
               key={g}
+              type="button"
               onClick={() => setSelectedGenre(g)}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                 selectedGenre === g
-                  ? "bg-amber-400/20 text-amber-300 border border-amber-400/30"
+                  ? "bg-amber-400/20 text-amber-300 border border-amber-400/40 shadow-sm shadow-amber-400/10 font-bold"
                   : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10"
               }`}
             >
@@ -137,50 +216,246 @@ export default function CatalogFilterGrid({ items }: CatalogFilterGridProps) {
         </div>
       </div>
 
-      {/* Second Filter Bar: Dropdowns */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 bg-[#121218] p-3 rounded-xl border border-white/5">
-        {/* Genre Dropdown */}
-        <div className="relative">
-          <select
-            value={selectedGenre}
-            onChange={(e) => setSelectedGenre(e.target.value)}
-            className="w-full bg-[#181822] text-xs sm:text-sm text-gray-300 rounded-lg px-3 py-2 border border-white/5 focus:border-amber-400/40 focus:outline-none appearance-none cursor-pointer"
-          >
-            {GENRES.map((g) => (
-              <option key={g} value={g} className="bg-[#181822] text-white">
-                {g === "Semua" ? "Semua Genre" : g}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-        </div>
+      {/* Modern Custom Selector Filter Bar */}
+      <div
+        ref={filterBarRef}
+        className="relative z-30 mb-6 bg-gradient-to-b from-[#151520] to-[#0f0f17] p-3 sm:p-4 rounded-2xl border border-white/10 shadow-xl shadow-black/40"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          {/* 3 Interactive Selectors */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 flex-1">
+            {/* 1. Genre Selector */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setActiveDropdown(activeDropdown === "genre" ? null : "genre")}
+                className={`w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border ${
+                  selectedGenre !== "Semua"
+                    ? "bg-amber-400/10 text-amber-300 border-amber-400/40 shadow-sm shadow-amber-400/15"
+                    : "bg-[#181824] hover:bg-[#202030] text-gray-200 border-white/10 hover:border-white/20"
+                }`}
+              >
+                <span className="flex items-center gap-2 truncate">
+                  <Layers
+                    className={`w-4 h-4 flex-shrink-0 ${
+                      selectedGenre !== "Semua" ? "text-amber-400" : "text-gray-400"
+                    }`}
+                  />
+                  <span className="text-gray-400 text-xs hidden md:inline">Genre:</span>
+                  <span className="font-semibold text-white truncate">
+                    {selectedGenre === "Semua" ? "Semua Genre" : selectedGenre}
+                  </span>
+                </span>
+                <ChevronDown
+                  className={`w-4 h-4 flex-shrink-0 text-gray-400 transition-transform duration-200 ${
+                    activeDropdown === "genre" ? "rotate-180 text-amber-400" : ""
+                  }`}
+                />
+              </button>
 
-        {/* Status Dropdown */}
-        <div className="relative">
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value as any)}
-            className="w-full bg-[#181822] text-xs sm:text-sm text-gray-300 rounded-lg px-3 py-2 border border-white/5 focus:border-amber-400/40 focus:outline-none appearance-none cursor-pointer"
-          >
-            <option value="all" className="bg-[#181822] text-white">Semua Status</option>
-            <option value="Ongoing" className="bg-[#181822] text-white">Ongoing</option>
-            <option value="Tamat" className="bg-[#181822] text-white">Tamat</option>
-          </select>
-          <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-        </div>
+              {/* Genre Floating Popover */}
+              {activeDropdown === "genre" && (
+                <div className="absolute top-full left-0 mt-2 w-72 sm:w-80 p-2.5 rounded-2xl bg-[#141420]/95 backdrop-blur-xl border border-white/15 shadow-2xl shadow-black/90 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="flex items-center justify-between px-2 py-1 mb-1.5 border-b border-white/10">
+                    <span className="text-[10px] font-bold tracking-wider uppercase text-amber-400 flex items-center gap-1.5">
+                      <Filter className="w-3 h-3" />
+                      Pilih Kategori Genre
+                    </span>
+                    {selectedGenre !== "Semua" && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedGenre("Semua")}
+                        className="text-[10px] text-gray-400 hover:text-white"
+                      >
+                        Reset Genre
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-1 max-h-64 overflow-y-auto no-scrollbar pr-0.5">
+                    {GENRES.map((g) => {
+                      const isSel = selectedGenre === g;
+                      return (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => {
+                            setSelectedGenre(g);
+                            setActiveDropdown(null);
+                          }}
+                          className={`flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-all text-left ${
+                            isSel
+                              ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md shadow-amber-400/20"
+                              : "text-gray-300 hover:text-white hover:bg-white/10"
+                          }`}
+                        >
+                          <span className="truncate">{g === "Semua" ? "Semua Genre" : g}</span>
+                          {isSel && <Check className="w-3.5 h-3.5 flex-shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
 
-        {/* Sort Dropdown */}
-        <div className="relative">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="w-full bg-[#181822] text-xs sm:text-sm text-gray-300 rounded-lg px-3 py-2 border border-white/5 focus:border-amber-400/40 focus:outline-none appearance-none cursor-pointer"
-          >
-            <option value="updated" className="bg-[#181822] text-white">Terbaru Diupdate</option>
-            <option value="rating" className="bg-[#181822] text-white">Rating Tertinggi</option>
-            <option value="popular" className="bg-[#181822] text-white">Paling Populer</option>
-          </select>
-          <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            {/* 2. Status Selector */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")}
+                className={`w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border ${
+                  selectedStatus !== "all"
+                    ? "bg-amber-400/10 text-amber-300 border-amber-400/40 shadow-sm shadow-amber-400/15"
+                    : "bg-[#181824] hover:bg-[#202030] text-gray-200 border-white/10 hover:border-white/20"
+                }`}
+              >
+                <span className="flex items-center gap-2 truncate">
+                  <Activity
+                    className={`w-4 h-4 flex-shrink-0 ${
+                      selectedStatus !== "all" ? "text-amber-400" : "text-gray-400"
+                    }`}
+                  />
+                  <span className="text-gray-400 text-xs hidden md:inline">Status:</span>
+                  <span className="flex items-center gap-1.5 font-semibold text-white truncate">
+                    {selectedStatus === "Ongoing" && (
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    )}
+                    {selectedStatus === "Tamat" && (
+                      <span className="w-2 h-2 rounded-full bg-indigo-400" />
+                    )}
+                    {selectedStatus === "all" && (
+                      <span className="w-2 h-2 rounded-full bg-gray-400" />
+                    )}
+                    <span>
+                      {selectedStatus === "all"
+                        ? "Semua Status"
+                        : selectedStatus === "Ongoing"
+                        ? "Ongoing"
+                        : "Tamat"}
+                    </span>
+                  </span>
+                </span>
+                <ChevronDown
+                  className={`w-4 h-4 flex-shrink-0 text-gray-400 transition-transform duration-200 ${
+                    activeDropdown === "status" ? "rotate-180 text-amber-400" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Status Floating Popover */}
+              {activeDropdown === "status" && (
+                <div className="absolute top-full left-0 mt-2 w-64 p-2.5 rounded-2xl bg-[#141420]/95 backdrop-blur-xl border border-white/15 shadow-2xl shadow-black/90 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="text-[10px] font-bold tracking-wider uppercase text-amber-400 px-2 py-1 mb-1.5 border-b border-white/10">
+                    Status Penayangan
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    {STATUS_OPTIONS.map((opt) => {
+                      const isSel = selectedStatus === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            setSelectedStatus(opt.value);
+                            setActiveDropdown(null);
+                          }}
+                          className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                            isSel
+                              ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md shadow-amber-400/20"
+                              : "text-gray-300 hover:text-white hover:bg-white/10"
+                          }`}
+                        >
+                          <span className="flex items-center gap-2.5">
+                            <span className={`w-2 h-2 rounded-full ${opt.color}`} />
+                            <span>{opt.label}</span>
+                          </span>
+                          {isSel && <Check className="w-3.5 h-3.5" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 3. Sort Selector */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setActiveDropdown(activeDropdown === "sort" ? null : "sort")}
+                className={`w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border ${
+                  sortBy !== "updated"
+                    ? "bg-amber-400/10 text-amber-300 border-amber-400/40 shadow-sm shadow-amber-400/15"
+                    : "bg-[#181824] hover:bg-[#202030] text-gray-200 border-white/10 hover:border-white/20"
+                }`}
+              >
+                <span className="flex items-center gap-2 truncate">
+                  <ArrowUpDown
+                    className={`w-4 h-4 flex-shrink-0 ${
+                      sortBy !== "updated" ? "text-amber-400" : "text-gray-400"
+                    }`}
+                  />
+                  <span className="text-gray-400 text-xs hidden md:inline">Urutan:</span>
+                  <span className="font-semibold text-white truncate">
+                    {SORT_OPTIONS.find((s) => s.value === sortBy)?.label || "Terbaru"}
+                  </span>
+                </span>
+                <ChevronDown
+                  className={`w-4 h-4 flex-shrink-0 text-gray-400 transition-transform duration-200 ${
+                    activeDropdown === "sort" ? "rotate-180 text-amber-400" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Sort Floating Popover */}
+              {activeDropdown === "sort" && (
+                <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-60 p-2.5 rounded-2xl bg-[#141420]/95 backdrop-blur-xl border border-white/15 shadow-2xl shadow-black/90 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="text-[10px] font-bold tracking-wider uppercase text-amber-400 px-2 py-1 mb-1.5 border-b border-white/10">
+                    Urutan Konten
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    {SORT_OPTIONS.map((opt) => {
+                      const isSel = sortBy === opt.value;
+                      const Icon = opt.icon;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            setSortBy(opt.value);
+                            setActiveDropdown(null);
+                          }}
+                          className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                            isSel
+                              ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md shadow-amber-400/20"
+                              : "text-gray-300 hover:text-white hover:bg-white/10"
+                          }`}
+                        >
+                          <span className="flex items-center gap-2.5">
+                            <Icon className="w-3.5 h-3.5" />
+                            <span>{opt.label}</span>
+                          </span>
+                          {isSel && <Check className="w-3.5 h-3.5" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Reset Action (only when any filter is active) */}
+          {hasActiveFilter && (
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-all hover:scale-105 active:scale-95"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset Filter</span>
+            </button>
+          )}
         </div>
       </div>
 

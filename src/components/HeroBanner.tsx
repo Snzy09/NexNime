@@ -416,8 +416,8 @@ export default function HeroBanner({
 
         {/* Carousel Bottom Controls & Category Pills */}
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
-          {/* Sub-category Quick Jump Pills */}
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          {/* Sub-category Quick Jump Pills - Modern Frosted Capsule Dock */}
+          <div className="inline-flex items-center gap-1 sm:gap-1.5 p-1 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 shadow-xl shadow-black/50 overflow-x-auto no-scrollbar max-w-full">
             {CATEGORY_TABS.map((cat, i) => {
               const isActive = slide.category.toUpperCase().includes(cat.key);
               return (
@@ -425,14 +425,21 @@ export default function HeroBanner({
                   key={i}
                   type="button"
                   onClick={() => jumpToCategory(cat.key)}
-                  className={`px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold tracking-wider transition-all flex items-center gap-1.5 ${
+                  className={`relative px-3 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-wider transition-all duration-300 flex items-center gap-1.5 whitespace-nowrap ${
                     isActive
-                      ? "bg-amber-400/20 text-amber-300 border border-amber-400/50 shadow-sm shadow-amber-400/20 ring-1 ring-amber-400/30"
-                      : "bg-black/50 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10"
+                      ? "bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-black shadow-lg shadow-amber-400/30 font-extrabold scale-[1.03]"
+                      : "text-gray-300 hover:text-white hover:bg-white/10"
                   }`}
                 >
-                  <cat.icon className={`w-3 h-3 ${cat.color}`} />
+                  <cat.icon
+                    className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                      isActive ? "text-black scale-110" : cat.color
+                    }`}
+                  />
                   <span>{cat.label}</span>
+                  {isActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
+                  )}
                 </button>
               );
             })}
