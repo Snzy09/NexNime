@@ -16,6 +16,9 @@ export interface FreeReelsItem {
   labels?: string;
   series_tag?: string[];
   total_episodes?: number;
+  episode_count?: number;
+  booking_count?: number;
+  listing_time?: number;
 }
 
 export interface FreeReelsCategory {
