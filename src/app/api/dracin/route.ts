@@ -6,30 +6,202 @@ import {
   getDracinDetail,
   getDracinEpisode,
 } from "@/lib/services/dracinService";
+import {
+  getFreeReelsFeed,
+  getFreeReelsPopular,
+  getFreeReelsSoon,
+  getFreeReelsFreeSoon,
+  getFreeReelsCategories,
+  getFreeReelsCategory,
+  getFreeReelsTrending,
+  searchFreeReels,
+  getFreeReelsInfo,
+  getFreeReelsEpisodes,
+  getFreeReelsStream,
+  getPineDramaLanguages,
+  getPineDramaPopular,
+  getPineDramaTrending,
+  getPineDramaCategories,
+  searchPineDrama,
+  getPineDramaInfo,
+  getPineDramaEpisodes,
+  getPineDramaStream,
+  getMeloloCategories,
+  searchMelolo,
+  getMeloloEpisodes,
+  getMeloloStream,
+} from "@/lib/services/dramoxService";
 import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+  const provider = (searchParams.get("provider") || "").toLowerCase();
   const action = searchParams.get("action") || "home";
-  const q = searchParams.get("q");
-  const slug = searchParams.get("slug");
-  const ep = parseInt(searchParams.get("ep") || "1");
+  const q = searchParams.get("q") || "";
+  const id = searchParams.get("id") || searchParams.get("slug") || "";
+  const ep = searchParams.get("ep") || "1";
+  const lang = searchParams.get("lang") || "id";
+  const limit = parseInt(searchParams.get("limit") || "15", 10);
 
   try {
+    // -------------------------------------------------------------
+    // Provider: FreeReels
+    // -------------------------------------------------------------
+    if (provider === "freereels") {
+      if (action === "feed" || action === "home") {
+        const items = await getFreeReelsFeed(limit);
+        return NextResponse.json({ success: true, items });
+      }
+      if (action === "popular") {
+        const items = await getFreeReelsPopular(limit);
+        return NextResponse.json({ success: true, items });
+      }
+      if (action === "soon") {
+        const items = await getFreeReelsSoon(limit);
+        return NextResponse.json({ success: true, items });
+      }
+      if (action === "freesoon") {
+        const items = await getFreeReelsFreeSoon(limit);
+        return NextResponse.json({ success: true, items });
+      }
+      if (action === "categories") {
+        const categories = await getFreeReelsCategories();
+        return NextResponse.json({ success: true, categories });
+      }
+      if (action === "category" && id) {
+        const items = await getFreeReelsCategory(id, limit);
+        return NextResponse.json({ success: true, items });
+      }
+      if (action === "trending") {
+        const trending = await getFreeReelsTrending();
+        return NextResponse.json({ success: true, trending });
+      }
+      if (action === "search" && q) {
+        const items = await searchFreeReels(q, limit);
+        return NextResponse.json({ success: true, items });
+      }
+      if ((action === "detail" || action === "episodes") && id) {
+        const episodes = await getFreeReelsEpisodes(id);
+        const info = await getFreeReelsInfo(id);
+        return NextResponse.json({ success: true, episodes, info });
+      }
+      if (action === "stream" && id) {
+        const stream = await getFreeReelsStream(id, ep);
+        if (stream && stream.stream_url) {
+          return NextResponse.json({ success: true, stream });
+        }
+        return NextResponse.json({ success: false, error: "Stream video FreeReels tidak tersedia." }, { status: 404 });
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Provider: PineDrama
+    // -------------------------------------------------------------
+    if (provider === "pinedrama") {
+      if (action === "languages") {
+        const languages = await getPineDramaLanguages();
+        return NextResponse.json({ success: true, languages });
+      }
+      if (action === "popular" || action === "home") {
+        const items = await getPineDramaPopular(lang, limit);
+        return NextResponse.json({ success: true, items });
+      }
+      if (action === "trending") {
+        const items = await getPineDramaTrending(lang, limit);
+        return NextResponse.json({ success: true, items });
+      }
+      if (action === "categories") {
+        const categories = await getPineDramaCategories(lang);
+        return NextResponse.json({ success: true, categories });
+      }
+      if (action === "search" && q) {
+        const items = await searchPineDrama(q, lang, limit);
+        return NextResponse.json({ success: true, items });
+      }
+      if ((action === "detail" || action === "episodes") && id) {
+        const episodes = await getPineDramaEpisodes(id);
+        const info = await getPineDramaInfo(id, lang);
+        return NextResponse.json({ success: true, episodes, info });
+      }
+      if (action === "stream" && id) {
+        const stream = await getPineDramaStream(id, ep, lang);
+        if (stream && (stream.stream_url || stream.success)) {
+          return NextResponse.json({ success: true, stream });
+        }
+        return NextResponse.json({ success: false, error: "Stream video PineDrama tidak tersedia." }, { status: 404 });
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Provider: Melolo
+    // -------------------------------------------------------------
+    if (provider === "melolo") {
+      if (action === "categories") {
+        const categories = await getMeloloCategories();
+        return NextResponse.json({ success: true, categories });
+      }
+      if (action === "search" && q) {
+        const items = await searchMelolo(q, limit, lang);
+        return NextResponse.json({ success: true, items });
+      }
+      if (action === "episodes" && id) {
+        const episodes = await getMeloloEpisodes(id);
+        return NextResponse.json({ success: true, episodes });
+      }
+      if (action === "stream" && id) {
+        const stream = await getMeloloStream(id, ep, lang);
+        if (stream && (stream.stream_url || stream.success)) {
+          return NextResponse.json({ success: true, stream });
+        }
+        return NextResponse.json({ success: false, error: "Stream video Melolo tidak tersedia." }, { status: 404 });
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Default & Multi-Provider Search
+    // -------------------------------------------------------------
     if (action === "search" && q) {
-      const items = await searchDracin(q);
-      if (items.length > 0) return NextResponse.json({ success: true, items });
+      const [asiaItems, freeReelsItems, pineItems] = await Promise.all([
+        searchDracin(q).catch(() => []),
+        searchFreeReels(q, 10).catch(() => []),
+        searchPineDrama(q, "id", 10).catch(() => []),
+      ]);
+
+      const normalizedFreeReels = freeReelsItems.map((f) => ({
+        id: f.id || f.key,
+        title: f.name || f.title,
+        slug: f.id || f.key,
+        image: f.cover,
+        episodes: 80,
+        provider: "freereels",
+        url: `/dracin/watch?provider=freereels&id=${encodeURIComponent(f.id || f.key || "")}&title=${encodeURIComponent(f.name || f.title || "")}`,
+      }));
+
+      const normalizedPine = pineItems.map((p) => ({
+        id: p.id,
+        title: p.title,
+        slug: p.id,
+        image: p.cover,
+        episodes: p.total || 50,
+        provider: "pinedrama",
+        url: `/dracin/watch?provider=pinedrama&id=${encodeURIComponent(p.id)}&title=${encodeURIComponent(p.title)}`,
+      }));
+
+      const combined = [...asiaItems, ...normalizedFreeReels, ...normalizedPine];
+      if (combined.length > 0) return NextResponse.json({ success: true, items: combined });
+
       const filtered = REAL_DRACIN_SHORTS.filter((d) =>
         d.title.toLowerCase().includes(q.toLowerCase())
       );
       return NextResponse.json({ success: true, items: filtered });
     }
 
-    if (action === "detail" && slug) {
-      const detail = await getDracinDetail(slug);
+    // AsiaBox Fallback endpoints
+    if (action === "detail" && id) {
+      const detail = await getDracinDetail(id);
       if (detail && detail.episodes.length > 0) return NextResponse.json({ success: true, detail });
 
-      const found = REAL_DRACIN_SHORTS.find((d) => d.slug === slug) || REAL_DRACIN_SHORTS[0];
+      const found = REAL_DRACIN_SHORTS.find((d) => d.slug === id) || REAL_DRACIN_SHORTS[0];
       return NextResponse.json({
         success: true,
         detail: {
@@ -48,11 +220,12 @@ export async function GET(request: Request) {
       });
     }
 
-    if (action === "episode" && slug) {
-      let episode = await getDracinEpisode(slug, ep);
+    if (action === "episode" && id) {
+      const epNum = parseInt(ep, 10);
+      let episode = await getDracinEpisode(id, epNum);
       if (!episode || !episode.video) {
-        const detail = await getDracinDetail(slug);
-        const found = detail?.episodes?.find((e) => e.number === ep);
+        const detail = await getDracinDetail(id);
+        const found = detail?.episodes?.find((e) => e.number === epNum);
         if (found && found.video) {
           episode = found;
         }
@@ -66,7 +239,7 @@ export async function GET(request: Request) {
       );
     }
 
-    // Default: home
+    // Default: AsiaBox Home
     const items = await getDracinHome();
     if (items.length > 0) return NextResponse.json({ success: true, items });
     return NextResponse.json({ success: true, items: REAL_DRACIN_SHORTS });

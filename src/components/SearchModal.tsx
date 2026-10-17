@@ -761,7 +761,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     {results.dracin.map((item, idx) => (
                       <Link
                         key={idx}
-                        href={`/dracin/watch?slug=${encodeURIComponent(item.slug)}&title=${encodeURIComponent(item.title)}`}
+                        href={item.url || `/dracin/watch?provider=${item.provider || "asiabox"}&id=${encodeURIComponent(item.slug || item.id)}&title=${encodeURIComponent(item.title)}`}
                         onClick={onClose}
                         className="flex items-center gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group"
                       >
@@ -775,7 +775,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             {item.title}
                           </p>
                           <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
-                            <span className="text-rose-400">9:16 Shorts</span>
+                            <span className="text-rose-400 font-semibold uppercase">{item.provider || "Shorts"}</span>
                             <span>•</span>
                             <span>{item.episodes || "80"} Eps</span>
                           </div>

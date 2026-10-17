@@ -22,6 +22,8 @@ import {
   Minimize2,
   ChevronLeft,
   Heart,
+  Globe,
+  Subtitles,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -29,18 +31,32 @@ import SearchModal from "@/components/SearchModal";
 import { DracinItem, DracinDetail } from "@/lib/services/dracinService";
 import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
 
+interface SubtitleTrack {
+  language: string;
+  name: string;
+  vtt_url?: string;
+  srt_url?: string;
+}
+
 function DracinWatchContent() {
   const searchParams = useSearchParams();
-  const rawSlug = searchParams.get("slug") || "";
+  const rawId = searchParams.get("id") || searchParams.get("slug") || "";
   const initialTitle = searchParams.get("title") || "";
   const initialEp = parseInt(searchParams.get("ep") || "1", 10);
+  const provider = (searchParams.get("provider") || "asiabox").toLowerCase();
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [detail, setDetail] = useState<DracinDetail | null>(null);
-  const [loadingDetail, setLoadingDetail] = useState(true);
   const [currentEpisodeNum, setCurrentEpisodeNum] = useState<number>(initialEp > 0 ? initialEp : 1);
   const [videoUrl, setVideoUrl] = useState<string>("");
   const [loadingVideo, setLoadingVideo] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Subtitles & Languages
+  const [subtitles, setSubtitles] = useState<SubtitleTrack[]>([]);
+  const [selectedSubLang, setSelectedSubLang] = useState<string>("id-ID");
+  const [showSubMenu, setShowSubMenu] = useState(false);
+  const [selectedLang, setSelectedLang] = useState<string>("id");
 
   // Player controls state
   const [isPlaying, setIsPlaying] = useState(true);
@@ -51,63 +67,136 @@ function DracinWatchContent() {
   const [showEpisodeDrawer, setShowEpisodeDrawer] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
+  const [totalEpisodesCount, setTotalEpisodesCount] = useState<number>(80);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerContainerRef = useRef<HTMLDivElement>(null);
 
-  // Fallback drama metadata if API takes time or is offline
+  // Fallback drama metadata
   const fallbackDrama: DracinItem =
-    REAL_DRACIN_SHORTS.find((d) => d.slug === rawSlug) || {
-      slug: rawSlug,
-      title: initialTitle || "Short Drama AsiaBox",
-      url: `https://asiaboxdrama.com/id/movie/${rawSlug}`,
+    REAL_DRACIN_SHORTS.find((d) => d.slug === rawId) || {
+      slug: rawId,
+      title: initialTitle || "Short Drama",
+      url: `/dracin/watch?provider=${provider}&id=${encodeURIComponent(rawId)}`,
       episodes: 80,
-      description: "Serial drama pendek vertikal 9:16 dengan teks bahasa Indonesia.",
+      description: "Serial drama pendek vertikal 9:16 kualitas HD.",
     };
 
   const activeDrama = detail?.film || fallbackDrama;
-  const totalEpisodes = detail?.total_episode || activeDrama.episodes || 80;
+  const dramaTitle = initialTitle || activeDrama.title || "Short Drama";
 
-  // 1. Fetch Drama Details
+  // 1. Fetch Episodes / Detail List
   useEffect(() => {
-    if (!rawSlug) return;
-    setLoadingDetail(true);
-    fetch(`/api/dracin?action=detail&slug=${encodeURIComponent(rawSlug)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.detail) {
-          setDetail(data.detail);
-        }
-      })
-      .catch((err) => console.error("Error loading dracin detail:", err))
-      .finally(() => setLoadingDetail(false));
-  }, [rawSlug]);
+    if (!rawId) return;
 
-  // 2. Fetch Episode Video Stream
+    if (provider === "freereels") {
+      fetch(`/api/dracin?provider=freereels&action=detail&id=${encodeURIComponent(rawId)}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.episodes?.episodes?.length) {
+            setTotalEpisodesCount(data.episodes.episodes.length);
+          } else if (data.info?.total_episodes) {
+            setTotalEpisodesCount(data.info.total_episodes);
+          } else {
+            setTotalEpisodesCount(80);
+          }
+        })
+        .catch(() => setTotalEpisodesCount(80));
+    } else if (provider === "pinedrama") {
+      fetch(`/api/dracin?provider=pinedrama&action=episodes&id=${encodeURIComponent(rawId)}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.episodes?.total) {
+            setTotalEpisodesCount(data.episodes.total);
+          } else if (data.episodes?.episodes?.length) {
+            setTotalEpisodesCount(data.episodes.episodes.length);
+          } else {
+            setTotalEpisodesCount(50);
+          }
+        })
+        .catch(() => setTotalEpisodesCount(50));
+    } else if (provider === "melolo") {
+      fetch(`/api/dracin?provider=melolo&action=episodes&id=${encodeURIComponent(rawId)}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.episodes?.total_episode) {
+            setTotalEpisodesCount(data.episodes.total_episode);
+          } else {
+            setTotalEpisodesCount(60);
+          }
+        })
+        .catch(() => setTotalEpisodesCount(60));
+    } else {
+      // AsiaBox
+      fetch(`/api/dracin?action=detail&slug=${encodeURIComponent(rawId)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.detail) {
+            setDetail(data.detail);
+            setTotalEpisodesCount(data.detail.total_episode || 80);
+          }
+        })
+        .catch(() => setTotalEpisodesCount(80));
+    }
+  }, [rawId, provider]);
+
+  // 2. Fetch Video Stream for Selected Episode
   useEffect(() => {
-    if (!rawSlug) return;
+    if (!rawId) return;
     setLoadingVideo(true);
+    setErrorMsg(null);
     setVideoUrl("");
 
-    fetch(
-      `/api/dracin?action=episode&slug=${encodeURIComponent(
-        rawSlug
-      )}&ep=${currentEpisodeNum}`
-    )
+    let url = `/api/dracin?action=episode&slug=${encodeURIComponent(rawId)}&ep=${currentEpisodeNum}`;
+    if (provider === "freereels") {
+      url = `/api/dracin?provider=freereels&action=stream&id=${encodeURIComponent(rawId)}&ep=${currentEpisodeNum}`;
+    } else if (provider === "pinedrama") {
+      url = `/api/dracin?provider=pinedrama&action=stream&id=${encodeURIComponent(rawId)}&ep=${currentEpisodeNum}&lang=${selectedLang}`;
+    } else if (provider === "melolo") {
+      url = `/api/dracin?provider=melolo&action=stream&id=${encodeURIComponent(rawId)}&ep=${currentEpisodeNum}&lang=${selectedLang}`;
+    }
+
+    fetch(url)
       .then((r) => r.json())
       .then((d) => {
-        if (d.episode?.video) {
-          setVideoUrl(d.episode.video);
+        if (provider === "freereels") {
+          if (d.stream?.stream_url) {
+            setVideoUrl(d.stream.stream_url);
+            if (d.stream.subtitles && Array.isArray(d.stream.subtitles)) {
+              setSubtitles(d.stream.subtitles);
+              const foundId = d.stream.subtitles.find(
+                (s: SubtitleTrack) => s.language.startsWith("id") || s.name.toLowerCase().includes("indonesia")
+              );
+              if (foundId) {
+                setSelectedSubLang(foundId.language);
+              } else if (d.stream.subtitles.length > 0) {
+                setSelectedSubLang(d.stream.subtitles[0].language);
+              }
+            }
+          } else {
+            setErrorMsg(d.error || "Stream video FreeReels tidak tersedia.");
+          }
+        } else if (provider === "pinedrama" || provider === "melolo") {
+          if (d.stream?.stream_url) {
+            setVideoUrl(d.stream.stream_url);
+          } else {
+            setErrorMsg(d.error || "Stream video tidak ditemukan.");
+          }
         } else {
-          setVideoUrl("");
+          // AsiaBox
+          if (d.episode?.video) {
+            setVideoUrl(d.episode.video);
+          } else {
+            setErrorMsg("Gagal memuat video episode AsiaBox.");
+          }
         }
       })
       .catch((err) => {
-        console.error("Failed to load episode video:", err);
-        setVideoUrl("");
+        console.error("Failed to load episode stream:", err);
+        setErrorMsg("Gagal menghubungi server stream drama.");
       })
       .finally(() => setLoadingVideo(false));
-  }, [rawSlug, currentEpisodeNum]);
+  }, [rawId, currentEpisodeNum, provider, selectedLang]);
 
   // 3. Attach HLS or direct stream to video element
   useEffect(() => {
@@ -181,444 +270,387 @@ function DracinWatchContent() {
     }
   };
 
-  const handleNextEpisode = () => {
-    if (currentEpisodeNum < totalEpisodes) {
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.play().catch(() => {});
+      setIsPlaying(true);
+    }
+  };
+
+  const handleNextEp = () => {
+    if (currentEpisodeNum < totalEpisodesCount) {
       setCurrentEpisodeNum((prev) => prev + 1);
     }
   };
 
-  const handlePrevEpisode = () => {
+  const handlePrevEp = () => {
     if (currentEpisodeNum > 1) {
       setCurrentEpisodeNum((prev) => prev - 1);
     }
   };
 
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
-      setDuration(videoRef.current.duration || 0);
-    }
-  };
-
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const seekTo = parseFloat(e.target.value);
-    if (videoRef.current) {
-      videoRef.current.currentTime = seekTo;
-      setCurrentTime(seekTo);
-    }
-  };
-
-  const formatTime = (seconds: number) => {
-    if (isNaN(seconds)) return "00:00";
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  };
-
-  // Vertical Touch / Mouse Drag / Wheel swipe navigation
-  const touchStartYRef = useRef<number | null>(null);
-  const touchStartXRef = useRef<number | null>(null);
-  const isSwipingRef = useRef(false);
-  const [swipeToast, setSwipeToast] = useState<{
-    type: "next" | "prev";
-    text: string;
-  } | null>(null);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartYRef.current = e.touches[0].clientY;
-    touchStartXRef.current = e.touches[0].clientX;
-    isSwipingRef.current = false;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartYRef.current === null || touchStartXRef.current === null) return;
-    const diffY = touchStartYRef.current - e.changedTouches[0].clientY;
-    const diffX = touchStartXRef.current - e.changedTouches[0].clientX;
-
-    if (Math.abs(diffY) > 45 && Math.abs(diffY) > Math.abs(diffX) * 1.2) {
-      isSwipingRef.current = true;
-      if (diffY > 0) {
-        if (currentEpisodeNum < totalEpisodes) {
-          setSwipeToast({ type: "next", text: `Episode ${currentEpisodeNum + 1}` });
-          handleNextEpisode();
-        }
-      } else {
-        if (currentEpisodeNum > 1) {
-          setSwipeToast({ type: "prev", text: `Episode ${currentEpisodeNum - 1}` });
-          handlePrevEpisode();
-        }
-      }
-      setTimeout(() => setSwipeToast(null), 850);
-    }
-    touchStartYRef.current = null;
-    touchStartXRef.current = null;
-  };
-
-  const lastWheelTimeRef = useRef<number>(0);
-  const mouseStartYRef = useRef<number | null>(null);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest("button, a, input, select")) return;
-    mouseStartYRef.current = e.clientY;
-    isSwipingRef.current = false;
-  };
-
-  const handleMouseUp = (e: React.MouseEvent) => {
-    if (mouseStartYRef.current === null) return;
-    const diffY = mouseStartYRef.current - e.clientY;
-    if (Math.abs(diffY) > 50) {
-      isSwipingRef.current = true;
-      if (diffY > 0 && currentEpisodeNum < totalEpisodes) {
-        setSwipeToast({ type: "next", text: `Episode ${currentEpisodeNum + 1}` });
-        handleNextEpisode();
-      } else if (diffY < 0 && currentEpisodeNum > 1) {
-        setSwipeToast({ type: "prev", text: `Episode ${currentEpisodeNum - 1}` });
-        handlePrevEpisode();
-      }
-      setTimeout(() => setSwipeToast(null), 850);
-    }
-    mouseStartYRef.current = null;
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    const now = Date.now();
-    if (now - lastWheelTimeRef.current < 650) return;
-    if (Math.abs(e.deltaY) > 35) {
-      lastWheelTimeRef.current = now;
-      if (e.deltaY > 0 && currentEpisodeNum < totalEpisodes) {
-        setSwipeToast({ type: "next", text: `Episode ${currentEpisodeNum + 1}` });
-        handleNextEpisode();
-      } else if (e.deltaY < 0 && currentEpisodeNum > 1) {
-        setSwipeToast({ type: "prev", text: `Episode ${currentEpisodeNum - 1}` });
-        handlePrevEpisode();
-      }
-      setTimeout(() => setSwipeToast(null), 850);
-    }
-  };
-
-  const handleVideoClick = () => {
-    if (isSwipingRef.current) {
-      isSwipingRef.current = false;
-      return;
-    }
-    if (videoRef.current) {
-      if (videoRef.current.paused) {
-        videoRef.current.play();
-        setIsPlaying(true);
-      } else {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      }
-    }
-  };
+  const selectedSub = subtitles.find((s) => s.language === selectedSubLang);
 
   return (
-    <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-rose-500 selection:text-white">
+    <div className="min-h-screen bg-[#060609] text-white flex flex-col selection:bg-rose-500 selection:text-white">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-      {/* Main Watch Container */}
-      <main className="flex-1 flex flex-col items-center justify-center p-2 sm:p-4 relative my-2 sm:my-4">
-        {/* Navigation Bar above Player */}
-        <div className="w-full max-w-[360px] sm:max-w-[420px] mb-2 px-1 flex items-center justify-between">
-          <Link
-            href="/dracin"
-            className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center gap-1.5 transition-all"
-          >
-            <ChevronLeft className="w-4 h-4 text-rose-400" />
-            <span>Kembali ke Katalog</span>
-          </Link>
-
-          <span className="text-[11px] font-medium text-gray-400">
-            AsiaBox 9:16
-          </span>
-        </div>
-
-        {/* 9:16 Vertical Video Frame */}
+      {/* Main Container */}
+      <main className="flex-1 flex flex-col items-center justify-center p-0 sm:py-6 sm:px-4">
         <div
           ref={playerContainerRef}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onWheel={handleWheel}
-          className="relative w-full max-w-[340px] sm:max-w-[380px] md:max-w-[400px] aspect-[9/16] rounded-2xl sm:rounded-3xl overflow-hidden bg-black flex items-center justify-center group select-none border border-white/10 shadow-2xl shadow-rose-950/20 cursor-grab active:cursor-grabbing"
+          className="relative w-full sm:max-w-md h-[calc(100vh-64px)] sm:h-[84vh] bg-black sm:rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col justify-between"
         >
-          {/* Swipe Toast Feedback */}
-          {swipeToast && (
-            <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none animate-in fade-in zoom-in-90 duration-200">
-              <div className="px-5 py-3 rounded-2xl bg-black/85 backdrop-blur-md border border-rose-500/50 text-white flex items-center gap-2.5 shadow-2xl shadow-rose-950/50">
-                {swipeToast.type === "next" ? (
-                  <ChevronUp className="w-5 h-5 text-rose-400 animate-bounce" />
-                ) : (
-                  <ChevronDown className="w-5 h-5 text-rose-400 animate-bounce" />
-                )}
-                <span className="font-extrabold text-sm tracking-wide">
-                  {swipeToast.text}
+          {/* Top Bar Overlay */}
+          <div className="absolute top-0 inset-x-0 p-4 bg-gradient-to-b from-black/90 via-black/40 to-transparent z-30 flex items-center justify-between gap-2">
+            <Link
+              href="/dracin"
+              className="w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Link>
+
+            <div className="flex-1 text-center px-2 min-w-0">
+              <span className="text-[10px] font-bold tracking-wider uppercase text-rose-400 bg-rose-950/70 px-2 py-0.5 rounded-full border border-rose-500/20 inline-block mb-0.5">
+                {provider.toUpperCase()} • EP {currentEpisodeNum}
+              </span>
+              <h1 className="text-xs sm:text-sm font-black text-white truncate drop-shadow-md">
+                {dramaTitle}
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              {/* Subtitle Softsub Selector for FreeReels */}
+              {provider === "freereels" && subtitles.length > 0 && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowSubMenu(!showSubMenu)}
+                    className="w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 transition-colors"
+                    title="Pilih Subtitle (24 Bahasa)"
+                  >
+                    <Subtitles className="w-4 h-4 text-amber-400" />
+                  </button>
+
+                  {showSubMenu && (
+                    <div className="absolute right-0 top-11 w-48 max-h-60 overflow-y-auto bg-[#12121A] border border-white/15 rounded-xl shadow-2xl p-1.5 z-50 text-xs">
+                      <p className="text-[10px] uppercase font-bold text-gray-400 px-2 py-1 border-b border-white/10">
+                        Pilih Subtitle ({subtitles.length})
+                      </p>
+                      {subtitles.map((sub) => (
+                        <button
+                          key={sub.language}
+                          type="button"
+                          onClick={() => {
+                            setSelectedSubLang(sub.language);
+                            setShowSubMenu(false);
+                          }}
+                          className={`w-full text-left px-2 py-1.5 rounded-lg flex items-center justify-between transition-colors ${
+                            selectedSubLang === sub.language
+                              ? "bg-rose-500 text-white font-bold"
+                              : "text-gray-300 hover:bg-white/10"
+                          }`}
+                        >
+                          <span className="truncate">{sub.name}</span>
+                          <span className="text-[10px] opacity-70 uppercase font-mono">
+                            {sub.language}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Language Selector for PineDrama Hardsub */}
+              {provider === "pinedrama" && (
+                <select
+                  value={selectedLang}
+                  onChange={(e) => setSelectedLang(e.target.value)}
+                  className="bg-black/70 text-amber-300 border border-white/20 rounded-full px-2 py-1 text-[11px] font-bold focus:outline-none"
+                  title="Pilih Bahasa Subtitle"
+                >
+                  <option value="id">ID (Indo)</option>
+                  <option value="en">EN (English)</option>
+                  <option value="th">TH (Thai)</option>
+                  <option value="vi">VI (Viet)</option>
+                  <option value="es">ES (Spanish)</option>
+                  <option value="ko">KO (Korean)</option>
+                  <option value="ja">JA (Japanese)</option>
+                </select>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setShowInfoModal(true)}
+                className="w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 transition-colors"
+              >
+                <Info className="w-4 h-4 text-gray-300" />
+              </button>
+            </div>
+          </div>
+
+          {/* Video Player Center Surface */}
+          <div
+            className="relative flex-1 w-full h-full flex items-center justify-center bg-black cursor-pointer overflow-hidden"
+            onClick={togglePlay}
+          >
+            {loadingVideo ? (
+              <div className="flex flex-col items-center gap-3 text-rose-400">
+                <div className="w-10 h-10 rounded-full border-2 border-rose-500 border-t-transparent animate-spin" />
+                <span className="text-xs font-mono tracking-wider animate-pulse">
+                  Memuat Episode {currentEpisodeNum}...
                 </span>
               </div>
-            </div>
-          )}
-
-          {/* Swipe Hint */}
-          <div className="sm:hidden absolute bottom-20 left-4 right-4 z-20 pointer-events-none text-center">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold text-rose-200 bg-black/60 backdrop-blur-md border border-white/10 opacity-70">
-              <ChevronUp className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
-              Geser ke atas untuk episode berikutnya
-            </span>
-          </div>
-
-          {/* Loading / Error States */}
-          {loadingVideo ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-20 animate-pulse">
-              <div className="text-center space-y-3">
-                <div className="w-10 h-10 rounded-full border-2 border-rose-500 border-t-transparent animate-spin mx-auto" />
-                <p className="text-xs text-rose-300 font-bold">
-                  Memuat Video Episode {currentEpisodeNum}...
-                </p>
-                <div className="h-3 w-40 rounded bg-white/10 mx-auto" />
-              </div>
-            </div>
-          ) : !videoUrl ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-20 p-6 text-center">
-              <div className="space-y-3">
+            ) : errorMsg ? (
+              <div className="p-6 text-center max-w-xs space-y-3">
                 <AlertCircle className="w-10 h-10 text-rose-500 mx-auto" />
-                <p className="text-sm font-bold text-white">
-                  Video Episode {currentEpisodeNum} Belum Tersedia
-                </p>
-                <p className="text-xs text-gray-400">
-                  Stream dari server AsiaBox sedang offline atau belum diunggah.
-                </p>
+                <p className="text-xs text-gray-300">{errorMsg}</p>
                 <button
+                  type="button"
                   onClick={() => setCurrentEpisodeNum(1)}
-                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white transition-all inline-flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Kembali ke Episode 1</span>
+                  Kembali ke Episode 1
                 </button>
               </div>
-            </div>
-          ) : (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              loop={false}
-              onTimeUpdate={handleTimeUpdate}
-              onLoadedMetadata={handleTimeUpdate}
-              onEnded={handleNextEpisode}
-              onClick={handleVideoClick}
-              className="w-full h-full object-cover cursor-pointer"
-            />
-          )}
-
-          {/* Centered Play button overlay when paused */}
-          {!isPlaying && videoUrl && !loadingVideo && (
-            <div
-              onClick={handleVideoClick}
-              className="absolute inset-0 flex items-center justify-center bg-black/30 z-20 cursor-pointer"
-            >
-              <div className="w-16 h-16 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-2xl scale-110 backdrop-blur-sm">
-                <Play className="w-8 h-8 fill-current ml-1" />
-              </div>
-            </div>
-          )}
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/60 pointer-events-none" />
-
-          {/* Top Bar Controls */}
-          <div className="absolute top-3 left-3 right-3 sm:top-4 sm:left-4 sm:right-4 flex items-center justify-between z-30">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-500/90 text-white backdrop-blur-md">
-                AsiaBox 9:16
-              </span>
-              <span className="text-xs font-semibold text-gray-200 bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-md">
-                Ep {currentEpisodeNum}/{totalEpisodes}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={toggleNativeFullscreen}
-                className="p-2 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md text-white transition-all pointer-events-auto"
-                title="Fullscreen"
+            ) : (
+              <video
+                ref={videoRef}
+                playsInline
+                crossOrigin="anonymous"
+                className="w-full h-full object-cover sm:object-contain bg-black"
+                onTimeUpdate={() => {
+                  if (videoRef.current) {
+                    setCurrentTime(videoRef.current.currentTime);
+                    setDuration(videoRef.current.duration || 0);
+                  }
+                }}
+                onEnded={handleNextEp}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
               >
-                {isNativeFullscreen ? (
-                  <Minimize2 className="w-4 h-4 text-rose-400" />
-                ) : (
-                  <Maximize2 className="w-4 h-4" />
+                {selectedSub && selectedSub.vtt_url && (
+                  <track
+                    key={selectedSub.language}
+                    kind="subtitles"
+                    src={selectedSub.vtt_url}
+                    srcLang={selectedSub.language}
+                    label={selectedSub.name}
+                    default
+                  />
                 )}
-              </button>
+              </video>
+            )}
 
-              <button
-                onClick={() => setIsMuted(!isMuted)}
-                className="p-2 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md text-white transition-all pointer-events-auto"
-                title={isMuted ? "Unmute" : "Mute"}
-              >
-                {isMuted ? (
-                  <VolumeX className="w-4 h-4 text-rose-400" />
-                ) : (
-                  <Volume2 className="w-4 h-4" />
-                )}
-              </button>
-
-              <button
-                onClick={() => setShowInfoModal(true)}
-                className="p-2 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md text-white transition-all pointer-events-auto"
-                title="Detail Drama"
-              >
-                <Info className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Right Action Icons (TikTok / Reels Style) */}
-          <div className="absolute right-3 bottom-24 flex flex-col items-center gap-4 z-10 pointer-events-auto">
-            <button
-              onClick={handlePrevEpisode}
-              disabled={currentEpisodeNum <= 1}
-              className="flex flex-col items-center gap-1 group disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white group-hover:bg-rose-500/30 group-hover:border-rose-500 transition-all">
-                <ChevronUp className="w-5 h-5" />
-              </div>
-              <span className="text-[10px] font-medium text-gray-300">Prev Ep</span>
-            </button>
-
-            <button
-              onClick={handleNextEpisode}
-              disabled={currentEpisodeNum >= totalEpisodes}
-              className="flex flex-col items-center gap-1 group disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white group-hover:bg-rose-500/30 group-hover:border-rose-500 transition-all">
-                <ChevronDown className="w-5 h-5" />
-              </div>
-              <span className="text-[10px] font-medium text-gray-300">Next Ep</span>
-            </button>
-
-            <button
-              onClick={() => setShowEpisodeDrawer(true)}
-              className="flex flex-col items-center gap-1 group"
-            >
-              <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-rose-400 group-hover:bg-rose-500 group-hover:text-white transition-all">
-                <ListOrdered className="w-5 h-5" />
-              </div>
-              <span className="text-[10px] font-medium text-gray-300">Daftar</span>
-            </button>
-
-            <button
-              onClick={() => {
-                const speeds: (1 | 1.25 | 1.5 | 2)[] = [1, 1.25, 1.5, 2];
-                const nextIndex = (speeds.indexOf(playbackSpeed) + 1) % speeds.length;
-                setPlaybackSpeed(speeds[nextIndex]);
-              }}
-              className="flex flex-col items-center gap-1 group"
-            >
-              <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-amber-300 font-bold text-xs group-hover:border-amber-400 transition-all">
-                {playbackSpeed}x
-              </div>
-              <span className="text-[10px] font-medium text-gray-300">Speed</span>
-            </button>
-          </div>
-
-          {/* Bottom Scrubber Progress Bar */}
-          <div className="absolute bottom-14 left-4 right-16 z-20 flex flex-col gap-1 pointer-events-auto">
-            <input
-              type="range"
-              min={0}
-              max={duration || 100}
-              value={currentTime}
-              onChange={handleSeek}
-              className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-rose-500 hover:h-1.5 transition-all"
-            />
-            <div className="flex items-center justify-between text-[10px] text-gray-300 font-mono">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
-          </div>
-
-          {/* Bottom Title & Synopsis */}
-          <div className="absolute bottom-3 left-4 right-16 z-10">
-            <h2 className="text-sm sm:text-base font-extrabold text-white line-clamp-1">
-              {activeDrama.title}
-            </h2>
-            <p className="text-[11px] text-gray-300 line-clamp-1 mt-0.5 opacity-90">
-              {activeDrama.description || "Drama pendek populer romantis & balas dendam."}
-            </p>
-          </div>
-        </div>
-
-        {/* Episode Selector Drawer Modal */}
-        {showEpisodeDrawer && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end">
-            <div className="w-full max-w-sm bg-[#12121A] h-full p-6 flex flex-col border-l border-white/10 animate-in slide-in-from-right duration-200">
-              <div className="flex items-center justify-between pb-4 border-b border-white/10">
-                <div>
-                  <h3 className="font-bold text-white text-base">Pilih Episode</h3>
-                  <p className="text-xs text-gray-400">
-                    Total {totalEpisodes} Episode Tersedia
-                  </p>
+            {/* Play/Pause Center Indicator on Pause */}
+            {!isPlaying && !loadingVideo && !errorMsg && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
+                <div className="w-16 h-16 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-2xl scale-110">
+                  <Play className="w-8 h-8 fill-white ml-1" />
                 </div>
-                <button
-                  onClick={() => setShowEpisodeDrawer(false)}
-                  className="p-1.5 rounded-lg bg-white/5 text-gray-400 hover:text-white"
-                >
-                  <X className="w-5 h-5" />
-                </button>
               </div>
+            )}
+          </div>
 
-              <div className="flex-1 overflow-y-auto py-4 grid grid-cols-4 gap-2">
-                {Array.from({ length: totalEpisodes }).map((_, i) => {
-                  const ep = i + 1;
-                  const isActive = ep === currentEpisodeNum;
-                  return (
+          {/* Right Floating Quick Actions */}
+          <div className="absolute right-3.5 bottom-24 flex flex-col items-center gap-3 z-30 pointer-events-auto">
+            {/* Previous Episode */}
+            <button
+              type="button"
+              disabled={currentEpisodeNum <= 1}
+              onClick={handlePrevEp}
+              className="w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 disabled:opacity-30 text-white flex items-center justify-center backdrop-blur-md border border-white/10 transition-all shadow-lg active:scale-90"
+              title="Episode Sebelumnya"
+            >
+              <ChevronUp className="w-5 h-5 text-gray-300" />
+            </button>
+
+            {/* Next Episode */}
+            <button
+              type="button"
+              disabled={currentEpisodeNum >= totalEpisodesCount}
+              onClick={handleNextEp}
+              className="w-10 h-10 rounded-full bg-rose-600 hover:bg-rose-500 disabled:opacity-30 text-white flex items-center justify-center backdrop-blur-md shadow-lg shadow-rose-600/40 transition-all active:scale-90"
+              title="Episode Selanjutnya"
+            >
+              <ChevronDown className="w-5 h-5 fill-white" />
+            </button>
+
+            {/* Episode Drawer Trigger */}
+            <button
+              type="button"
+              onClick={() => setShowEpisodeDrawer(true)}
+              className="w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 transition-all shadow-lg active:scale-90"
+              title="Daftar Semua Episode"
+            >
+              <ListOrdered className="w-5 h-5 text-amber-400" />
+            </button>
+
+            {/* Mute Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsMuted(!isMuted)}
+              className="w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 transition-all shadow-lg active:scale-90"
+            >
+              {isMuted ? (
+                <VolumeX className="w-4 h-4 text-rose-400" />
+              ) : (
+                <Volume2 className="w-4 h-4 text-gray-200" />
+              )}
+            </button>
+
+            {/* Native Fullscreen */}
+            <button
+              type="button"
+              onClick={toggleNativeFullscreen}
+              className="w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 transition-all shadow-lg active:scale-90"
+            >
+              {isNativeFullscreen ? (
+                <Minimize2 className="w-4 h-4 text-gray-200" />
+              ) : (
+                <Maximize2 className="w-4 h-4 text-gray-200" />
+              )}
+            </button>
+          </div>
+
+          {/* Bottom Floating Bar */}
+          <div className="absolute bottom-0 inset-x-0 p-3.5 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-30 flex flex-col gap-2">
+            {/* Seek progress bar */}
+            <div className="w-full flex items-center gap-2">
+              <span className="text-[10px] font-mono text-gray-300">
+                {Math.floor(currentTime / 60)}:
+                {String(Math.floor(currentTime % 60)).padStart(2, "0")}
+              </span>
+              <div
+                className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden cursor-pointer relative"
+                onClick={(e) => {
+                  if (!videoRef.current || !duration) return;
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const pos = (e.clientX - rect.left) / rect.width;
+                  videoRef.current.currentTime = pos * duration;
+                }}
+              >
+                <div
+                  className="h-full bg-rose-500 rounded-full transition-all"
+                  style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
+                />
+              </div>
+              <span className="text-[10px] font-mono text-gray-400">
+                {Math.floor(duration / 60)}:
+                {String(Math.floor(duration % 60)).padStart(2, "0")}
+              </span>
+            </div>
+
+            {/* Bottom Controls Bar */}
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setShowEpisodeDrawer(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-xs font-bold text-white backdrop-blur-md transition-colors"
+              >
+                <ListOrdered className="w-3.5 h-3.5 text-amber-400" />
+                <span>Ep {currentEpisodeNum} / {totalEpisodesCount}</span>
+              </button>
+
+              {/* Speed Buttons */}
+              <div className="flex items-center gap-1 bg-black/60 rounded-full p-0.5 border border-white/10">
+                {([1, 1.25, 1.5, 2] as const).map((spd) => (
+                  <button
+                    key={spd}
+                    type="button"
+                    onClick={() => setPlaybackSpeed(spd)}
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors ${
+                      playbackSpeed === spd
+                        ? "bg-rose-500 text-white"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    {spd}x
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Episode Drawer Sheet */}
+          {showEpisodeDrawer && (
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-md z-50 flex flex-col justify-end transition-opacity">
+              <div className="bg-[#12121A] border-t border-white/10 rounded-t-3xl max-h-[70%] flex flex-col p-4">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div className="flex items-center gap-2">
+                    <ListOrdered className="w-5 h-5 text-amber-400" />
+                    <h3 className="text-sm font-bold text-white">Daftar Episode</h3>
+                    <span className="text-xs text-gray-400 font-mono">
+                      (Total {totalEpisodesCount} Ep)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowEpisodeDrawer(false)}
+                    className="p-1 rounded-full text-gray-400 hover:text-white"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto py-3 grid grid-cols-4 sm:grid-cols-5 gap-2">
+                  {Array.from({ length: totalEpisodesCount }, (_, i) => i + 1).map((epNum) => (
                     <button
-                      key={ep}
+                      key={epNum}
+                      type="button"
                       onClick={() => {
-                        setCurrentEpisodeNum(ep);
+                        setCurrentEpisodeNum(epNum);
                         setShowEpisodeDrawer(false);
                       }}
-                      className={`py-2.5 rounded-xl text-xs font-bold transition-all ${
-                        isActive
-                          ? "bg-rose-500 text-white shadow-lg shadow-rose-500/30 scale-105"
-                          : "bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white"
+                      className={`h-11 rounded-xl text-xs font-bold transition-all flex items-center justify-center ${
+                        currentEpisodeNum === epNum
+                          ? "bg-gradient-to-tr from-rose-600 to-rose-400 text-white shadow-lg shadow-rose-600/30 scale-105"
+                          : "bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5"
                       }`}
                     >
-                      {ep}
+                      {epNum}
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Info Modal */}
-        {showInfoModal && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-[#12121A] border border-white/10 rounded-2xl p-6 max-w-md w-full space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-lg text-white">
-                  {activeDrama.title}
-                </h3>
+          {/* Info Modal */}
+          {showInfoModal && (
+            <div className="absolute inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+              <div className="bg-[#13131C] border border-white/15 rounded-3xl p-5 max-w-sm w-full space-y-3 relative shadow-2xl">
                 <button
+                  type="button"
                   onClick={() => setShowInfoModal(false)}
-                  className="p-1.5 rounded-lg bg-white/5 text-gray-400 hover:text-white"
+                  className="absolute top-4 right-4 text-gray-400 hover:text-white"
                 >
                   <X className="w-5 h-5" />
                 </button>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed">
-                {activeDrama.description ||
-                  "Drama pendek vertikal dengan subtitle bahasa Indonesia."}
-              </p>
-              <div className="pt-2 text-xs text-rose-400 font-semibold flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4" />
-                <span>Kualitas HD • Rasio 9:16 Layar Penuh</span>
+                <div className="flex items-center gap-2 text-rose-400">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="text-xs font-bold uppercase tracking-wider">
+                    {provider.toUpperCase()} Info
+                  </span>
+                </div>
+                <h3 className="text-base font-black text-white">{dramaTitle}</h3>
+                <p className="text-xs text-gray-300 leading-relaxed max-h-48 overflow-y-auto">
+                  {activeDrama.description || "Serial drama pendek vertikal 9:16 terbaru dengan resolusi Full HD dan subtitle bahasa Indonesia."}
+                </p>
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-gray-400">
+                  <span>Provider: <b className="text-white uppercase">{provider}</b></span>
+                  <span>Total: <b className="text-white">{totalEpisodesCount} Episode</b></span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </main>
 
       <Footer />
@@ -633,9 +665,7 @@ export default function DracinWatchPage() {
         <div className="min-h-screen bg-[#07070A] text-white flex items-center justify-center">
           <div className="text-center space-y-3 animate-pulse">
             <div className="w-12 h-12 rounded-full bg-rose-500/20 mx-auto" />
-            <p className="text-xs text-rose-400 font-mono">
-              Memuat AsiaBox Short Drama...
-            </p>
+            <p className="text-xs text-rose-400 font-mono">Menyiapkan Player Short Drama...</p>
           </div>
         </div>
       }
