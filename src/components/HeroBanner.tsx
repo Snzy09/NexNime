@@ -384,14 +384,14 @@ export default function HeroBanner({
           </span>
         </div>
 
-        {/* Center Content: Title, Synopsis & Desktop Poster Preview */}
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 my-auto py-4">
+        {/* Center Content: Title & Synopsis */}
+        <div className="relative z-10 flex flex-col items-start justify-center my-auto py-4">
           {/* Left Text Column */}
-          <div className="max-w-2xl flex-1">
+          <div className="max-w-2xl sm:max-w-3xl">
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight drop-shadow-lg">
               {slide.title}
             </h1>
-            <p className="mt-3 text-sm sm:text-base text-gray-300 line-clamp-2 sm:line-clamp-3 leading-relaxed drop-shadow">
+            <p className="mt-3 text-sm sm:text-base text-gray-200 line-clamp-2 sm:line-clamp-3 leading-relaxed drop-shadow-md">
               {slide.subtitle}
             </p>
 
@@ -411,28 +411,6 @@ export default function HeroBanner({
                 <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
-          </div>
-
-          {/* Right Floating Sharp Poster Card (md and above) */}
-          <div className="hidden md:flex shrink-0 items-center justify-center">
-            <Link
-              href={slide.ctaLink}
-              className="group relative w-[160px] sm:w-[180px] lg:w-[210px] aspect-[2/3] rounded-2xl overflow-hidden border-2 border-amber-400/30 hover:border-amber-400 shadow-2xl shadow-black/90 transition-all duration-500 hover:scale-105"
-            >
-              <img
-                src={slide.image}
-                alt={slide.title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 pointer-events-none"
-                loading="eager"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-3 left-2 right-2 text-center pointer-events-none">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-400 text-black shadow-md group-hover:scale-105 transition-transform">
-                  <Play className="w-3 h-3 fill-black" />
-                  Lihat Detail
-                </span>
-              </div>
-            </Link>
           </div>
         </div>
 
