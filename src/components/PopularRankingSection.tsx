@@ -95,11 +95,14 @@ export default function PopularRankingSection({ items }: PopularRankingSectionPr
               </div>
 
               {/* Title & Footer Info */}
-              <div className="p-2.5 sm:p-3 flex flex-col justify-between flex-1">
-                <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-amber-300 transition-colors">
+              <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1 min-h-[5.5rem]">
+                <h3
+                  className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-relaxed group-hover:text-amber-300 transition-colors"
+                  title={anime.title}
+                >
                   {anime.title}
                 </h3>
-                <div className="flex items-center justify-between text-[11px] text-gray-400 mt-2 pt-2 border-t border-white/5">
+                <div className="flex items-center justify-between text-[11px] text-gray-400 mt-2.5 pt-2 border-t border-white/5">
                   <span className="font-semibold text-gray-400">{anime.type || "TV"}</span>
                   <span className="font-bold text-emerald-400">{anime.episode || "Ongoing"}</span>
                 </div>

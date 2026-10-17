@@ -6,6 +6,7 @@ import SearchModal from "@/components/SearchModal";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import { Clapperboard, Star, Play, Heart, AlertCircle } from "lucide-react";
+import DrakorSection from "@/components/DrakorSection";
 import DrakorSkeleton from "@/components/skeletons/DrakorSkeleton";
 import CatalogGridSkeleton from "@/components/skeletons/CatalogGridSkeleton";
 import { DrakorItem } from "@/lib/services/drakorService";
@@ -66,6 +67,11 @@ export default function DrakorHubPage() {
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <main className="flex-1 py-4 space-y-6">
+        {/* Popular Drakor Ranking Carousel */}
+        {!loadingDrakorId && drakorList.length > 0 && (
+          <DrakorSection items={drakorList.slice(0, 10)} />
+        )}
+
         {/* PROVIDER 1: DRAKORID */}
         <div id="drakorid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
           {/* Tab Controls for DrakorID */}

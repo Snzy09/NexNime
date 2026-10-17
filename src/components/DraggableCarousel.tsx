@@ -66,7 +66,7 @@ export default function DraggableCarousel({
       onMouseUp={handleMouseUpOrLeave}
       onMouseLeave={handleMouseUpOrLeave}
       onClickCapture={handleClickCapture}
-      className={`flex items-stretch gap-3 sm:gap-4 overflow-x-auto select-none no-scrollbar scroll-smooth py-1 ${
+      className={`flex items-stretch gap-3 sm:gap-4 overflow-x-auto select-none no-scrollbar scroll-smooth py-2.5 px-0.5 ${
         isDragging ? "cursor-grabbing" : "cursor-grab"
       } ${className}`}
       style={{

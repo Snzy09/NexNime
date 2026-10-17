@@ -23,6 +23,7 @@ import { ReelShortItem } from "@/lib/services/reelshortService";
 import { NetShortItem } from "@/lib/services/netshortService";
 import { FreeReelsItem, FreeReelsCategory, PineDramaItem, PineDramaLanguage } from "@/lib/services/dramoxService";
 import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
+import DracinReelsSection from "@/components/DracinReelsSection";
 import DracinReelsSkeleton from "@/components/skeletons/DracinReelsSkeleton";
 
 function DracinHubContent() {
@@ -257,6 +258,11 @@ function DracinHubContent() {
           </a>
         </div>
       </div>
+
+      {/* Popular Dracin Ranking Carousel */}
+      {!loadingAsiaList && dramaList.length > 0 && (
+        <DracinReelsSection items={dramaList.slice(0, 10)} />
+      )}
 
       {/* ========================================================= */}
       {/* SECTION 1: FREEREELS (Flagship Multi-Sub Softsub 24 Bahasa) */}
