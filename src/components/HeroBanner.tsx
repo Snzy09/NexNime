@@ -398,65 +398,35 @@ export default function HeroBanner({
           </span>
         </div>
 
-        {/* Redesigned Headline with Split Hero Layout on Desktop */}
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto py-3">
-          {/* Left: Headline Typography & Action Bar */}
-          <div className="md:col-span-8 lg:col-span-8 flex flex-col items-start">
-            <div className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-extrabold uppercase tracking-widest text-amber-400 mb-2">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-              <span>HEADLINE UTAMA • {slide.category}</span>
-            </div>
-
-            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.12] drop-shadow-2xl">
-              {slide.title}
-            </h1>
-
-            <p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base text-gray-200/90 line-clamp-2 sm:line-clamp-3 leading-relaxed max-w-2xl drop-shadow-md">
-              {slide.subtitle}
-            </p>
-
-            <div className="mt-6 flex flex-wrap items-center gap-3 sm:gap-4">
-              <Link
-                href={slide.ctaLink}
-                className="inline-flex items-center gap-2.5 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full font-black text-xs sm:text-sm text-black bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-600 shadow-xl shadow-amber-500/30 transition-all hover:scale-105 active:scale-95 group/btn"
-              >
-                <Play className="w-4 h-4 fill-black group-hover/btn:scale-110 transition-transform" />
-                <span>{slide.ctaText}</span>
-              </Link>
-              <Link
-                href={slide.browseLink}
-                className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-bold text-xs sm:text-sm text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md transition-all hover:scale-105"
-              >
-                <span>Lihat Semua {slide.category}</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
+        {/* Headline Typography & Action Bar */}
+        <div className="relative z-10 flex flex-col items-start my-auto py-3 max-w-3xl">
+          <div className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-extrabold uppercase tracking-widest text-amber-400 mb-2">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            <span>HEADLINE UTAMA • {slide.category}</span>
           </div>
 
-          {/* Right: Floating Glass-Framed Real Scraped Poster Card (Desktop only) */}
-          <div className="hidden md:flex md:col-span-4 lg:col-span-4 justify-end">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.12] drop-shadow-2xl">
+            {slide.title}
+          </h1>
+
+          <p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base text-gray-200/90 line-clamp-2 sm:line-clamp-3 leading-relaxed max-w-2xl drop-shadow-md">
+            {slide.subtitle}
+          </p>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3 sm:gap-4">
             <Link
               href={slide.ctaLink}
-              className="group/poster relative w-44 lg:w-52 aspect-[2/3] rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl shadow-black/90 hover:scale-105 transition-all duration-500 block shrink-0"
+              className="inline-flex items-center gap-2.5 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full font-black text-xs sm:text-sm text-black bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-600 shadow-xl shadow-amber-500/30 transition-all hover:scale-105 active:scale-95 group/btn"
             >
-              <img
-                src={slide.image}
-                alt={slide.title}
-                className="w-full h-full object-cover group-hover/poster:scale-110 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover/poster:opacity-50 transition-opacity" />
-              <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/15 text-[10px] font-black text-amber-300 flex items-center gap-1 shadow-md">
-                <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-                <span>{slide.rating}</span>
-              </div>
-              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                <span className="text-[10px] font-extrabold text-white bg-amber-500/90 backdrop-blur-sm px-2.5 py-1 rounded-full uppercase tracking-wider shadow">
-                  {slide.category}
-                </span>
-                <span className="w-8 h-8 rounded-full bg-amber-400 text-black flex items-center justify-center shadow-lg group-hover/poster:scale-110 transition-transform">
-                  <Play className="w-4 h-4 fill-black ml-0.5" />
-                </span>
-              </div>
+              <Play className="w-4 h-4 fill-black group-hover/btn:scale-110 transition-transform" />
+              <span>{slide.ctaText}</span>
+            </Link>
+            <Link
+              href={slide.browseLink}
+              className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-bold text-xs sm:text-sm text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md transition-all hover:scale-105"
+            >
+              <span>Lihat Semua {slide.category}</span>
+              <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
