@@ -164,20 +164,17 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2.5 sm:gap-4 lg:gap-6">
           {/* Left: Brand Logo & Desktop Navigation */}
           <div className="flex items-center gap-3 lg:gap-5 shrink-0">
-            <Link href="/" className="flex items-center gap-2 group shrink-0">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-200 flex items-center justify-center p-0.5 shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
-                <div className="w-full h-full bg-[#0E0E14] rounded-[10px] flex items-center justify-center font-black text-amber-400 text-[11px] sm:text-xs tracking-tighter">
-                  NN
+            <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-300 p-0.5 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform shrink-0">
+                <div className="w-full h-full bg-[#0B0B10] rounded-full flex items-center justify-center font-black text-xs sm:text-sm tracking-tight">
+                  <span className="text-amber-500">N</span>
+                  <span className="text-amber-300">N</span>
                 </div>
               </div>
-              <div className="flex flex-col">
-                <span className="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent group-hover:opacity-90 leading-tight">
-                  Nex<span className="text-white font-light text-xs sm:text-sm">Nime</span>
-                </span>
-                <span className="text-[7px] sm:text-[8px] tracking-widest uppercase text-amber-400/70 font-semibold -mt-0.5 hidden xs:block">
-                  Streaming &amp; Manga
-                </span>
-              </div>
+              <span className="font-black text-lg sm:text-xl tracking-tight leading-none group-hover:opacity-90 transition-opacity">
+                <span className="text-amber-400">Nex</span>
+                <span className="text-white">Nime</span>
+              </span>
             </Link>
 
             {/* Desktop Nav Links - Visible on lg+ */}

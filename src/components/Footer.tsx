@@ -9,14 +9,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Brand Info */}
           <div className="md:col-span-2">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-200 flex items-center justify-center p-0.5">
-                <div className="w-full h-full bg-[#0E0E14] rounded-full flex items-center justify-center font-black text-amber-400 text-xs">
-                  NN
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-300 flex items-center justify-center p-0.5 shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform shrink-0">
+                <div className="w-full h-full bg-[#0A0A0F] rounded-full flex items-center justify-center font-black text-xs tracking-tight">
+                  <span className="text-amber-500">N</span>
+                  <span className="text-amber-300">N</span>
                 </div>
               </div>
-              <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
-                Nex<span className="text-white font-light text-sm">Nime</span>
+              <span className="font-black text-xl tracking-tight leading-none">
+                <span className="text-amber-400">Nex</span>
+                <span className="text-white">Nime</span>
               </span>
             </Link>
             <p className="mt-3 text-xs text-gray-400 leading-relaxed max-w-sm">
