@@ -257,7 +257,7 @@ export default function AnimeDetailPage({ params }: { params: { slug: string } }
                   alt={animeData.title}
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).src =
-                      "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300&q=80";
+                      "https://static.anipop.xyz/poster/anime/jujutsu-kaisen-2nd-season.jpg?h=400";
                   }}
                   className="w-full h-full object-cover"
                 />

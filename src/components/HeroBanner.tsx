@@ -48,24 +48,24 @@ const HERO_SLIDES_FALLBACK: HeroSlide[] = [
   {
     id: "fallback-1",
     category: "ANIME",
-    typeBadge: "Premier Anime",
-    rating: "9.9",
-    quality: "ULTRA HD",
-    badgeStatus: "Ongoing",
-    title: "NexNime Universe — Streaming Anime & Donghua",
+    typeBadge: "Anime Terpopuler #1",
+    rating: "9.65",
+    quality: "FULL HD 1080P",
+    badgeStatus: "Tamat",
+    title: "Jujutsu Kaisen Season 2 — Shibuya Incident",
     subtitle:
-      "Platform streaming terlengkap dengan ribuan judul Anime, Donghua, Manga, Drakor, dan Dracin kualitas Full HD 1080p audio jernih dan bebas gangguan.",
-    ctaText: "Jelajahi Anime",
-    ctaLink: "/anime",
+      "Pertempuran epik Shibuya Incident antara para penyihir Jujutsu terkuat dan kutukan tingkat khusus. Tonton seluruh episode sub Indo kualitas 1080p jernih tanpa jeda.",
+    ctaText: "Tonton Anime",
+    ctaLink: "/anime/jujutsu-kaisen-season-2",
     browseLink: "/anime",
-    image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&q=85",
-    bgGradient: "from-amber-950/70 via-black/40 to-transparent",
+    image: "https://static.anipop.xyz/poster/anime/jujutsu-kaisen-2nd-season.jpg?h=800",
+    bgGradient: "from-amber-950/80 via-black/50 to-transparent",
     accentColor: "text-amber-400",
   },
   {
     id: "fallback-2",
     category: "MANHWA",
-    typeBadge: "Trending Manhwa",
+    typeBadge: "Trending Manhwa #1",
     rating: "9.85",
     quality: "4K ULTRA HD",
     badgeStatus: "Ongoing",
@@ -73,11 +73,45 @@ const HERO_SLIDES_FALLBACK: HeroSlide[] = [
     subtitle:
       "Tonton petualangan Sung Jin-woo membangkitkan prajurit bayangan dan menaklukkan Dungeon Peringkat S dalam kualitas 4K tanpa hambatan.",
     ctaText: "Baca Sekarang",
-    ctaLink: "/manga",
+    ctaLink: "/manga/solo-leveling",
     browseLink: "/manga",
-    image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=1600&q=85",
-    bgGradient: "from-indigo-950/70 via-black/40 to-transparent",
+    image: "https://static.anipop.xyz/poster/anime/ore-dake-level-up-na-ken.jpg?h=800",
+    bgGradient: "from-indigo-950/80 via-black/50 to-transparent",
     accentColor: "text-indigo-400",
+  },
+  {
+    id: "fallback-3",
+    category: "DRAKOR",
+    typeBadge: "Drakor Populer #1",
+    rating: "9.80",
+    quality: "FULL HD 1080P",
+    badgeStatus: "Ongoing",
+    title: "Queen of Tears (Air Mata Sang Ratu)",
+    subtitle:
+      "Kisah intrik dan romansa emosional pewaris konglomerat Queens Group dan direktur hukum dalam menghadapi krisis pernikahan dan perebutan kekuasaan keluarga chaebol.",
+    ctaText: "Nonton Drakor",
+    ctaLink: "/drakor",
+    browseLink: "/drakor",
+    image: "https://drakorid.org/wp-content/uploads/2024/03/queen-of-tears.jpg",
+    bgGradient: "from-blue-950/80 via-black/50 to-transparent",
+    accentColor: "text-blue-400",
+  },
+  {
+    id: "fallback-4",
+    category: "DRACIN 9:16",
+    typeBadge: "Dracin Reels Vertikal",
+    rating: "9.75",
+    quality: "60FPS VERTICAL",
+    badgeStatus: "80+ Episode",
+    title: "Kaisar Naga yang Menyamar Jadi Menantu Miskin",
+    subtitle:
+      "Dihina oleh keluarga mertua karena dianggap miskin, identitas asli sang miliarder penguasa bisnis terungkap saat pesta ulang tahun konglomerat kota.",
+    ctaText: "Nonton Reels",
+    ctaLink: "/dracin",
+    browseLink: "/dracin",
+    image: "https://d378mspt4q6n8p.cloudfront.net/posters/dragon-emperor.jpg",
+    bgGradient: "from-purple-950/80 via-black/50 to-transparent",
+    accentColor: "text-purple-400",
   },
 ];
 
@@ -198,7 +232,7 @@ export default function HeroBanner({
         ctaText: "Nonton Drakor",
         ctaLink: `/drakor/${d.slug}`,
         browseLink: "/drakor",
-        image: d.poster || "",
+        image: d.poster || "https://drakorid.org/wp-content/uploads/2024/03/queen-of-tears.jpg",
         bgGradient: "from-blue-950/70 via-black/40 to-transparent",
         accentColor: "text-blue-400",
       });
@@ -221,7 +255,7 @@ export default function HeroBanner({
         ctaText: "Nonton Reels",
         ctaLink: `/dracin?drama=${dr.slug}`,
         browseLink: "/dracin",
-        image: dr.image || "",
+        image: dr.image || "https://d378mspt4q6n8p.cloudfront.net/posters/dragon-emperor.jpg",
         bgGradient: "from-purple-950/70 via-black/40 to-transparent",
         accentColor: "text-purple-400",
       });
@@ -348,69 +382,103 @@ export default function HeroBanner({
         onTouchEnd={handleTouchEnd}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        className="relative rounded-3xl overflow-hidden min-h-[420px] sm:min-h-[460px] md:min-h-[500px] border border-white/10 shadow-2xl flex flex-col justify-between p-6 sm:p-10 md:p-12 select-none"
+        className="relative rounded-3xl overflow-hidden min-h-[460px] sm:min-h-[500px] md:min-h-[540px] border border-white/10 shadow-2xl flex flex-col justify-between p-5 sm:p-8 md:p-10 select-none group"
       >
         {/* Dynamic Realtime Background Image with Ambient Zoom */}
         <div
           key={slide.image}
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 scale-105 filter brightness-95 md:brightness-100 opacity-95"
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 scale-105 filter brightness-75 md:brightness-85 opacity-75 md:opacity-85"
           style={{ backgroundImage: `url(${slide.image})` }}
         />
 
         {/* Ambient Theme Color Tint */}
         <div
-          className={`absolute inset-0 bg-gradient-to-r ${slide.bgGradient} opacity-40 transition-all duration-700`}
+          className={`absolute inset-0 bg-gradient-to-r ${slide.bgGradient} opacity-50 transition-all duration-700`}
         />
 
         {/* Scrim Overlays for Razor-Sharp Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#09090D] via-[#09090D]/65 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0E]/80 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#09090D] via-[#09090D]/85 md:via-[#09090D]/65 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0E] via-transparent to-black/30" />
 
-        {/* Top Badges */}
-        <div className="relative z-10 flex flex-wrap items-center gap-2.5">
-          <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-amber-300 bg-amber-400/10 border border-amber-400/30 flex items-center gap-1.5 backdrop-blur-sm shadow-sm">
+        {/* Top Badges Strip */}
+        <div className="relative z-10 flex flex-wrap items-center gap-2">
+          <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider text-amber-300 bg-amber-400/20 border border-amber-400/40 flex items-center gap-1.5 backdrop-blur-md shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             {slide.typeBadge}
           </span>
-          <span className="px-3 py-1 rounded-full text-xs font-bold text-amber-300 bg-black/60 border border-white/10 flex items-center gap-1 backdrop-blur-sm">
+          <span className="px-2.5 py-1 rounded-full text-xs font-black text-amber-300 bg-black/70 border border-white/15 flex items-center gap-1 backdrop-blur-md">
             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
             {slide.rating}
           </span>
-          <span className="px-3 py-1 rounded-full text-xs font-bold tracking-wider text-white bg-white/10 border border-white/15 backdrop-blur-sm">
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider text-white bg-white/10 border border-white/15 backdrop-blur-md">
             {slide.quality}
           </span>
-          <span className="px-3 py-1 rounded-full text-xs font-medium text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 backdrop-blur-sm">
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-500/40 backdrop-blur-md flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             {slide.badgeStatus}
           </span>
         </div>
 
-        {/* Center Content: Title & Synopsis */}
-        <div className="relative z-10 flex flex-col items-start justify-center my-auto py-4">
-          {/* Left Text Column */}
-          <div className="max-w-2xl sm:max-w-3xl">
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight drop-shadow-lg">
+        {/* Redesigned Headline with Split Hero Layout on Desktop */}
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto py-3">
+          {/* Left: Headline Typography & Action Bar */}
+          <div className="md:col-span-8 lg:col-span-8 flex flex-col items-start">
+            <div className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-extrabold uppercase tracking-widest text-amber-400 mb-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+              <span>HEADLINE UTAMA • {slide.category}</span>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.12] drop-shadow-2xl">
               {slide.title}
             </h1>
-            <p className="mt-3 text-sm sm:text-base text-gray-200 line-clamp-2 sm:line-clamp-3 leading-relaxed drop-shadow-md">
+
+            <p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base text-gray-200/90 line-clamp-2 sm:line-clamp-3 leading-relaxed max-w-2xl drop-shadow-md">
               {slide.subtitle}
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-3 sm:gap-4">
               <Link
                 href={slide.ctaLink}
-                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full font-bold text-sm text-black bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-600 shadow-lg shadow-amber-500/25 transition-all hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2.5 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full font-black text-xs sm:text-sm text-black bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-600 shadow-xl shadow-amber-500/30 transition-all hover:scale-105 active:scale-95 group/btn"
               >
-                <Play className="w-4 h-4 fill-black" />
-                {slide.ctaText}
+                <Play className="w-4 h-4 fill-black group-hover/btn:scale-110 transition-transform" />
+                <span>{slide.ctaText}</span>
               </Link>
               <Link
                 href={slide.browseLink}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-sm transition-all hover:scale-105"
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-bold text-xs sm:text-sm text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md transition-all hover:scale-105"
               >
                 <span>Lihat Semua {slide.category}</span>
                 <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
+          </div>
+
+          {/* Right: Floating Glass-Framed Real Scraped Poster Card (Desktop only) */}
+          <div className="hidden md:flex md:col-span-4 lg:col-span-4 justify-end">
+            <Link
+              href={slide.ctaLink}
+              className="group/poster relative w-44 lg:w-52 aspect-[2/3] rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl shadow-black/90 hover:scale-105 transition-all duration-500 block shrink-0"
+            >
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full object-cover group-hover/poster:scale-110 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover/poster:opacity-50 transition-opacity" />
+              <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/15 text-[10px] font-black text-amber-300 flex items-center gap-1 shadow-md">
+                <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                <span>{slide.rating}</span>
+              </div>
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                <span className="text-[10px] font-extrabold text-white bg-amber-500/90 backdrop-blur-sm px-2.5 py-1 rounded-full uppercase tracking-wider shadow">
+                  {slide.category}
+                </span>
+                <span className="w-8 h-8 rounded-full bg-amber-400 text-black flex items-center justify-center shadow-lg group-hover/poster:scale-110 transition-transform">
+                  <Play className="w-4 h-4 fill-black ml-0.5" />
+                </span>
+              </div>
+            </Link>
           </div>
         </div>
 

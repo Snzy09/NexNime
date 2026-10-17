@@ -116,7 +116,7 @@ export default function DrakorHubPage() {
                   >
                     <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/40">
                       <img
-                        src={drama.poster || "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&q=80"}
+                        src={drama.poster || "https://drakorid.org/wp-content/uploads/2024/03/queen-of-tears.jpg"}
                         alt={drama.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />

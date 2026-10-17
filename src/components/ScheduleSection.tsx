@@ -108,11 +108,11 @@ export default function ScheduleSection({ schedule }: ScheduleSectionProps) {
             >
               <div className="w-11 h-14 rounded-lg overflow-hidden bg-black/60 shrink-0">
                 <img
-                  src={item.poster || "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=200&q=80"}
+                  src={item.poster || "https://static.anipop.xyz/poster/anime/jujutsu-kaisen-2nd-season.jpg?h=300"}
                   alt={item.title}
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).src =
-                      "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=200&q=80";
+                      "https://static.anipop.xyz/poster/anime/jujutsu-kaisen-2nd-season.jpg?h=300";
                   }}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 />

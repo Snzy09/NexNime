@@ -55,7 +55,7 @@ export default function DracinReelsSection({ items }: DracinReelsSectionProps) {
               {/* Poster Container */}
               <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
                 <img
-                  src={dracin.image || "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&q=80"}
+                  src={dracin.image || "https://d378mspt4q6n8p.cloudfront.net/posters/dragon-emperor.jpg"}
                   alt={dracin.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none"
                   loading="lazy"
