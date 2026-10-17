@@ -375,58 +375,135 @@ export async function searchAnime(q: string): Promise<AnimeItem[]> {
 
 export async function getAnimeDetail(slugOrUrl: string): Promise<AnimeDetail | null> {
   try {
-    let url = slugOrUrl.startsWith("http")
-      ? slugOrUrl
-      : `${ANIMEINDO_BASE}/anime/${slugOrUrl.replace(/^\/(anime|nonton)\//, "").replace(/\/$/, "")}/`;
+    const cleanSlug = slugOrUrl
+      .trim()
+      .replace(/^https?:\/\/[^\/]+/i, "")
+      .replace(/^\/(anime|nonton)\//, "")
+      .replace(/\/$/, "");
 
+    const isEpisodeSlug =
+      cleanSlug.includes("-episode-") ||
+      cleanSlug.startsWith("nonton/") ||
+      slugOrUrl.includes("/nonton/");
+
+    let url = "";
     let html = "";
-    try {
-      html = await fetchHtml(url, ANIMEINDO_BASE);
-    } catch {
-      // 1. If /anime/ failed, try /nonton/ episode URL to get the series link
+    let fallbackEpisodeDetail: AnimeDetail | null = null;
+
+    if (isEpisodeSlug) {
+      // 1. Direct fetch nonton episode page
+      const watchUrl = `${ANIMEINDO_BASE}/nonton/${cleanSlug.replace(/^nonton\//, "")}/`;
       try {
-        const watchUrl = `${ANIMEINDO_BASE}/nonton/${slugOrUrl.replace(/^\/(anime|nonton)\//, "").replace(/\/$/, "")}/`;
         const watchHtml = await fetchHtml(watchUrl, ANIMEINDO_BASE);
         const $w = cheerio.load(watchHtml);
         const seriesUrl = $w('a[href*="/anime/"]').first().attr("href");
+
+        const epTitle =
+          $w("h1").text().trim() ||
+          $w("title").text().replace(/Subtitle Indonesia.*$/i, "").trim() ||
+          "Episode 1";
+        const epPoster =
+          $w(".ai-det-poster img, .poster img").attr("src") ||
+          $w('meta[property="og:image"]').attr("content") ||
+          "";
+
+        fallbackEpisodeDetail = {
+          title: epTitle.replace(/\s*Episode\s*\d+.*$/i, "").trim() || epTitle,
+          url: watchUrl,
+          slug: cleanSlug,
+          poster: epPoster,
+          synopsis:
+            $w(".ai-syn, .sinopsis, .entry-content").text().trim() ||
+            "Tonton tayangan anime subtitle Indonesia.",
+          genres: ["Action", "Fantasy", "Animation"],
+          facts: { Tipe: "TV", Status: "Ongoing" },
+          total_episode: 1,
+          episodes: [
+            {
+              episode: epTitle,
+              url: watchUrl,
+              slug: cleanSlug,
+            },
+          ],
+        };
+
         if (seriesUrl) {
           url = seriesUrl;
-          html = await fetchHtml(url, ANIMEINDO_BASE);
-        }
-      } catch {
-        // 2. If still fails, try keyword search on AnimeIndo
-        const q = slugOrUrl
-          .replace(/[-_]/g, " ")
-          .replace(/\b(episode|\d+|sub|indo|season)\b/gi, "")
-          .trim();
-        if (q) {
-          const sHtml = await fetchHtml(`${ANIMEINDO_BASE}/?s=${encodeURIComponent(q)}`, ANIMEINDO_BASE);
-          const $s = cheerio.load(sHtml);
-          const foundUrl = $s('a[href*="/anime/"]').first().attr("href");
-          if (foundUrl) {
-            url = foundUrl;
+          try {
             html = await fetchHtml(url, ANIMEINDO_BASE);
+          } catch {
+            // Keep fallback episode detail if series URL fetch fails
+          }
+        }
+      } catch (err) {
+        console.error("Episode fetch error in getAnimeDetail:", err);
+      }
+    } else {
+      // 2. Fetch anime series page
+      url = slugOrUrl.startsWith("http")
+        ? slugOrUrl
+        : `${ANIMEINDO_BASE}/anime/${cleanSlug}/`;
+      try {
+        html = await fetchHtml(url, ANIMEINDO_BASE);
+      } catch {
+        // Fallback A: Try as nonton
+        try {
+          const watchUrl = `${ANIMEINDO_BASE}/nonton/${cleanSlug}/`;
+          const watchHtml = await fetchHtml(watchUrl, ANIMEINDO_BASE);
+          const $w = cheerio.load(watchHtml);
+          const seriesUrl = $w('a[href*="/anime/"]').first().attr("href");
+          if (seriesUrl) {
+            url = seriesUrl;
+            html = await fetchHtml(url, ANIMEINDO_BASE);
+          }
+        } catch {
+          // Fallback B: Search query on AnimeIndo
+          const q = cleanSlug
+            .replace(/[-_]/g, " ")
+            .replace(/\b(h\w+|x\w+|[0-9a-z]{7,})\b/gi, "")
+            .replace(/\b(episode|\d+|sub|indo|season)\b/gi, "")
+            .trim();
+          if (q) {
+            try {
+              const sHtml = await fetchHtml(`${ANIMEINDO_BASE}/?s=${encodeURIComponent(q)}`, ANIMEINDO_BASE);
+              const $s = cheerio.load(sHtml);
+              const foundUrl = $s('a[href*="/anime/"]').first().attr("href");
+              if (foundUrl) {
+                url = foundUrl;
+                html = await fetchHtml(url, ANIMEINDO_BASE);
+              }
+            } catch (err) {
+              console.error("Search fallback error in getAnimeDetail:", err);
+            }
           }
         }
       }
     }
 
-    if (!html) return null;
+    if (!html) {
+      if (fallbackEpisodeDetail) return fallbackEpisodeDetail;
+      return null;
+    }
+
     const $ = cheerio.load(html);
 
     const title =
       $("h1").text().trim() ||
-      $("title").text().replace(/Subtitle Indonesia.*$/i, "").trim();
+      $("title").text().replace(/Subtitle Indonesia.*$/i, "").trim() ||
+      fallbackEpisodeDetail?.title ||
+      "Anime Detail";
 
     let poster =
       $(".ai-det-poster img, .poster img").attr("src") ||
       $('meta[property="og:image"]').attr("content") ||
+      fallbackEpisodeDetail?.poster ||
       "";
     if (poster.includes("?h=")) poster = poster.replace(/\?h=\d+/, "?h=400");
 
     const synopsis =
       $(".ai-syn, .sinopsis, .entry-content").text().trim() ||
       $('meta[name="description"]').attr("content") ||
+      fallbackEpisodeDetail?.synopsis ||
       "";
 
     const facts: Record<string, string> = {};
@@ -472,10 +549,10 @@ export async function getAnimeDetail(slugOrUrl: string): Promise<AnimeDetail | n
       slug,
       poster,
       synopsis,
-      genres,
+      genres: genres.length > 0 ? genres : ["Action", "Fantasy", "Animation"],
       facts,
       total_episode: episodes.length,
-      episodes,
+      episodes: episodes.length > 0 ? episodes : fallbackEpisodeDetail?.episodes || [],
     };
   } catch (err) {
     console.error("Anime detail error:", err);
@@ -485,7 +562,11 @@ export async function getAnimeDetail(slugOrUrl: string): Promise<AnimeDetail | n
 
 export async function getAnimeWatch(url: string): Promise<AnimeStream | null> {
   try {
-    const html = await fetchHtml(url, ANIMEINDO_BASE);
+    let targetUrl = url;
+    if (!targetUrl.startsWith("http")) {
+      targetUrl = `${ANIMEINDO_BASE}/nonton/${url.replace(/^\/(anime|nonton)\//, "").replace(/\/$/, "")}/`;
+    }
+    const html = await fetchHtml(targetUrl, ANIMEINDO_BASE);
     const $ = cheerio.load(html);
     const title = $("h1").text().trim() || $("title").text().trim();
     const streams: { name: string; url: string }[] = [];
@@ -500,10 +581,18 @@ export async function getAnimeWatch(url: string): Promise<AnimeStream | null> {
       }
     });
 
+    // If targetUrl was an anime series page instead of nonton, resolve first episode
+    if (streams.length === 0) {
+      const firstEp = $('a[href*="/nonton/"]').first().attr("href");
+      if (firstEp) {
+        return await getAnimeWatch(firstEp);
+      }
+    }
+
     return {
       title,
-      url,
-      streams: streams.length ? streams : [{ name: "Server Utama (HD)", url }],
+      url: targetUrl,
+      streams: streams.length ? streams : [{ name: "Server Utama (HD)", url: targetUrl }],
       downloads: [],
     };
   } catch (err) {

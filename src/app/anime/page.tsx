@@ -153,8 +153,12 @@ export default function AnimePage() {
   // Fetch AnimeIndo / Schedule Data
   useEffect(() => {
     setLoadingAnimeIndo(true);
+    const animeUrl = searchQuery.trim()
+      ? `/api/anime?action=search&q=${encodeURIComponent(searchQuery.trim())}`
+      : `/api/anime?action=popular`;
+
     Promise.all([
-      fetch("/api/anime?action=popular").then((r) => r.json()),
+      fetch(animeUrl).then((r) => r.json()),
       fetch("/api/anime?action=schedule").then((r) => r.json()),
     ])
       .then(([animeRes, schedRes]) => {
@@ -163,7 +167,7 @@ export default function AnimePage() {
       })
       .catch((e) => console.error("Error fetching anime page:", e))
       .finally(() => setLoadingAnimeIndo(false));
-  }, []);
+  }, [searchQuery]);
 
   const filteredDonghua = animexinItems.filter((item) => {
     if (!searchQuery.trim()) return true;

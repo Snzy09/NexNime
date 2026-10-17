@@ -32,15 +32,69 @@ export default function AnimeDetailPage({ params }: { params: { slug: string } }
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/anime?action=detail&slug=${params.slug}`)
+    fetch(`/api/anime?action=detail&slug=${encodeURIComponent(params.slug)}`)
       .then((r) => r.json())
       .then((d) => {
-        if (d.detail) {
+        if (d.detail && d.success !== false) {
           setAnimeData(d.detail);
+          if (d.detail.episodes && d.detail.episodes.length > 0) {
+            const epIdx = d.detail.episodes.findIndex(
+              (ep: any) =>
+                ep.slug === params.slug ||
+                ep.url.includes(params.slug) ||
+                params.slug.includes(ep.slug)
+            );
+            if (epIdx !== -1) {
+              setSelectedEpIndex(epIdx);
+            }
+          }
         } else {
-          // fallback
-          const found =
-            REAL_ANIME_POPULAR.find((a) => a.slug === params.slug) || REAL_ANIME_POPULAR[0];
+          const found = REAL_ANIME_POPULAR.find((a) => a.slug === params.slug);
+          if (found) {
+            setAnimeData({
+              title: found.title,
+              slug: found.slug,
+              poster: found.poster,
+              synopsis: found.info,
+              genres: found.genres || ["Action", "Fantasy", "Shounen"],
+              facts: { Tipe: found.type || "TV", Status: found.status || "Ongoing", Skor: found.rating || "9.5" },
+              total_episode: 24,
+              episodes: Array.from({ length: 24 }, (_, i) => ({
+                episode: `Episode ${i + 1}`,
+                url: `${found.url}episode-${i + 1}`,
+                slug: `${found.slug}-episode-${i + 1}`,
+              })),
+            });
+          } else {
+            const cleanTitle = decodeURIComponent(params.slug)
+              .replace(/[-_]/g, " ")
+              .replace(/\b(h\w+|x\w+|[0-9a-z]{7,})\b/gi, "")
+              .replace(/\s+/g, " ")
+              .trim()
+              .replace(/\b\w/g, (c) => c.toUpperCase());
+
+            setAnimeData({
+              title: cleanTitle || "Anime Detail",
+              slug: params.slug,
+              poster: "",
+              synopsis: `Tayangan anime ${cleanTitle}. Video dimuat langsung dari sumber provider AnimeIndo.`,
+              genres: ["Action", "Fantasy", "Animation"],
+              facts: { Tipe: "TV", Status: "Ongoing", Provider: "AnimeIndo" },
+              total_episode: 1,
+              episodes: [
+                {
+                  episode: "Episode 1",
+                  url: `https://ww2.animeindo.pro/nonton/${params.slug}/`,
+                  slug: params.slug,
+                },
+              ],
+            });
+          }
+        }
+      })
+      .catch(() => {
+        const found = REAL_ANIME_POPULAR.find((a) => a.slug === params.slug);
+        if (found) {
           setAnimeData({
             title: found.title,
             slug: found.slug,
@@ -52,26 +106,34 @@ export default function AnimeDetailPage({ params }: { params: { slug: string } }
             episodes: Array.from({ length: 24 }, (_, i) => ({
               episode: `Episode ${i + 1}`,
               url: `${found.url}episode-${i + 1}`,
+              slug: `${found.slug}-episode-${i + 1}`,
             })),
           });
+        } else {
+          const cleanTitle = decodeURIComponent(params.slug)
+            .replace(/[-_]/g, " ")
+            .replace(/\b(h\w+|x\w+|[0-9a-z]{7,})\b/gi, "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .replace(/\b\w/g, (c) => c.toUpperCase());
+
+          setAnimeData({
+            title: cleanTitle || "Anime Detail",
+            slug: params.slug,
+            poster: "",
+            synopsis: `Tayangan anime ${cleanTitle}. Video dimuat langsung dari sumber provider AnimeIndo.`,
+            genres: ["Action", "Fantasy", "Animation"],
+            facts: { Tipe: "TV", Status: "Ongoing", Provider: "AnimeIndo" },
+            total_episode: 1,
+            episodes: [
+              {
+                episode: "Episode 1",
+                url: `https://ww2.animeindo.pro/nonton/${params.slug}/`,
+                slug: params.slug,
+              },
+            ],
+          });
         }
-      })
-      .catch(() => {
-        const found =
-          REAL_ANIME_POPULAR.find((a) => a.slug === params.slug) || REAL_ANIME_POPULAR[0];
-        setAnimeData({
-          title: found.title,
-          slug: found.slug,
-          poster: found.poster,
-          synopsis: found.info,
-          genres: found.genres || ["Action", "Fantasy", "Shounen"],
-          facts: { Tipe: found.type || "TV", Status: found.status || "Ongoing", Skor: found.rating || "9.5" },
-          total_episode: 24,
-          episodes: Array.from({ length: 24 }, (_, i) => ({
-            episode: `Episode ${i + 1}`,
-            url: `${found.url}episode-${i + 1}`,
-          })),
-        });
       })
       .finally(() => setLoading(false));
   }, [params.slug]);
@@ -252,15 +314,22 @@ export default function AnimeDetailPage({ params }: { params: { slug: string } }
           <div className="lg:col-span-8 rounded-2xl bg-[#121218] border border-white/10 p-6 space-y-5">
             <div className="flex flex-col sm:flex-row gap-5 items-start">
               <div className="w-32 sm:w-36 aspect-[2/3] rounded-xl overflow-hidden bg-black/60 shrink-0 border border-white/10 shadow-lg">
-                <img
-                  src={animeData.poster}
-                  alt={animeData.title}
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src =
-                      "https://static.anipop.xyz/poster/anime/jujutsu-kaisen-2nd-season.jpg?h=400";
-                  }}
-                  className="w-full h-full object-cover"
-                />
+                {animeData.poster ? (
+                  <img
+                    src={animeData.poster}
+                    alt={animeData.title}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src =
+                        "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80";
+                    }}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-[#181822] text-amber-400 p-2 text-center">
+                    <Tv className="w-8 h-8 mb-1 opacity-60" />
+                    <span className="text-[10px] text-gray-400 font-bold line-clamp-2">{animeData.title}</span>
+                  </div>
+                )}
               </div>
 
               <div className="flex-1">

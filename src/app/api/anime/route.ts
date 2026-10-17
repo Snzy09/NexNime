@@ -50,11 +50,19 @@ export async function GET(request: Request) {
           },
         });
       }
+      return NextResponse.json(
+        { success: false, detail: null, error: `Anime '${slug}' tidak ditemukan` },
+        { status: 404 }
+      );
     }
 
     if (action === "watch" && watchUrl) {
       const stream = await getAnimeWatch(watchUrl);
       if (stream) return NextResponse.json({ success: true, stream });
+      return NextResponse.json(
+        { success: false, stream: null, error: "Stream video tidak ditemukan" },
+        { status: 404 }
+      );
     }
 
     if (action === "donghua") {
