@@ -26,7 +26,7 @@ export default function NetShortSection({ items }: NetShortSectionProps) {
               <span>NetShort Mini Series</span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 flex items-center gap-1">
                 <Flame className="w-3 h-3 text-purple-400" />
-                9:16 Shorts
+                Shorts
               </span>
             </h2>
           </div>

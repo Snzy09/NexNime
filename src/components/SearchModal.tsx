@@ -37,7 +37,7 @@ const POPULAR_QUERIES = [
 
 const CATEGORY_SHORTCUTS = [
   { label: "Anime & Donghua", href: "/anime", icon: Tv, color: "text-amber-400" },
-  { label: "Drama Pendek (9:16)", href: "/dracin", icon: Video, color: "text-rose-400" },
+  { label: "Dracin", href: "/dracin", icon: Video, color: "text-rose-400" },
   { label: "Drakor Asia", href: "/drakor", icon: Clapperboard, color: "text-blue-400" },
   { label: "Manga & Komik", href: "/manga", icon: BookOpen, color: "text-emerald-400" },
   { label: "Film Movie", href: "/film", icon: Film, color: "text-red-400" },

@@ -225,21 +225,21 @@ export default function Home() {
           <DrakorSection items={drakorList} />
         )}
 
-        {/* 7. Dracin Short Video Reels (9:16) */}
+        {/* 7. Dracin Short Video Reels */}
         {loadingDracin ? (
           <DracinReelsSkeleton />
         ) : (
           <DracinReelsSection items={dracinList} />
         )}
 
-        {/* 8. ReelShort Vertical Drama Reels (9:16) */}
+        {/* 8. ReelShort Vertical Drama Reels */}
         {loadingReelshort ? (
           <DracinReelsSkeleton />
         ) : (
           <ReelShortSection items={reelshortList} />
         )}
 
-        {/* 9. NetShort Vertical Drama Reels (9:16) */}
+        {/* 9. NetShort Vertical Drama Reels */}
         {loadingNetshort ? (
           <DracinReelsSkeleton />
         ) : (

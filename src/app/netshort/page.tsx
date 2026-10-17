@@ -181,7 +181,7 @@ export default function NetShortPage() {
                       </span>
 
                       <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-black/60 text-purple-300 backdrop-blur-sm border border-white/10">
-                        9:16 Reel
+                        Reel
                       </span>
                     </div>
 

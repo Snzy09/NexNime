@@ -376,7 +376,7 @@ function ReelShortWatchContent() {
 
             <div className="border-l border-white/10 pl-3">
               <span className="text-[10px] text-rose-400 font-bold uppercase tracking-wider block">
-                REELSHORT VIDEO PENDEK (9:16)
+                REELSHORT VIDEO PENDEK
               </span>
               <h1 className="text-xs sm:text-sm font-black text-white truncate max-w-xs sm:max-w-md">
                 {detail?.title || initialTitle || "Memuat Drama..."}

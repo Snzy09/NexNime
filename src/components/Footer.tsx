@@ -22,7 +22,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="mt-3 text-xs text-gray-400 leading-relaxed max-w-sm">
-              Platform hiburan streaming Anime Jepang, Donghua, K-Drama (Drakor), Dracin Short Video vertikal 9:16, serta baca komik Manga, Manhwa &amp; Manhua dengan subtitle Indonesia berkualitas HD 1080p.
+              Platform hiburan streaming Anime Jepang, Donghua, K-Drama (Drakor), Dracin, serta baca komik Manga, Manhwa &amp; Manhua dengan subtitle Indonesia berkualitas HD 1080p.
             </p>
             <div className="flex items-center gap-3 mt-4 text-xs text-gray-500">
               <span>© {new Date().getFullYear()} NexNime. All rights reserved.</span>
@@ -100,7 +100,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/dracin" className="hover:text-rose-300 transition-colors">
-                  Dracin Short Video (9:16)
+                  Dracin
                 </Link>
               </li>
               <li>

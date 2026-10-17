@@ -80,7 +80,7 @@ function DracinWatchContent() {
       title: initialTitle || "Short Drama",
       url: `/dracin/watch?provider=${provider}&id=${encodeURIComponent(rawId)}`,
       episodes: 80,
-      description: "Serial drama pendek vertikal 9:16 kualitas HD.",
+      description: "Serial drama pendek kualitas HD.",
     };
 
   const activeDrama = detail?.film || fallbackDrama;

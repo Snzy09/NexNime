@@ -94,7 +94,7 @@ const HERO_SLIDES_FALLBACK: HeroSlide[] = [
   },
   {
     id: "fallback-4",
-    category: "DRACIN 9:16",
+    category: "DRACIN",
     typeBadge: "Dracin Reels Vertikal",
     rating: "9.75",
     quality: "60FPS VERTICAL",
@@ -226,13 +226,13 @@ export default function HeroBanner({
       });
     }
 
-    // 5. Realtime Top Dracin Mini Drama 9:16 (AsiaBox)
+    // 5. Realtime Top Dracin Mini Drama (AsiaBox)
     if (dracinList.length > 0) {
       const dr = dracinList[0];
       list.push({
         id: `dracin-${dr.slug}`,
-        category: "DRACIN 9:16",
-        typeBadge: "DRACIN SHORT 9:16",
+        category: "DRACIN",
+        typeBadge: "DRACIN",
         rating: "9.7",
         quality: "VERTICAL 60FPS",
         badgeStatus: `${dr.episodes || 60}+ Episode`,

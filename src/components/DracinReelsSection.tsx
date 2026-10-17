@@ -23,7 +23,7 @@ export default function DracinReelsSection({ items }: DracinReelsSectionProps) {
               <Video className="w-5 h-5 text-rose-400" />
             </div>
             <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
-              <span>Drama Pendek Populer Pekan Ini (9:16 Short Drama)</span>
+              <span>Dracin Populer Pekan Ini</span>
             </h2>
           </div>
           <div className="mt-1">

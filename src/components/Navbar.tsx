@@ -134,7 +134,7 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
       bgColor: "bg-rose-500/10 border-rose-500/20 group-hover:border-rose-400/50",
     },
     {
-      title: "Dracin Short 9:16",
+      title: "Dracin",
       desc: "Drama Vertikal AsiaBox & ReelShort",
       href: "/dracin",
       icon: Video,

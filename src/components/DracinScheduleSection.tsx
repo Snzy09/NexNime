@@ -63,7 +63,7 @@ export default function DracinScheduleSection({ initialItems }: DracinScheduleSe
                 </span>
               </h2>
               <p className="text-xs text-gray-400">
-                Jadwal penayangan perdana serial drama pendek vertikal 9:16 FreeReels
+                Jadwal penayangan perdana serial drama pendek FreeReels
               </p>
             </div>
           </div>

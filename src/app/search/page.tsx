@@ -494,7 +494,7 @@ function SearchResultsContent() {
               Pencarian Universal NexNime
             </h3>
             <p className="text-xs sm:text-sm text-gray-400 max-w-md mx-auto mb-6">
-              Ketik judul di atas untuk mencari secara serentak di semua kategori: Anime, Drama Pendek 9:16, Drakor, Manga, Film Movie, dan Novel.
+              Ketik judul di atas untuk mencari secara serentak di semua kategori: Anime, Dracin, Drakor, Manga, Film Movie, dan Novel.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2 max-w-lg mx-auto">
               {POPULAR_QUERIES.map((tag) => (
@@ -548,7 +548,7 @@ function SearchResultsContent() {
 
             {/* 2. Short Drama / Dracin Section */}
             {renderSection(
-              "Drama Pendek (9:16 Short Drama)",
+              "Dracin",
               "dracin",
               searchData.results.dracin,
               <Video className="w-5 h-5 text-rose-500" />,

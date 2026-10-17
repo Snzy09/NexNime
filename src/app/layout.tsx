@@ -15,7 +15,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "NexNime — Streaming Anime, Manga, Film, Drakor & Dracin",
-  description: "Platform hiburan streaming Anime Jepang, Donghua, K-Drama (Drakor), Dracin 9:16, serta baca komik Manga, Manhwa & Light Novel sub Indo.",
+  description: "Platform hiburan streaming Anime Jepang, Donghua, K-Drama (Drakor), Dracin, serta baca komik Manga, Manhwa & Light Novel sub Indo.",
 };
 
 export default function RootLayout({

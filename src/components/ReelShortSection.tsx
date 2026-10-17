@@ -36,7 +36,7 @@ export default function ReelShortSection({ items }: ReelShortSectionProps) {
               <span>ReelShort Mini Series</span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30 flex items-center gap-1">
                 <Flame className="w-3 h-3 text-rose-400" />
-                9:16 Reels
+                Reels
               </span>
             </h2>
           </div>
