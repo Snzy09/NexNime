@@ -8,10 +8,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  Tv,
-  BookOpen,
-  Clapperboard,
-  Video,
 } from "lucide-react";
 import { AnimeItem } from "@/lib/services/animeService";
 import { MangaItem } from "@/lib/services/mangaTypes";
@@ -113,14 +109,6 @@ const HERO_SLIDES_FALLBACK: HeroSlide[] = [
     bgGradient: "from-purple-950/80 via-black/50 to-transparent",
     accentColor: "text-purple-400",
   },
-];
-
-const CATEGORY_TABS = [
-  { label: "ANIME", key: "ANIME", href: "/anime", icon: Tv, color: "text-amber-400" },
-  { label: "DONGHUA", key: "DONGHUA", href: "/animexin", icon: Sparkles, color: "text-rose-400" },
-  { label: "MANHWA", key: "MANHWA", href: "/manga?type=manhwa", icon: BookOpen, color: "text-emerald-400" },
-  { label: "DRAKOR", key: "DRAKOR", href: "/drakor", icon: Clapperboard, color: "text-blue-400" },
-  { label: "DRACIN 9:16", key: "DRACIN", href: "/dracin", icon: Video, color: "text-purple-400" },
 ];
 
 export default function HeroBanner({
@@ -360,15 +348,6 @@ export default function HeroBanner({
     dragStartXRef.current = null;
   };
 
-  const jumpToCategory = (catKey: string) => {
-    const targetIdx = slides.findIndex((s) =>
-      s.category.toUpperCase().includes(catKey.toUpperCase())
-    );
-    if (targetIdx !== -1) {
-      setCurrentSlide(targetIdx);
-    }
-  };
-
   return (
     <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8">
       {/* Curved Hero Container */}
@@ -482,35 +461,15 @@ export default function HeroBanner({
           </div>
         </div>
 
-        {/* Carousel Bottom Controls & Category Pills */}
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
-          {/* Sub-category Quick Jump Pills - Modern Frosted Capsule Dock */}
-          <div className="inline-flex items-center gap-1 sm:gap-1.5 p-1 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 shadow-xl shadow-black/50 overflow-x-auto no-scrollbar max-w-full">
-            {CATEGORY_TABS.map((cat, i) => {
-              const isActive = slide.category.toUpperCase().includes(cat.key);
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => jumpToCategory(cat.key)}
-                  className={`relative px-3 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-wider transition-all duration-300 flex items-center gap-1.5 whitespace-nowrap ${
-                    isActive
-                      ? "bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-black shadow-lg shadow-amber-400/30 font-extrabold scale-[1.03]"
-                      : "text-gray-300 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  <cat.icon
-                    className={`w-3.5 h-3.5 transition-transform duration-300 ${
-                      isActive ? "text-black scale-110" : cat.color
-                    }`}
-                  />
-                  <span>{cat.label}</span>
-                  {isActive && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
-                  )}
-                </button>
-              );
-            })}
+        {/* Carousel Bottom Controls */}
+        <div className="relative z-10 flex items-center justify-between gap-4 pt-4 border-t border-white/10">
+          {/* Slide Indicator Badge */}
+          <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
+            <span className="text-amber-400 font-extrabold">{activeIndex + 1}</span>
+            <span>/</span>
+            <span>{slides.length}</span>
+            <span className="text-white/20">•</span>
+            <span className="text-gray-300 uppercase tracking-wider text-[11px] font-semibold">{slide.category}</span>
           </div>
 
           {/* Arrows & Slide Indicator Dots */}
