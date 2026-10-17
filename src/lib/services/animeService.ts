@@ -12,6 +12,7 @@ if (typeof process !== "undefined") {
 import * as cheerio from "cheerio";
 import { REAL_SCHEDULE } from "./realDataFallback";
 import { getAnichinPopular } from "./anichinService";
+import { searchSamehadaku } from "./samehadakuService";
 
 const ANIMEINDO_BASE = "https://ww2.animeindo.pro";
 const ANICHIN_BASE = "https://anichin.moe";
@@ -366,11 +367,30 @@ export async function searchAnime(q: string): Promise<AnimeItem[]> {
       }
     });
 
-    return out;
+    if (out.length > 0) return out;
   } catch (err) {
     console.error("Anime search error:", err);
-    return [];
   }
+
+  // Resilient fallback to Samehadaku if AnimeIndo search is blocked or empty
+  try {
+    const sItems = await searchSamehadaku(q);
+    if (sItems && sItems.length > 0) {
+      return sItems.map((s) => ({
+        title: s.title,
+        url: s.url,
+        slug: s.slug,
+        poster: s.thumb || "",
+        episode: s.episode || "Ep Terbaru",
+        info: s.type || "TV",
+        rating: s.score || "★ 8.5",
+        status: s.status || "Ongoing",
+        type: "TV" as const,
+      }));
+    }
+  } catch {}
+
+  return [];
 }
 
 export async function getAnimeDetail(slugOrUrl: string): Promise<AnimeDetail | null> {

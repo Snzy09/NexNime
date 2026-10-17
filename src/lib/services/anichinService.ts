@@ -10,6 +10,8 @@ if (typeof process !== "undefined") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
+import { getDonghuaLatest, searchDonghua } from "./donghuaFilmService";
+
 const BASE = "https://anichin.moe";
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36";
@@ -695,31 +697,86 @@ function buildPagedUrl(base: string, page: number): string {
 export async function getAnichinHome(page: number = 1): Promise<AnichinHomeData> {
   const p = parseInt(String(page), 10) || 1;
   const url = p > 1 ? BASE + "/page/" + p + "/" : BASE + "/";
-  const { text, status } = await fetchText(url);
-  if (status === 403 || text.includes("403 Forbidden")) {
-    return {
-      source: url,
-      type: "home",
-      page: p,
-      count: 0,
-      rilisan_terbaru: [],
-      terpopuler_hari_ini: [],
-      jadwal: { by_day: {}, days: [] },
-      items: [],
-    };
+  try {
+    const { text, status } = await fetchText(url);
+    if (status !== 403 && !text.includes("403 Forbidden") && text.includes("listupd")) {
+      const data = parseHome(text, url);
+      if (data && data.items && data.items.length > 0) {
+        data.page = p;
+        return data;
+      }
+    }
+  } catch (err) {
+    console.error("fetchText error in getAnichinHome:", err);
   }
-  const data = parseHome(text, url);
-  data.page = p;
-  return data;
+
+  // Resilient fallback to live DonghuaFilm records when AniChin blocks Vercel IPs
+  try {
+    const dhRes = await getDonghuaLatest(p, 20);
+    if (dhRes && dhRes.results && dhRes.results.length > 0) {
+      const mapped: AnichinItem[] = dhRes.results.map((d: any) => ({
+        title: d.title,
+        href: `/donghuafilm/watch?id=${d.id}`,
+        url: d.url,
+        slug: d.slug,
+        episode: d.latest_episode ? `Ep ${d.latest_episode}` : "Ongoing",
+        type: "Donghua",
+        sub: "Sub Indo",
+        poster: d.poster || d.cover || "https://static.anipop.xyz/poster/anime/gensou-sangokushi.jpg?h=400",
+      }));
+      return {
+        source: "https://donghuafilm.site",
+        type: "home",
+        page: p,
+        count: mapped.length,
+        rilisan_terbaru: mapped,
+        terpopuler_hari_ini: mapped.slice(0, 10),
+        jadwal: { by_day: {}, days: [] },
+        items: mapped,
+      };
+    }
+  } catch {}
+
+  return {
+    source: url,
+    type: "home",
+    page: p,
+    count: 0,
+    rilisan_terbaru: [],
+    terpopuler_hari_ini: [],
+    jadwal: { by_day: {}, days: [] },
+    items: [],
+  };
 }
 
 export async function getAnichinPopular(page: number = 1): Promise<AnichinItem[]> {
   const p = parseInt(String(page), 10) || 1;
   const url = BASE + "/anime/?order=popular" + (p > 1 ? "&page=" + p : "");
-  const { text, status } = await fetchText(url);
-  if (status === 403 || text.includes("403 Forbidden")) return [];
-  const data = parseListUpd(text, url);
-  return data.items;
+  try {
+    const { text, status } = await fetchText(url);
+    if (status !== 403 && !text.includes("403 Forbidden") && text.includes("listupd")) {
+      const data = parseListUpd(text, url);
+      if (data && data.items && data.items.length > 0) return data.items;
+    }
+  } catch {}
+
+  // Resilient fallback
+  try {
+    const dhRes = await getDonghuaLatest(p, 24);
+    if (dhRes && dhRes.results && dhRes.results.length > 0) {
+      return dhRes.results.map((d: any) => ({
+        title: d.title,
+        href: `/donghuafilm/watch?id=${d.id}`,
+        url: d.url,
+        slug: d.slug,
+        episode: d.latest_episode ? `Ep ${d.latest_episode}` : "Ongoing",
+        type: "Donghua",
+        sub: "Sub Indo",
+        poster: d.poster || d.cover || "https://static.anipop.xyz/poster/anime/gensou-sangokushi.jpg?h=400",
+      }));
+    }
+  } catch {}
+  return [];
 }
 
 export async function searchAnichin(query: string, page: number = 1): Promise<AnichinItem[]> {
@@ -728,9 +785,31 @@ export async function searchAnichin(query: string, page: number = 1): Promise<An
   const p = parseInt(String(page), 10) || 1;
   let url = BASE + "/?s=" + encodeURIComponent(q);
   if (p > 1) url += "&page=" + p;
-  const { text, status } = await fetchText(url);
-  if (status === 403 || text.includes("403 Forbidden")) return [];
-  return parseSearch(text, url);
+  try {
+    const { text, status } = await fetchText(url);
+    if (status !== 403 && !text.includes("403 Forbidden")) {
+      const items = parseSearch(text, url);
+      if (items && items.length > 0) return items;
+    }
+  } catch {}
+
+  // Resilient fallback
+  try {
+    const dhRes = await searchDonghua(q, p, 20);
+    if (dhRes && dhRes.results && dhRes.results.length > 0) {
+      return dhRes.results.map((d: any) => ({
+        title: d.title,
+        href: `/donghuafilm/watch?id=${d.id}`,
+        url: d.url,
+        slug: d.slug,
+        episode: d.latest_episode ? `Ep ${d.latest_episode}` : "Ongoing",
+        type: "Donghua",
+        sub: "Sub Indo",
+        poster: d.poster || d.cover || "https://static.anipop.xyz/poster/anime/gensou-sangokushi.jpg?h=400",
+      }));
+    }
+  } catch {}
+  return [];
 }
 
 export async function getAnichinDetail(raw: string): Promise<AnichinDetail | null> {

@@ -60,10 +60,10 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
       match: (p: string) => p.startsWith("/film") || p.startsWith("/vidbox"),
     },
     {
-      href: "/anime#jadwal",
+      href: "/jadwal",
       label: "Jadwal",
       icon: Calendar,
-      match: (p: string) => p.includes("#jadwal"),
+      match: (p: string) => p.startsWith("/jadwal") || p.includes("#jadwal"),
     },
     {
       href: "/dracin",
@@ -100,7 +100,7 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
     activeTabIdx = 4;
   } else if (isOtherOpen || isOtherActive) {
     activeTabIdx = 2;
-  } else if (pathname.includes("#jadwal")) {
+  } else if (pathname.startsWith("/jadwal") || pathname.includes("#jadwal")) {
     activeTabIdx = 3;
   } else if (
     pathname.startsWith("/anime") ||
@@ -350,13 +350,10 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
 
             {/* 4. JADWAL */}
             <Link
-              href="/anime#jadwal"
+              href="/jadwal"
               onClick={() => {
                 setIsOtherOpen(false);
                 setIsSettingsOpen(false);
-                if (pathname === "/anime") {
-                  document.getElementById("jadwal")?.scrollIntoView({ behavior: "smooth" });
-                }
               }}
               className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition-all duration-200 ${
                 activeTabIdx === 3

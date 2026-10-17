@@ -37,17 +37,26 @@ export default function AnichinPage() {
   // Initial fetch
   useEffect(() => {
     setLoading(true);
-    Promise.all([
+    Promise.allSettled([
       fetch("/api/anichin?action=home").then((r) => r.json()),
       fetch("/api/anichin?action=popular").then((r) => r.json()),
       fetch("/api/anichin?action=genres").then((r) => r.json()),
     ])
-      .then(([homeRes, popRes, genreRes]) => {
-        if (homeRes.rilisan_terbaru) setItems(homeRes.rilisan_terbaru);
-        else if (homeRes.items) setItems(homeRes.items);
-        if (homeRes.jadwal) setJadwal(homeRes.jadwal);
-        if (popRes.items) setPopularItems(popRes.items);
-        if (genreRes.items) setGenres(genreRes.items);
+      .then(([homeSettled, popSettled, genreSettled]) => {
+        const homeRes = homeSettled.status === "fulfilled" ? homeSettled.value : null;
+        const popRes = popSettled.status === "fulfilled" ? popSettled.value : null;
+        const genreRes = genreSettled.status === "fulfilled" ? genreSettled.value : null;
+
+        if (homeRes) {
+          if (homeRes.rilisan_terbaru && Array.isArray(homeRes.rilisan_terbaru) && homeRes.rilisan_terbaru.length > 0) {
+            setItems(homeRes.rilisan_terbaru);
+          } else if (homeRes.items && Array.isArray(homeRes.items)) {
+            setItems(homeRes.items);
+          }
+          if (homeRes.jadwal) setJadwal(homeRes.jadwal);
+        }
+        if (popRes && popRes.items) setPopularItems(popRes.items);
+        if (genreRes && genreRes.items) setGenres(genreRes.items);
       })
       .catch((err) => console.error("Error loading AniChin home:", err))
       .finally(() => setLoading(false));
