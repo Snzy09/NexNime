@@ -71,42 +71,6 @@ export default function NovelCatalogPage() {
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <main className="flex-1 py-4 space-y-6">
-        {/* Banner Hero */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-          <div className="rounded-2xl bg-gradient-to-r from-emerald-950/60 via-[#0B1E19] to-[#0A1412] p-6 border border-emerald-500/20 shadow-xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-4xl font-black text-white flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400">
-                    <BookOpen className="w-7 h-7" />
-                  </div>
-                  <span>BacaLN - Light Novel &amp; Web Novel Hub</span>
-                </h1>
-                <p className="text-xs sm:text-sm text-gray-300 mt-2 max-w-2xl">
-                  Baca ribuan light novel, web novel Korea, China, dan Jepang terjemahan bahasa Indonesia terlengkap.
-                  Dilengkapi fitur auto-scroll (1x, 2x, 3x speed), ukuran font kustom, tema baca malam/sepia, dan bebas dummy data.
-                </p>
-              </div>
-
-              {/* Navigation toggle to Manga */}
-              <div className="flex flex-wrap items-center gap-2">
-                <Link
-                  href="/manga"
-                  className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-gray-200 text-xs font-semibold border border-white/10 flex items-center gap-1.5 transition-colors"
-                >
-                  <Layers className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Beralih ke Manga (MangaDex)</span>
-                </Link>
-
-                <span className="text-[10px] px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3" />
-                  BacaLN Scraper
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Filter / Search Bar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#111118] p-3 rounded-2xl border border-white/5">

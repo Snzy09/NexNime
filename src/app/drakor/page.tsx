@@ -65,22 +65,7 @@ export default function DrakorHubPage() {
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-      <main className="flex-1 py-4 space-y-8">
-        {/* Banner Top */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-          <div className="rounded-2xl bg-gradient-to-r from-blue-950/40 via-[#101420] to-[#0D0D14] p-6 border border-blue-500/20 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2">
-                <Clapperboard className="w-8 h-8 text-blue-400" />
-                <span>Drakor Hub - Streaming Serial Drama Korea &amp; Asia</span>
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-300 mt-2 max-w-2xl">
-                Semua serial drama Korea &amp; Asia dari DrakorID dan OppaDrama tergabung dalam 1 halaman. Subtitle Indonesia &amp; server cepat tanpa harus ganti tab.
-              </p>
-            </div>
-          </div>
-        </div>
-
+      <main className="flex-1 py-4 space-y-6">
         {/* PROVIDER 1: DRAKORID */}
         <div id="drakorid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
           {/* Tab Controls for DrakorID */}

@@ -72,36 +72,7 @@ export default function DonghuaFilmCatalogPage() {
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <main className="flex-1 py-4 space-y-6">
-        {/* Banner Hero */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-          <div className="rounded-2xl bg-gradient-to-r from-amber-950/60 via-[#1C160E] to-[#0E0C08] p-6 border border-amber-500/20 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-4xl font-black text-white flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-amber-400/20 border border-amber-400/30 text-amber-300">
-                  <Tv className="w-7 h-7" />
-                </div>
-                <span>DonghuaFilm - Streaming Donghua HD Sub Indo</span>
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-300 mt-2 max-w-2xl">
-                Nonton animasi 3D &amp; 2D China (Donghua) terlengkap sub Indo. Dilengkapi streaming multi-server (Embed &amp; Direct MP4), link download per episode, dan 100% data real live scrape.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <Link
-                href="/anime"
-                className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-gray-200 text-xs font-semibold border border-white/10 flex items-center gap-1.5 transition-colors"
-              >
-                <Layers className="w-3.5 h-3.5 text-amber-400" />
-                <span>Buka di Anime Hub</span>
-              </Link>
-              <span className="text-[10px] px-3 py-1.5 rounded-full bg-amber-400/20 text-amber-300 font-bold border border-amber-400/30 uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3" />
-                DonghuaFilm API
-              </span>
-            </div>
-          </div>
-        </div>
+        {/* Popular Tags */}
 
         {/* Popular Tags */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

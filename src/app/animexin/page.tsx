@@ -68,32 +68,6 @@ export default function AnimeXinPage() {
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <main className="flex-1 py-4 space-y-6">
-        {/* Banner Top */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-          <div className="rounded-2xl bg-gradient-to-r from-cyan-950/60 via-[#0E1520] to-[#0D0D14] p-6 border border-cyan-500/20 shadow-xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-4xl font-black text-white flex items-center gap-2">
-                  <Tv className="w-8 h-8 text-cyan-400" />
-                  <span>AnimeXin - Streaming Donghua Subtitle Indonesia</span>
-                </h1>
-                <p className="text-xs sm:text-sm text-gray-300 mt-2">
-                  Pusat tontonan animasi China (Donghua) populer: Renegade Immortal, Against the Gods, Swallowed Star, Battle Through the Heavens dengan multi-server video player.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30 uppercase tracking-wider">
-                  AnimeXin Scraper
-                </span>
-                <span className="text-[10px] px-2.5 py-1 rounded-full bg-amber-400/20 text-amber-300 font-bold border border-amber-400/30">
-                  Sub Indo &amp; Eng
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Filter Pills */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl">

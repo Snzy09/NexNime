@@ -44,32 +44,6 @@ export default function ReelShortPage() {
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <main className="flex-1 py-4 space-y-6">
-        {/* Banner Top */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-          <div className="rounded-2xl bg-gradient-to-r from-rose-950/50 via-[#181014] to-[#0D0D14] p-6 border border-rose-500/20 shadow-xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-4xl font-black text-white flex items-center gap-2">
-                  <Video className="w-8 h-8 text-rose-500" />
-                  <span>ReelShort - Streaming Video Pendek (9:16)</span>
-                </h1>
-                <p className="text-xs sm:text-sm text-gray-300 mt-2">
-                  Nonton ribuan drama pendek vertikal resolusi HD rasio 9:16 ala TikTok/Reels. Data 100% real hasil live scrape &amp; dekripsi stream ReelShort.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30 uppercase tracking-wider">
-                  Rasio 9:16 Vertikal
-                </span>
-                <span className="text-[10px] px-2.5 py-1 rounded-full bg-amber-400/20 text-amber-300 font-bold border border-amber-400/30">
-                  HD Streams
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Category Genre Filter Pills */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl">

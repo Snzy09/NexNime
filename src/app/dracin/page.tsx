@@ -215,75 +215,67 @@ function DracinHubContent() {
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-      {/* Header Hub Banner */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 w-full">
-        <div className="rounded-2xl bg-gradient-to-r from-rose-950/60 via-[#190F17] to-[#0D0D14] p-4 sm:p-6 border border-rose-500/20 shadow-xl flex flex-col gap-3">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
-            <div>
-              <h1 className="text-xl sm:text-3xl font-black text-white flex items-center gap-2">
-                <Video className="w-6 h-6 sm:w-8 sm:h-8 text-rose-500 shrink-0" />
-                <span>Short Drama Hub (9:16 Vertikal)</span>
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-2xl leading-relaxed">
-                Semua serial drama pendek vertikal rasio 9:16 dari 6 platform (FreeReels, PineDrama, Melolo, AsiaBox, ReelShort, NetShort) tergabung dalam 1 halaman. Klik judul untuk langsung menonton di player vertikal.
-              </p>
-            </div>
-
-            {/* Quick jump anchor links */}
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <a
-                href="#freereels"
-                className="px-3 py-1.5 rounded-xl bg-rose-500 text-white font-bold text-xs shadow-md shadow-rose-500/30 hover:bg-rose-400 transition-all flex items-center gap-1"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>FreeReels</span>
-              </a>
-              <a
-                href="#pinedrama"
-                className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold border border-white/10 transition-colors"
-              >
-                PineDrama
-              </a>
-              <a
-                href="#melolo"
-                className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold border border-white/10 transition-colors"
-              >
-                Melolo
-              </a>
-              <a
-                href="#asiabox"
-                className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold border border-white/10 transition-colors"
-              >
-                AsiaBox
-              </a>
-              <a
-                href="#reelshort"
-                className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold border border-white/10 transition-colors"
-              >
-                ReelShort
-              </a>
-              <a
-                href="#netshort"
-                className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold border border-white/10 transition-colors"
-              >
-                NetShort
-              </a>
-            </div>
-          </div>
+      {/* Minimal Provider Bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2 w-full">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+          <a
+            href="#freereels"
+            className="px-3 py-1 rounded-full bg-rose-500 text-white font-bold text-xs shadow-md shadow-rose-500/25 flex items-center gap-1 shrink-0"
+          >
+            <Sparkles className="w-3 h-3" />
+            <span>FreeReels</span>
+          </a>
+          <a
+            href="#pinedrama"
+            className="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold border border-white/10 transition-colors shrink-0"
+          >
+            PineDrama
+          </a>
+          <a
+            href="#melolo"
+            className="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold border border-white/10 transition-colors shrink-0"
+          >
+            Melolo
+          </a>
+          <a
+            href="#asiabox"
+            className="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold border border-white/10 transition-colors shrink-0"
+          >
+            AsiaBox
+          </a>
+          <a
+            href="#reelshort"
+            className="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold border border-white/10 transition-colors shrink-0"
+          >
+            ReelShort
+          </a>
+          <a
+            href="#netshort"
+            className="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold border border-white/10 transition-colors shrink-0"
+          >
+            NetShort
+          </a>
         </div>
       </div>
 
       {/* ========================================================= */}
       {/* SECTION 1: FREEREELS (Flagship Multi-Sub Softsub 24 Bahasa) */}
       {/* ========================================================= */}
-      <section id="freereels" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-rose-500/20">
+      <section id="freereels" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
           <div>
-            <h2 className="text-base sm:text-xl font-black text-white flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-rose-500" />
-              <span>FreeReels Short Drama (HLS &amp; 24 Subtitles)</span>
-            </h2>
-            <p className="text-[11px] text-gray-400 mt-0.5">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-rose-500" />
+              </div>
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                <span>FreeReels Drama</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
+                  HLS &amp; 24 Sub
+                </span>
+              </h2>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">
               Streaming HLS multi-resolusi dengan pilihan subtitle eksternal (termasuk Bahasa Indonesia)
             </p>
           </div>
@@ -457,14 +449,21 @@ function DracinHubContent() {
       {/* ========================================================= */}
       {/* SECTION 2: PINEDRAMA (TikTok Mini Drama 13 Bahasa Hardsub) */}
       {/* ========================================================= */}
-      <section id="pinedrama" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-amber-500/20">
+      <section id="pinedrama" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
           <div>
-            <h2 className="text-base sm:text-xl font-black text-white flex items-center gap-2">
-              <Film className="w-5 h-5 text-amber-400" />
-              <span>PineDrama (TikTok Mini Drama)</span>
-            </h2>
-            <p className="text-[11px] text-gray-400 mt-0.5">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                <Film className="w-5 h-5 text-amber-400" />
+              </div>
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                <span>PineDrama</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                  TikTok Mini Drama
+                </span>
+              </h2>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">
               Serial pendek trending ByteDance dengan subtitle hardsub bahasa terpilih
             </p>
           </div>
@@ -575,14 +574,21 @@ function DracinHubContent() {
       {/* SECTION 3: MELOLO (ByteDance Bilingual Drama) */}
       {/* ========================================================= */}
       {meloloCategories.length > 0 && (
-        <section id="melolo" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-cyan-500/20">
+        <section id="melolo" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
             <div>
-              <h2 className="text-base sm:text-xl font-black text-white flex items-center gap-2">
-                <Video className="w-5 h-5 text-cyan-400" />
-                <span>Melolo (ByteDance Bilingual Drama)</span>
-              </h2>
-              <p className="text-[11px] text-gray-400 mt-0.5">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                  <Video className="w-5 h-5 text-cyan-400" />
+                </div>
+                <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                  <span>Melolo Drama</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30">
+                    ByteDance
+                  </span>
+                </h2>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">
                 Katalog serial pendek Melolo dengan subtitle bilingual English &amp; Mandarin
               </p>
             </div>
@@ -667,12 +673,19 @@ function DracinHubContent() {
       {/* ========================================================= */}
       {/* SECTION 4: ASIABOX CATALOG */}
       {/* ========================================================= */}
-      <section id="asiabox" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
-        <div className="flex items-center justify-between pb-2 border-b border-white/10">
-          <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-            <Flame className="w-5 h-5 text-rose-500" />
-            <span>Koleksi Serial AsiaBox (Klik untuk Nonton)</span>
-          </h2>
+      <section id="asiabox" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
+              <Flame className="w-5 h-5 text-rose-500" />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <span>AsiaBox Drama</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
+                Sub Indo
+              </span>
+            </h2>
+          </div>
           <span className="text-xs text-gray-400">
             {loadingAsiaList ? "Memuat katalog..." : `${dramaList.length} Judul`}
           </span>
@@ -740,12 +753,19 @@ function DracinHubContent() {
       {/* ========================================================= */}
       {/* SECTION 5: REELSHORT CATALOG */}
       {/* ========================================================= */}
-      <section id="reelshort" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
-        <div className="flex items-center justify-between pb-2 border-b border-white/10">
-          <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-400" />
-            <span>Koleksi ReelShort (Serial Romantis &amp; Billionaire)</span>
-          </h2>
+      <section id="reelshort" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-rose-400" />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <span>ReelShort</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
+                Romance &amp; CEO
+              </span>
+            </h2>
+          </div>
           <span className="text-xs text-gray-400">
             {loadingReelShort ? "Memuat..." : `${reelShortDramas.length} Judul`}
           </span>
@@ -853,12 +873,19 @@ function DracinHubContent() {
       {/* ========================================================= */}
       {/* SECTION 6: NETSHORT CATALOG */}
       {/* ========================================================= */}
-      <section id="netshort" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
-        <div className="flex items-center justify-between pb-2 border-b border-white/10">
-          <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-            <Layers className="w-5 h-5 text-purple-400" />
-            <span>Koleksi NetShort (Drama Vertikal HD)</span>
-          </h2>
+      <section id="netshort" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4 w-full scroll-mt-20">
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+              <Layers className="w-5 h-5 text-purple-400" />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <span>NetShort</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">
+                Vertikal HD
+              </span>
+            </h2>
+          </div>
           <span className="text-xs text-gray-400">
             {loadingNetShort ? "Memuat..." : `${netShortDramas.length} Judul`}
           </span>

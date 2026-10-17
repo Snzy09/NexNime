@@ -107,24 +107,9 @@ export default function FilmHubPage() {
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-      <main className="flex-1 py-4 space-y-8">
-        {/* Banner Top */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-          <div className="rounded-2xl bg-gradient-to-r from-red-950/40 via-[#181216] to-[#0D0D14] p-6 border border-red-500/20 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2">
-                <Film className="w-8 h-8 text-red-500" />
-                <span>Film Hub - Bioskop HD &amp; Series Multi-Server</span>
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-300 mt-2 max-w-2xl">
-                Semua film bioskop dunia, serial TV, dan film Asia dari VidBox dan OppaDrama tergabung dalam 1 halaman. Nonton langsung tanpa perlu ganti tab.
-              </p>
-            </div>
-          </div>
-        </div>
-
+      <main className="flex-1 py-4 space-y-6">
         {/* Popular Tags for Film */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
           <div className="relative rounded-2xl bg-[#121218] border border-white/10 p-2.5 sm:p-3 shadow-xl">
             <div className="flex flex-wrap items-center gap-1.5 text-xs">
               <span className="font-bold text-red-400 flex items-center gap-1 mr-1">

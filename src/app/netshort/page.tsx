@@ -82,32 +82,6 @@ export default function NetShortPage() {
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <main className="flex-1 py-4 space-y-6">
-        {/* Banner Top */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-          <div className="rounded-2xl bg-gradient-to-r from-purple-950/60 via-[#16101D] to-[#0D0D14] p-6 border border-purple-500/20 shadow-xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-4xl font-black text-white flex items-center gap-2">
-                  <Video className="w-8 h-8 text-purple-400" />
-                  <span>NetShort - Streaming Drama Vertikal (9:16)</span>
-                </h1>
-                <p className="text-xs sm:text-sm text-gray-300 mt-2">
-                  Nonton puluhan serial drama pendek vertikal resolusi tinggi dari NetShort. Data 100% real hasil scrape &amp; direct MP4 video playback tanpa dummy.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 uppercase tracking-wider">
-                  NetShort 9:16
-                </span>
-                <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-400/20 text-emerald-300 font-bold border border-emerald-400/30">
-                  Direct MP4 Stream
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Category Pills */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-2xl bg-[#121218] border border-white/10 p-3 sm:p-4 shadow-xl">

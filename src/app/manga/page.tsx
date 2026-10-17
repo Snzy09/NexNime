@@ -72,20 +72,7 @@ function MangaCatalog() {
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <main className="flex-1 py-4 space-y-6">
-        {/* Banner Top - Reading Hub Switcher */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-          <div className="rounded-2xl bg-gradient-to-r from-emerald-950/40 via-[#10141C] to-[#0D0D14] p-6 border border-emerald-500/20 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2">
-                <BookOpen className="w-8 h-8 text-emerald-400" />
-                <span>Reading Hub - Komik Manga, Manhwa &amp; Novel</span>
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-300 mt-2 max-w-2xl">
-                Semua bacaan komik (Manga, Manhwa, Manhua) dan Light Novel terjemahan Indonesia tergabung dalam 1 tempat tanpa perlu ganti tab.
-              </p>
-            </div>
-          </div>
-        </div>
+        {/* Manga Spotlight Section */}
 
 
 

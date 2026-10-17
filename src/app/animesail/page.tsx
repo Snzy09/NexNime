@@ -77,36 +77,6 @@ export default function AnimeSailCatalogPage() {
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <main className="flex-1 py-4 space-y-6">
-        {/* Banner Hero */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-          <div className="rounded-2xl bg-gradient-to-r from-sky-950/60 via-[#0B1528] to-[#0A0D18] p-6 border border-sky-500/20 shadow-xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-4xl font-black text-white flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-sky-500/20 border border-sky-500/30 text-sky-400">
-                    <Compass className="w-7 h-7 animate-pulse" />
-                  </div>
-                  <span>AnimeSail - Streaming Anime Sub Indo</span>
-                </h1>
-                <p className="text-xs sm:text-sm text-gray-300 mt-2 max-w-2xl">
-                  Nonton streaming anime subtitle Indonesia terlengkap dan terupdate.
-                  Didukung multi-server video (Abyss, Dodo Player, dll) dengan kualitas HD dan bebas dummy data.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 font-bold border border-sky-500/30 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3" />
-                  AnimeSail Live
-                </span>
-                <span className="text-[10px] px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
-                  Multi Server HD
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Filter Tabs & Search Bar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#111118] p-3 rounded-2xl border border-white/5">
