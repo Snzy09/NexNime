@@ -10,11 +10,8 @@ import CatalogGridSkeleton from "@/components/skeletons/CatalogGridSkeleton";
 import { VidboxItem } from "@/lib/services/vidboxService";
 import { OppaDramaCard } from "@/lib/services/oppadramaService";
 
-type FilmProvider = "all" | "vidbox_movies" | "vidbox_series" | "oppadrama_movies";
-
 export default function FilmHubPage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<FilmProvider>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   // VidBox Movies State
@@ -123,54 +120,6 @@ export default function FilmHubPage() {
                 Semua film bioskop dunia, serial TV, dan film Asia dari VidBox dan OppaDrama tergabung dalam 1 halaman. Nonton langsung tanpa perlu ganti tab.
               </p>
             </div>
-
-            {/* Provider & Type Switcher / Quick Jump */}
-            <div className="flex flex-wrap items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0">
-              <button
-                onClick={() => {
-                  setActiveTab("all");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  activeTab === "all"
-                    ? "bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-lg shadow-red-500/20"
-                    : "text-gray-400 hover:text-white"
-                }`}
-              >
-                <Film className="w-3.5 h-3.5" />
-                <span>Semua Film</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  document.getElementById("vidbox_movies")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-              >
-                <Clapperboard className="w-3.5 h-3.5 text-red-400" />
-                <span>VidBox Movies</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  document.getElementById("vidbox_series")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-              >
-                <Tv className="w-3.5 h-3.5 text-rose-400" />
-                <span>VidBox Series</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  document.getElementById("oppadrama_movies")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-              >
-                <Heart className="w-3.5 h-3.5 text-fuchsia-400" />
-                <span>OppaDrama Movies</span>
-              </button>
-            </div>
           </div>
         </div>
 
@@ -197,8 +146,7 @@ export default function FilmHubPage() {
         </div>
 
         {/* SECTION 1: VIDBOX MOVIES GRID */}
-        {(activeTab === "all" || activeTab === "vidbox_movies") && (
-          <div id="vidbox_movies" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
+        <div id="vidbox_movies" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
                 <Clapperboard className="w-5 h-5 text-red-500" />
@@ -275,11 +223,9 @@ export default function FilmHubPage() {
               </div>
             )}
           </div>
-        )}
 
         {/* SECTION 2: VIDBOX TV SERIES GRID */}
-        {(activeTab === "all" || activeTab === "vidbox_series") && (
-          <div id="vidbox_series" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
+        <div id="vidbox_series" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
                 <Tv className="w-5 h-5 text-rose-400" />
@@ -356,11 +302,9 @@ export default function FilmHubPage() {
               </div>
             )}
           </div>
-        )}
 
         {/* SECTION 3: OPPADRAMA MOVIES GRID */}
-        {(activeTab === "all" || activeTab === "oppadrama_movies") && (
-          <div id="oppadrama_movies" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
+        <div id="oppadrama_movies" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
                 <Heart className="w-5 h-5 text-fuchsia-400" />
@@ -431,7 +375,6 @@ export default function FilmHubPage() {
               </div>
             )}
           </div>
-        )}
       </main>
 
       <Footer />

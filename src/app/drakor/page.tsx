@@ -5,17 +5,14 @@ import Navbar from "@/components/Navbar";
 import SearchModal from "@/components/SearchModal";
 import Footer from "@/components/Footer";
 import Link from "next/link";
-import { Clapperboard, Star, Play, Search, Flame, Heart, AlertCircle, Sparkles } from "lucide-react";
+import { Clapperboard, Star, Play, Heart, AlertCircle } from "lucide-react";
 import DrakorSkeleton from "@/components/skeletons/DrakorSkeleton";
 import CatalogGridSkeleton from "@/components/skeletons/CatalogGridSkeleton";
 import { DrakorItem } from "@/lib/services/drakorService";
 import { OppaDramaCard } from "@/lib/services/oppadramaService";
 
-type DrakorProvider = "all" | "drakorid" | "oppadrama";
-
 export default function DrakorHubPage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [provider, setProvider] = useState<DrakorProvider>("all");
   const [activeTab, setActiveTab] = useState<"trending" | "ongoing">("trending");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -81,51 +78,12 @@ export default function DrakorHubPage() {
                 Semua serial drama Korea &amp; Asia dari DrakorID dan OppaDrama tergabung dalam 1 halaman. Subtitle Indonesia &amp; server cepat tanpa harus ganti tab.
               </p>
             </div>
-
-            {/* Provider Switcher / Quick Jump */}
-            <div className="flex items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0">
-              <button
-                onClick={() => {
-                  setProvider("all");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  provider === "all"
-                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30"
-                    : "text-gray-400 hover:text-white"
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Semua Drakor</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  document.getElementById("drakorid")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                <span>DrakorID</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  document.getElementById("oppadrama")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-              >
-                <Heart className="w-3.5 h-3.5 text-fuchsia-400" />
-                <span>OppaDrama</span>
-              </button>
-            </div>
           </div>
         </div>
 
         {/* PROVIDER 1: DRAKORID */}
-        {(provider === "all" || provider === "drakorid") && (
-          <div id="drakorid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
-            {/* Tab Controls for DrakorID */}
+        <div id="drakorid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
+          {/* Tab Controls for DrakorID */}
             <div className="flex items-center gap-2 pb-3 border-b border-white/5">
               <button
                 onClick={() => setActiveTab("trending")}
@@ -206,12 +164,10 @@ export default function DrakorHubPage() {
               </div>
             )}
           </div>
-        )}
 
         {/* PROVIDER 2: OPPADRAMA */}
-        {(provider === "all" || provider === "oppadrama") && (
-          <div id="oppadrama" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+        <div id="oppadrama" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
                 <Heart className="w-5 h-5 text-fuchsia-400" />
                 <span>OppaDrama - Serial Drama Korea &amp; Asia Sub Indo</span>
@@ -283,7 +239,6 @@ export default function DrakorHubPage() {
               </div>
             )}
           </div>
-        )}
       </main>
 
       <Footer />

@@ -21,11 +21,8 @@ import { AnimeSailCard } from "@/lib/services/animesailService";
 import { AnimeXinItem } from "@/lib/services/animexinService";
 import { DonghuaFilmItem } from "@/lib/services/donghuaFilmService";
 
-type AnimeSource = "all" | "samehadaku" | "donghuafilm" | "animesail" | "animexin" | "animeindo";
-
 export default function AnimePage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [source, setSource] = useState<AnimeSource>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Samehadaku Live State
@@ -53,10 +50,6 @@ export default function AnimePage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
-      const src = sp.get("source") as AnimeSource;
-      if (src && ["all", "samehadaku", "donghuafilm", "animesail", "animexin", "animeindo"].includes(src)) {
-        setSource(src);
-      }
       const q = sp.get("q");
       if (q) {
         setSearchQuery(q);
@@ -152,13 +145,6 @@ export default function AnimePage() {
     return item.title.toLowerCase().includes(searchQuery.toLowerCase().trim());
   });
 
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#09090D] text-white flex flex-col selection:bg-amber-400 selection:text-black">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
@@ -168,74 +154,14 @@ export default function AnimePage() {
         {/* Top Header Banner */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
           <div className="rounded-2xl bg-gradient-to-r from-amber-950/50 via-[#161420] to-[#0D0D14] p-6 border border-amber-500/20 shadow-xl">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2">
-                  <Tv className="w-8 h-8 text-amber-400" />
-                  <span>Anime Hub - Streaming Multi-Provider Sub Indo</span>
-                </h1>
-                <p className="text-xs sm:text-sm text-gray-300 mt-2">
-                  Semua sumber anime &amp; donghua tergabung dalam 1 halaman: Samehadaku, DonghuaFilm, AnimeSail, AnimeXin, dan Jadwal AnimeIndo. Bebas gonta-ganti tab!
-                </p>
-              </div>
-
-              {/* Multi-Provider Quick Jump Navigation */}
-              <div className="flex flex-wrap items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0">
-                <button
-                  onClick={() => {
-                    setSource("all");
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                    source === "all"
-                      ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-lg shadow-amber-500/20"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Semua Provider</span>
-                </button>
-
-                <button
-                  onClick={() => scrollToSection("samehadaku")}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-                >
-                  <span className="w-2 h-2 rounded-full bg-amber-400" />
-                  <span>Samehadaku</span>
-                </button>
-
-                <button
-                  onClick={() => scrollToSection("donghuafilm")}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-                >
-                  <Tv className="w-3.5 h-3.5 text-amber-400" />
-                  <span>DonghuaFilm</span>
-                </button>
-
-                <button
-                  onClick={() => scrollToSection("animesail")}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-                >
-                  <Compass className="w-3.5 h-3.5 text-sky-400" />
-                  <span>AnimeSail</span>
-                </button>
-
-                <button
-                  onClick={() => scrollToSection("animexin")}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-                >
-                  <Layers className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Donghua (AnimeXin)</span>
-                </button>
-
-                <button
-                  onClick={() => scrollToSection("animeindo")}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  <span>AnimeIndo &amp; Jadwal</span>
-                </button>
-              </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2">
+                <Tv className="w-8 h-8 text-amber-400" />
+                <span>Anime Hub - Streaming Multi-Provider Sub Indo</span>
+              </h1>
+              <p className="text-xs sm:text-sm text-gray-300 mt-2">
+                Semua sumber anime &amp; donghua tergabung dalam 1 halaman: Samehadaku, DonghuaFilm, AnimeSail, AnimeXin, dan Jadwal AnimeIndo.
+              </p>
             </div>
           </div>
         </div>
@@ -263,85 +189,82 @@ export default function AnimePage() {
         </div>
 
         {/* PROVIDER 1: SAMEHADAKU */}
-        {(source === "all" || source === "samehadaku") && (
-          <div id="samehadaku" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
-              <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
-                <Tv className="w-5 h-5 text-amber-400" />
-                <span>
-                  {searchQuery
-                    ? `Hasil Pencarian Samehadaku: "${searchQuery}"`
-                    : "Rilis Anime Terbaru Samehadaku (Streaming Sub Indo)"}
-                </span>
-              </h2>
-              <span className="text-xs text-gray-400">
-                {loadingSamehadaku ? "Memuat live data..." : `${samehadakuItems.length} Judul Real`}
+        <div id="samehadaku" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10">
+            <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+              <Tv className="w-5 h-5 text-amber-400" />
+              <span>
+                {searchQuery
+                  ? `Hasil Pencarian Samehadaku: "${searchQuery}"`
+                  : "Rilis Anime Terbaru Samehadaku (Streaming Sub Indo)"}
               </span>
-            </div>
-
-            {loadingSamehadaku && <CatalogGridSkeleton count={12} />}
-
-            {!loadingSamehadaku && samehadakuItems.length === 0 && (
-              <div className="rounded-2xl bg-[#12121A] border border-white/10 p-12 text-center space-y-3">
-                <AlertCircle className="w-10 h-10 text-amber-400 mx-auto" />
-                <h3 className="text-base font-bold text-white">Tidak ada anime ditemukan</h3>
-                <p className="text-xs text-gray-400">
-                  Coba kata kunci lain atau kosongkan kolom pencarian.
-                </p>
-              </div>
-            )}
-
-            {!loadingSamehadaku && samehadakuItems.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-                {samehadakuItems.map((item, idx) => (
-                  <Link
-                    key={idx}
-                    href={`/samehadaku/${item.slug}`}
-                    className="group relative rounded-xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-amber-400/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60"
-                  >
-                    <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
-                      {item.thumb ? (
-                        <img
-                          src={item.thumb}
-                          alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A24] to-[#101018]">
-                          <Tv className="w-10 h-10 text-amber-400/40" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40" />
-                      <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-amber-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase border border-amber-400/30">
-                        SAMEHADAKU
-                      </div>
-                      {item.episode && (
-                        <div className="absolute bottom-2 right-2 bg-amber-400 text-black text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
-                          {item.episode}
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-3 flex flex-col justify-between flex-1 space-y-2">
-                      <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-amber-300">
-                        {item.title}
-                      </h3>
-                      <div className="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-white/5">
-                        <span className="text-emerald-400">{item.status || "Ongoing"}</span>
-                        <span className="text-amber-400 font-bold flex items-center gap-1">
-                          <Play className="w-2.5 h-2.5 fill-current" /> Nonton
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+            </h2>
+            <span className="text-xs text-gray-400">
+              {loadingSamehadaku ? "Memuat live data..." : `${samehadakuItems.length} Judul Real`}
+            </span>
           </div>
-        )}
+
+          {loadingSamehadaku && <CatalogGridSkeleton count={12} />}
+
+          {!loadingSamehadaku && samehadakuItems.length === 0 && (
+            <div className="rounded-2xl bg-[#12121A] border border-white/10 p-12 text-center space-y-3">
+              <AlertCircle className="w-10 h-10 text-amber-400 mx-auto" />
+              <h3 className="text-base font-bold text-white">Tidak ada anime ditemukan</h3>
+              <p className="text-xs text-gray-400">
+                Coba kata kunci lain atau kosongkan kolom pencarian.
+              </p>
+            </div>
+          )}
+
+          {!loadingSamehadaku && samehadakuItems.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              {samehadakuItems.map((item, idx) => (
+                <Link
+                  key={idx}
+                  href={`/samehadaku/${item.slug}`}
+                  className="group relative rounded-xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-amber-400/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60"
+                >
+                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
+                    {item.thumb ? (
+                      <img
+                        src={item.thumb}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A24] to-[#101018]">
+                        <Tv className="w-10 h-10 text-amber-400/40" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40" />
+                    <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-amber-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase border border-amber-400/30">
+                      SAMEHADAKU
+                    </div>
+                    {item.episode && (
+                      <div className="absolute bottom-2 right-2 bg-amber-400 text-black text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
+                        {item.episode}
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3 flex flex-col justify-between flex-1 space-y-2">
+                    <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-amber-300">
+                      {item.title}
+                    </h3>
+                    <div className="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-white/5">
+                      <span className="text-emerald-400">{item.status || "Ongoing"}</span>
+                      <span className="text-amber-400 font-bold flex items-center gap-1">
+                        <Play className="w-2.5 h-2.5 fill-current" /> Nonton
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* PROVIDER 2: DONGHUAFILM */}
-        {(source === "all" || source === "donghuafilm") && (
-          <div id="donghuafilm" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
+        <div id="donghuafilm" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
                 <Tv className="w-5 h-5 text-amber-400" />
@@ -414,181 +337,174 @@ export default function AnimePage() {
               </div>
             )}
           </div>
-        )}
 
         {/* PROVIDER 3: ANIMESAIL */}
-        {(source === "all" || source === "animesail") && (
-          <div id="animesail" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
-              <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
-                <Compass className="w-5 h-5 text-sky-400" />
-                <span>
-                  {searchQuery
-                    ? `Hasil Pencarian AnimeSail: "${searchQuery}"`
-                    : "Anime Terbaru AnimeSail (Multi-Server HD Sub Indo)"}
-                </span>
-              </h2>
-              <span className="text-xs text-gray-400">
-                {loadingAnimeSail ? "Memuat live data..." : `${animesailItems.length} Judul Real`}
+        <div id="animesail" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10">
+            <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+              <Compass className="w-5 h-5 text-sky-400" />
+              <span>
+                {searchQuery
+                  ? `Hasil Pencarian AnimeSail: "${searchQuery}"`
+                  : "Anime Terbaru AnimeSail (Multi-Server HD Sub Indo)"}
               </span>
-            </div>
-
-            {loadingAnimeSail && <CatalogGridSkeleton count={12} />}
-
-            {!loadingAnimeSail && animesailItems.length === 0 && (
-              <div className="rounded-2xl bg-[#12121A] border border-white/10 p-12 text-center space-y-3">
-                <AlertCircle className="w-10 h-10 text-sky-400 mx-auto" />
-                <h3 className="text-base font-bold text-white">Tidak ada anime ditemukan</h3>
-                <p className="text-xs text-gray-400">
-                  Coba kata kunci lain atau periksa tab provider lainnya.
-                </p>
-              </div>
-            )}
-
-            {!loadingAnimeSail && animesailItems.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-                {animesailItems.map((item, idx) => (
-                  <Link
-                    key={idx}
-                    href={`/animesail/watch?slug=${item.slug}`}
-                    className="group relative rounded-xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-sky-400/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60"
-                  >
-                    <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
-                      {item.thumbnail ? (
-                        <img
-                          src={item.thumbnail}
-                          alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#1A1A24]">
-                          <Tv className="w-10 h-10 text-sky-400/40" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40" />
-                      <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-sky-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase border border-sky-400/30">
-                        ANIMESAIL
-                      </div>
-                      {item.episode && (
-                        <div className="absolute bottom-2 right-2 bg-sky-500 text-black text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
-                          {item.episode}
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-3 flex flex-col justify-between flex-1 space-y-2">
-                      <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-sky-300">
-                        {item.title}
-                      </h3>
-                      <div className="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-white/5">
-                        <span className="text-sky-400">{item.type || "Anime"}</span>
-                        <span className="text-sky-400 font-bold flex items-center gap-1">
-                          <Play className="w-2.5 h-2.5 fill-current" /> Nonton
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+            </h2>
+            <span className="text-xs text-gray-400">
+              {loadingAnimeSail ? "Memuat live data..." : `${animesailItems.length} Judul Real`}
+            </span>
           </div>
-        )}
+
+          {loadingAnimeSail && <CatalogGridSkeleton count={12} />}
+
+          {!loadingAnimeSail && animesailItems.length === 0 && (
+            <div className="rounded-2xl bg-[#12121A] border border-white/10 p-12 text-center space-y-3">
+              <AlertCircle className="w-10 h-10 text-sky-400 mx-auto" />
+              <h3 className="text-base font-bold text-white">Tidak ada anime ditemukan</h3>
+              <p className="text-xs text-gray-400">
+                Coba kata kunci lain atau periksa tab provider lainnya.
+              </p>
+            </div>
+          )}
+
+          {!loadingAnimeSail && animesailItems.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              {animesailItems.map((item, idx) => (
+                <Link
+                  key={idx}
+                  href={`/animesail/watch?slug=${item.slug}`}
+                  className="group relative rounded-xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-sky-400/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60"
+                >
+                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
+                    {item.thumbnail ? (
+                      <img
+                        src={item.thumbnail}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-[#1A1A24]">
+                        <Tv className="w-10 h-10 text-sky-400/40" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40" />
+                    <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-sky-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase border border-sky-400/30">
+                      ANIMESAIL
+                    </div>
+                    {item.episode && (
+                      <div className="absolute bottom-2 right-2 bg-sky-500 text-black text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
+                        {item.episode}
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3 flex flex-col justify-between flex-1 space-y-2">
+                    <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-sky-300">
+                      {item.title}
+                    </h3>
+                    <div className="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-white/5">
+                      <span className="text-sky-400">{item.type || "Anime"}</span>
+                      <span className="text-sky-400 font-bold flex items-center gap-1">
+                        <Play className="w-2.5 h-2.5 fill-current" /> Nonton
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* PROVIDER 4: ANIMEXIN DONGHUA */}
-        {(source === "all" || source === "animexin") && (
-          <div id="animexin" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
-              <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
-                <Layers className="w-5 h-5 text-cyan-400" />
-                <span>
-                  {searchQuery
-                    ? `Hasil Pencarian Donghua: "${searchQuery}"`
-                    : "AnimeXin - Donghua 3D Animasi China Subtitle Indonesia"}
-                </span>
-              </h2>
-              <span className="text-xs text-gray-400">
-                {loadingAnimeXin ? "Memuat live data..." : `${filteredDonghua.length} Judul Real`}
+        <div id="animexin" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10">
+            <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+              <Layers className="w-5 h-5 text-cyan-400" />
+              <span>
+                {searchQuery
+                  ? `Hasil Pencarian Donghua: "${searchQuery}"`
+                  : "AnimeXin - Donghua 3D Animasi China Subtitle Indonesia"}
               </span>
-            </div>
-
-            {loadingAnimeXin && <CatalogGridSkeleton count={12} />}
-
-            {!loadingAnimeXin && filteredDonghua.length === 0 && (
-              <div className="rounded-2xl bg-[#12121A] border border-white/10 p-12 text-center space-y-3">
-                <AlertCircle className="w-10 h-10 text-cyan-400 mx-auto" />
-                <h3 className="text-base font-bold text-white">Tidak ada donghua ditemukan</h3>
-                <p className="text-xs text-gray-400">
-                  Coba kata kunci lain untuk mencari donghua favoritmu.
-                </p>
-              </div>
-            )}
-
-            {!loadingAnimeXin && filteredDonghua.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-                {filteredDonghua.map((item, idx) => (
-                  <Link
-                    key={idx}
-                    href={`/animexin/watch?slug=${item.slug}`}
-                    className="group relative rounded-xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-cyan-400/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60"
-                  >
-                    <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
-                      {item.poster ? (
-                        <img
-                          src={
-                            item.poster.startsWith("http")
-                              ? `/api/animexin?action=image&url=${encodeURIComponent(item.poster)}`
-                              : item.poster
-                          }
-                          alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#1A1A24]">
-                          <Tv className="w-10 h-10 text-cyan-400/40" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40" />
-                      <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-cyan-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase border border-cyan-400/30">
-                        ANIMEXIN DONGHUA
-                      </div>
-                      {item.episode && (
-                        <div className="absolute bottom-2 right-2 bg-cyan-400 text-black text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
-                          {item.episode}
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-3 flex flex-col justify-between flex-1 space-y-2">
-                      <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-cyan-300">
-                        {item.title}
-                      </h3>
-                      <div className="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-white/5">
-                        <span className="text-cyan-400">{item.type || "Donghua"}</span>
-                        <span className="text-cyan-400 font-bold flex items-center gap-1">
-                          <Play className="w-2.5 h-2.5 fill-current" /> Nonton
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+            </h2>
+            <span className="text-xs text-gray-400">
+              {loadingAnimeXin ? "Memuat live data..." : `${filteredDonghua.length} Judul Real`}
+            </span>
           </div>
-        )}
+
+          {loadingAnimeXin && <CatalogGridSkeleton count={12} />}
+
+          {!loadingAnimeXin && filteredDonghua.length === 0 && (
+            <div className="rounded-2xl bg-[#12121A] border border-white/10 p-12 text-center space-y-3">
+              <AlertCircle className="w-10 h-10 text-cyan-400 mx-auto" />
+              <h3 className="text-base font-bold text-white">Tidak ada donghua ditemukan</h3>
+              <p className="text-xs text-gray-400">
+                Coba kata kunci lain untuk mencari donghua favoritmu.
+              </p>
+            </div>
+          )}
+
+          {!loadingAnimeXin && filteredDonghua.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              {filteredDonghua.map((item, idx) => (
+                <Link
+                  key={idx}
+                  href={`/animexin/watch?slug=${item.slug}`}
+                  className="group relative rounded-xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-cyan-400/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60"
+                >
+                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
+                    {item.poster ? (
+                      <img
+                        src={
+                          item.poster.startsWith("http")
+                            ? `/api/animexin?action=image&url=${encodeURIComponent(item.poster)}`
+                            : item.poster
+                        }
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-[#1A1A24]">
+                        <Tv className="w-10 h-10 text-cyan-400/40" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40" />
+                    <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-cyan-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase border border-cyan-400/30">
+                      ANIMEXIN DONGHUA
+                    </div>
+                    {item.episode && (
+                      <div className="absolute bottom-2 right-2 bg-cyan-400 text-black text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
+                        {item.episode}
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3 flex flex-col justify-between flex-1 space-y-2">
+                    <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-cyan-300">
+                      {item.title}
+                    </h3>
+                    <div className="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-white/5">
+                      <span className="text-cyan-400">{item.type || "Donghua"}</span>
+                      <span className="text-cyan-400 font-bold flex items-center gap-1">
+                        <Play className="w-2.5 h-2.5 fill-current" /> Nonton
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* PROVIDER 5: ANIMEINDO & JADWAL */}
-        {(source === "all" || source === "animeindo") && (
-          <div id="animeindo" className="space-y-6 scroll-mt-20">
-            {/* Top Populer Anime Ranking */}
-            {loadingAnimeIndo ? <RankingCardsSkeleton /> : <PopularRankingSection items={animeList} />}
+        <div id="animeindo" className="space-y-6 scroll-mt-20">
+          {/* Top Populer Anime Ranking */}
+          {loadingAnimeIndo ? <RankingCardsSkeleton /> : <PopularRankingSection items={animeList} />}
 
-            {/* Jadwal Rilis Hari Ini & Mingguan */}
-            <div id="jadwal">
-              {loadingAnimeIndo ? <ScheduleSkeleton /> : <ScheduleSection schedule={scheduleList} />}
-            </div>
-
-            {/* Katalog Anime Lengkap */}
-            {loadingAnimeIndo ? <CatalogGridSkeleton count={12} /> : <CatalogFilterGrid items={animeList} />}
+          {/* Jadwal Rilis Hari Ini & Mingguan */}
+          <div id="jadwal">
+            {loadingAnimeIndo ? <ScheduleSkeleton /> : <ScheduleSection schedule={scheduleList} />}
           </div>
-        )}
+
+          {/* Katalog Anime Lengkap */}
+          {loadingAnimeIndo ? <CatalogGridSkeleton count={12} /> : <CatalogFilterGrid items={animeList} />}
+        </div>
       </main>
 
       <Footer />

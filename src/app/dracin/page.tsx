@@ -19,10 +19,7 @@ import { NetShortItem } from "@/lib/services/netshortService";
 import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
 import DracinReelsSkeleton from "@/components/skeletons/DracinReelsSkeleton";
 
-type ShortDramaProvider = "all" | "asiabox" | "reelshort" | "netshort";
-
 function DracinHubContent() {
-  const [provider, setProvider] = useState<ShortDramaProvider>("all");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // AsiaBox State
@@ -37,17 +34,6 @@ function DracinHubContent() {
   // NetShort State
   const [netShortDramas, setNetShortDramas] = useState<NetShortItem[]>([]);
   const [loadingNetShort, setLoadingNetShort] = useState(true);
-
-  // Read URL query params
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const sp = new URLSearchParams(window.location.search);
-      const prov = sp.get("provider") as ShortDramaProvider;
-      if (prov && ["all", "asiabox", "reelshort", "netshort"].includes(prov)) {
-        setProvider(prov);
-      }
-    }
-  }, []);
 
   // 1. Fetch AsiaBox on mount
   useEffect(() => {
@@ -117,60 +103,11 @@ function DracinHubContent() {
               Semua drama pendek rasio 9:16 dari 3 platform (AsiaBox, ReelShort, NetShort) tergabung dalam 1 halaman. Pilih drama untuk mulai menonton.
             </p>
           </div>
-
-          {/* Quick Jump Anchor Tabs */}
-          <div className="flex items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0 w-full lg:w-auto overflow-x-auto no-scrollbar">
-            <button
-              onClick={() => {
-                setProvider("all");
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
-                provider === "all"
-                  ? "bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-lg shadow-rose-500/30"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Semua Drama</span>
-            </button>
-
-            <button
-              onClick={() => {
-                document.getElementById("asiabox")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-            >
-              <Play className="w-3.5 h-3.5 fill-current text-rose-500" />
-              <span>AsiaBox</span>
-            </button>
-
-            <button
-              onClick={() => {
-                document.getElementById("reelshort")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>ReelShort</span>
-            </button>
-
-            <button
-              onClick={() => {
-                document.getElementById("netshort")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-            >
-              <Layers className="w-3.5 h-3.5 text-purple-400" />
-              <span>NetShort</span>
-            </button>
-          </div>
         </div>
       </div>
 
       {/* VIEW 1: ASIABOX CATALOG */}
-      {(provider === "all" || provider === "asiabox") && (
-        <div id="asiabox" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full scroll-mt-20">
+      <div id="asiabox" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full scroll-mt-20">
           {/* AsiaBox Catalog Grid */}
           <div className="space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
@@ -242,11 +179,9 @@ function DracinHubContent() {
             )}
           </div>
         </div>
-      )}
 
       {/* VIEW 2: REELSHORT CATALOG */}
-      {(provider === "all" || provider === "reelshort") && (
-        <div id="reelshort" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full scroll-mt-20">
+      <div id="reelshort" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full scroll-mt-20">
           <div className="flex items-center justify-between pb-2 border-b border-white/10">
             <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-amber-400" />
@@ -355,69 +290,66 @@ function DracinHubContent() {
             </div>
           )}
         </div>
-      )}
 
       {/* VIEW 3: NETSHORT CATALOG */}
-      {(provider === "all" || provider === "netshort") && (
-        <div id="netshort" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full scroll-mt-20">
-          <div className="flex items-center justify-between pb-2 border-b border-white/10">
-            <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-              <Layers className="w-5 h-5 text-purple-400" />
-              <span>Koleksi NetShort (Drama Vertikal HD)</span>
-            </h2>
-            <span className="text-xs text-gray-400">
-              {loadingNetShort ? "Memuat..." : `${netShortDramas.length} Judul`}
-            </span>
-          </div>
-          {/* Loading */}
-          {loadingNetShort && (
-            <div className="py-12 flex justify-center items-center">
-              <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
-            </div>
-          )}
-
-          {/* NetShort Grid (Directly under banner, saving maximum space) */}
-          {!loadingNetShort && netShortDramas.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-              {netShortDramas.map((item, idx) => (
-                <Link
-                  key={idx}
-                  href={`/netshort/watch?slug=${item.slug}&title=${encodeURIComponent(item.title)}`}
-                  className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-purple-500/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-950/40"
-                >
-                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/70">
-                    {item.cover ? (
-                      <img
-                        src={item.cover}
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-purple-950/20 text-xs text-purple-300 p-2 text-center">
-                        {item.title}
-                      </div>
-                    )}
-                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-purple-600 text-white text-[10px] font-black uppercase tracking-wider">
-                      NETSHORT
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-purple-600/90 text-white flex items-center justify-center shadow-lg shadow-purple-600/50 scale-90 group-hover:scale-100 transition-transform">
-                        <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-white ml-0.5" />
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-2.5 sm:p-3 flex flex-col justify-between flex-1 space-y-1">
-                    <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-purple-300 transition-colors leading-snug">
-                      {item.title}
-                    </h3>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+      <div id="netshort" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 w-full scroll-mt-20">
+        <div className="flex items-center justify-between pb-2 border-b border-white/10">
+          <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+            <Layers className="w-5 h-5 text-purple-400" />
+            <span>Koleksi NetShort (Drama Vertikal HD)</span>
+          </h2>
+          <span className="text-xs text-gray-400">
+            {loadingNetShort ? "Memuat..." : `${netShortDramas.length} Judul`}
+          </span>
         </div>
-      )}
+        {/* Loading */}
+        {loadingNetShort && (
+          <div className="py-12 flex justify-center items-center">
+            <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
+          </div>
+        )}
+
+        {/* NetShort Grid (Directly under banner, saving maximum space) */}
+        {!loadingNetShort && netShortDramas.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {netShortDramas.map((item, idx) => (
+              <Link
+                key={idx}
+                href={`/netshort/watch?slug=${item.slug}&title=${encodeURIComponent(item.title)}`}
+                className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-purple-500/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-950/40"
+              >
+                <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/70">
+                  {item.cover ? (
+                    <img
+                      src={item.cover}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-purple-950/20 text-xs text-purple-300 p-2 text-center">
+                      {item.title}
+                    </div>
+                  )}
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-purple-600 text-white text-[10px] font-black uppercase tracking-wider">
+                    NETSHORT
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-purple-600/90 text-white flex items-center justify-center shadow-lg shadow-purple-600/50 scale-90 group-hover:scale-100 transition-transform">
+                      <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-white ml-0.5" />
+                    </span>
+                  </div>
+                </div>
+                <div className="p-2.5 sm:p-3 flex flex-col justify-between flex-1 space-y-1">
+                  <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-purple-300 transition-colors leading-snug">
+                    {item.title}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
 
       <Footer />
     </div>

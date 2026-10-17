@@ -7,7 +7,7 @@ import SearchModal from "@/components/SearchModal";
 import MangaSpotlightSection from "@/components/MangaSpotlightSection";
 import Footer from "@/components/Footer";
 import Link from "next/link";
-import { BookOpen, Star, Sparkles, BookMarked } from "lucide-react";
+import { BookOpen, Star } from "lucide-react";
 import MangaSpotlightSkeleton from "@/components/skeletons/MangaSpotlightSkeleton";
 import CatalogGridSkeleton from "@/components/skeletons/CatalogGridSkeleton";
 import NovelSection from "@/components/NovelSection";
@@ -83,33 +83,6 @@ function MangaCatalog() {
               <p className="text-xs sm:text-sm text-gray-300 mt-2 max-w-2xl">
                 Semua bacaan komik (Manga, Manhwa, Manhua) dan Light Novel terjemahan Indonesia tergabung dalam 1 tempat tanpa perlu ganti tab.
               </p>
-            </div>
-
-            {/* Reading Hub Quick Jump Navigation */}
-            <div className="flex items-center gap-1.5 bg-[#14141E] p-1.5 rounded-xl border border-white/10 shrink-0">
-              <button
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className="px-3.5 py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20 flex items-center gap-1.5"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Semua Bacaan</span>
-              </button>
-
-              <button
-                onClick={() => document.getElementById("katalog-komik")?.scrollIntoView({ behavior: "smooth" })}
-                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-              >
-                <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Manga &amp; Manhwa</span>
-              </button>
-
-              <button
-                onClick={() => document.getElementById("katalog-novel")?.scrollIntoView({ behavior: "smooth" })}
-                className="px-3.5 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5"
-              >
-                <BookMarked className="w-3.5 h-3.5 text-amber-400" />
-                <span>Light Novel</span>
-              </button>
             </div>
           </div>
         </div>
