@@ -410,8 +410,20 @@ export default function JadwalPage() {
                       alt={item.title}
                       loading="lazy"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src =
-                          "https://static.anipop.xyz/poster/anime/jujutsu-kaisen-2nd-season.jpg?h=400";
+                        const target = e.currentTarget as HTMLImageElement;
+                        if (target.dataset.failed) return;
+                        target.dataset.failed = "true";
+                        if (item.category === "donghua") {
+                          target.src = "https://anichin.moe/wp-content/uploads/2023/09/RENEGADE-IMMORTAL-SUBTITLE-INDONESIA-3.webp";
+                        } else if (item.category === "manga") {
+                          target.src = "https://cdn.myanimelist.net/images/manga/2/253146.jpg";
+                        } else if (item.category === "dracin") {
+                          target.src = "https://eu2.contabostorage.com/4f114786b23142088dd7adc82f4e687b:asiaboxdrama/42000027421/poster.jpg";
+                        } else if (item.category === "drakor") {
+                          target.src = "https://convert.d-cdn.me/convert/aHR0cHM6Ly9hc3NldHMuZC1jZG4ubWUvaW1nLzIwMjYvMTAvMzQ0LWR5ZGJkcTRmLmpwZw--/180x200/1.jpg";
+                        } else {
+                          target.src = "https://static.anipop.xyz/poster/anime/one-piece.jpg?h=400";
+                        }
                       }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
