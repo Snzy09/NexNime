@@ -59,7 +59,7 @@ const HERO_SLIDES_FALLBACK: HeroSlide[] = [
     ctaLink: "/anime",
     browseLink: "/anime",
     image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&q=85",
-    bgGradient: "from-amber-950/85 via-black/85 to-[#09090D]",
+    bgGradient: "from-amber-950/70 via-black/40 to-transparent",
     accentColor: "text-amber-400",
   },
   {
@@ -76,7 +76,7 @@ const HERO_SLIDES_FALLBACK: HeroSlide[] = [
     ctaLink: "/manga",
     browseLink: "/manga",
     image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=1600&q=85",
-    bgGradient: "from-indigo-950/85 via-black/85 to-[#09090D]",
+    bgGradient: "from-indigo-950/70 via-black/40 to-transparent",
     accentColor: "text-indigo-400",
   },
 ];
@@ -123,7 +123,7 @@ export default function HeroBanner({
         ctaLink: `/anime/${a.slug}`,
         browseLink: "/anime",
         image: a.poster,
-        bgGradient: "from-amber-950/90 via-black/85 to-[#09090D]",
+        bgGradient: "from-amber-950/70 via-black/40 to-transparent",
         accentColor: "text-amber-400",
       });
     }
@@ -149,7 +149,7 @@ export default function HeroBanner({
         ctaLink: `/animexin/watch?url=${encodeURIComponent(ax.url)}&title=${encodeURIComponent(ax.title)}`,
         browseLink: "/animexin",
         image: axImg,
-        bgGradient: "from-rose-950/90 via-black/85 to-[#09090D]",
+        bgGradient: "from-rose-950/70 via-black/40 to-transparent",
         accentColor: "text-rose-400",
       });
     }
@@ -177,7 +177,7 @@ export default function HeroBanner({
         ctaLink: `/manga/${m.id}`,
         browseLink: "/manga",
         image: mImg,
-        bgGradient: "from-emerald-950/90 via-black/85 to-[#09090D]",
+        bgGradient: "from-emerald-950/70 via-black/40 to-transparent",
         accentColor: "text-emerald-400",
       });
     }
@@ -199,7 +199,7 @@ export default function HeroBanner({
         ctaLink: `/drakor/${d.slug}`,
         browseLink: "/drakor",
         image: d.poster || "",
-        bgGradient: "from-blue-950/90 via-black/85 to-[#09090D]",
+        bgGradient: "from-blue-950/70 via-black/40 to-transparent",
         accentColor: "text-blue-400",
       });
     }
@@ -222,7 +222,7 @@ export default function HeroBanner({
         ctaLink: `/dracin?drama=${dr.slug}`,
         browseLink: "/dracin",
         image: dr.image || "",
-        bgGradient: "from-purple-950/90 via-black/85 to-[#09090D]",
+        bgGradient: "from-purple-950/70 via-black/40 to-transparent",
         accentColor: "text-purple-400",
       });
     }
@@ -246,7 +246,7 @@ export default function HeroBanner({
         ctaLink: `/anime/${a2.slug}`,
         browseLink: "/anime",
         image: a2.poster,
-        bgGradient: "from-amber-950/90 via-black/85 to-[#09090D]",
+        bgGradient: "from-amber-950/70 via-black/40 to-transparent",
         accentColor: "text-amber-400",
       });
     }
@@ -274,7 +274,7 @@ export default function HeroBanner({
         ctaLink: `/manga/${m2.id}`,
         browseLink: "/manga",
         image: m2Img,
-        bgGradient: "from-teal-950/90 via-black/85 to-[#09090D]",
+        bgGradient: "from-teal-950/70 via-black/40 to-transparent",
         accentColor: "text-teal-400",
       });
     }
@@ -350,21 +350,21 @@ export default function HeroBanner({
         onMouseUp={handleMouseUp}
         className="relative rounded-3xl overflow-hidden min-h-[420px] sm:min-h-[460px] md:min-h-[500px] border border-white/10 shadow-2xl flex flex-col justify-between p-6 sm:p-10 md:p-12 select-none"
       >
-        {/* Dynamic Realtime Background Image with Ambient Zoom & Soft Blur */}
+        {/* Dynamic Realtime Background Image with Ambient Zoom */}
         <div
           key={slide.image}
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 scale-110 filter blur-[3px] brightness-[0.55]"
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 scale-105 filter brightness-95 md:brightness-100 opacity-95"
           style={{ backgroundImage: `url(${slide.image})` }}
         />
 
         {/* Ambient Theme Color Tint */}
         <div
-          className={`absolute inset-0 bg-gradient-to-r ${slide.bgGradient} opacity-90 transition-all duration-700`}
+          className={`absolute inset-0 bg-gradient-to-r ${slide.bgGradient} opacity-40 transition-all duration-700`}
         />
 
-        {/* Dark Scrim Overlays for Razor-Sharp Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#09090D] via-[#09090D]/85 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0E] via-transparent to-black/40" />
+        {/* Scrim Overlays for Razor-Sharp Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#09090D] via-[#09090D]/65 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0E]/80 via-transparent to-black/20" />
 
         {/* Top Badges */}
         <div className="relative z-10 flex flex-wrap items-center gap-2.5">
