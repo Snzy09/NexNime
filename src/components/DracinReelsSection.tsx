@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Video, Play, Eye, ChevronRight, Sparkles, MoveHorizontal } from "lucide-react";
+import { Video, Play, Eye, ChevronRight, Sparkles } from "lucide-react";
 import { DracinItem } from "@/lib/services/dracinService";
 import DraggableCarousel from "@/components/DraggableCarousel";
 
@@ -29,14 +29,10 @@ export default function DracinReelsSection({ items }: DracinReelsSectionProps) {
               </span>
             </h2>
           </div>
-          <div className="flex items-center gap-3 mt-1">
+          <div className="mt-1">
             <p className="text-xs sm:text-sm text-gray-400">
               Serial drama pendek vertikal 80+ episode instan ala TikTok &amp; Reels
             </p>
-            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-rose-300/80 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
-              <MoveHorizontal className="w-3 h-3 text-rose-400" />
-              Geser mouse ↔
-            </span>
           </div>
         </div>
 

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Flame, Star, ChevronRight, MoveHorizontal } from "lucide-react";
+import { Flame, Star, ChevronRight } from "lucide-react";
 import { AnimeItem } from "@/lib/services/animeService";
 import DraggableCarousel from "@/components/DraggableCarousel";
 
@@ -26,14 +26,10 @@ export default function PopularRankingSection({ items }: PopularRankingSectionPr
               Anime Populer Pekan Ini
             </h2>
           </div>
-          <div className="flex items-center gap-3 mt-1">
+          <div className="mt-1">
             <p className="text-xs sm:text-sm text-gray-400">
               Peringkat anime dengan rating &amp; penonton tertinggi
             </p>
-            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-              <MoveHorizontal className="w-3 h-3 text-amber-400" />
-              Geser mouse ↔
-            </span>
           </div>
         </div>
 

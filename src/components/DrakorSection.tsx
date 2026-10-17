@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Clapperboard, Star, ChevronRight, Play, MoveHorizontal } from "lucide-react";
+import { Clapperboard, Star, ChevronRight, Play } from "lucide-react";
 import { DrakorItem } from "@/lib/services/drakorService";
 import DraggableCarousel from "@/components/DraggableCarousel";
 
@@ -26,14 +26,10 @@ export default function DrakorSection({ items }: DrakorSectionProps) {
               Drama Korea Populer (Drakor)
             </h2>
           </div>
-          <div className="flex items-center gap-3 mt-1">
+          <div className="mt-1">
             <p className="text-xs sm:text-sm text-gray-400">
               Streaming K-Drama terbaru &amp; ongoing subtitle Indonesia multi-server
             </p>
-            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-blue-300/80 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
-              <MoveHorizontal className="w-3 h-3 text-blue-400" />
-              Geser mouse ↔
-            </span>
           </div>
         </div>
 
