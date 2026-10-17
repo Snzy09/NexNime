@@ -138,6 +138,12 @@ export default function AnimeDetailPage({ params }: { params: { slug: string } }
       .finally(() => setLoading(false));
   }, [params.slug]);
 
+function isValidEmbedUrl(url?: string): boolean {
+  if (!url) return false;
+  if (url.includes("/nonton/") || url.includes("/anime/")) return false;
+  return /embed|\/e\/|\/play|putarin|streamtape|mp4upload|hxfile|blogger\.com|google\.com\/file|\.mp4|\.m3u8/i.test(url);
+}
+
   // Load real stream for currently selected episode
   useEffect(() => {
     if (!animeData?.episodes || animeData.episodes.length === 0) return;
@@ -152,12 +158,12 @@ export default function AnimeDetailPage({ params }: { params: { slug: string } }
           setServers(d.stream.streams);
           setSelectedServer(0);
         } else {
-          setServers([{ name: "Server Sumber", url: currentEp.url }]);
+          setServers([]);
           setSelectedServer(0);
         }
       })
       .catch(() => {
-        setServers([{ name: "Server Sumber", url: currentEp.url }]);
+        setServers([]);
         setSelectedServer(0);
       })
       .finally(() => setStreamLoading(false));
@@ -246,7 +252,7 @@ export default function AnimeDetailPage({ params }: { params: { slug: string } }
                 <Play className="w-10 h-10 animate-pulse fill-amber-400" />
                 <span className="text-sm font-semibold tracking-wide">Menyiapkan streaming video...</span>
               </div>
-            ) : servers.length > 0 && servers[selectedServer]?.url ? (
+            ) : servers.length > 0 && isValidEmbedUrl(servers[selectedServer]?.url) ? (
               <iframe
                 src={servers[selectedServer].url}
                 title={`Streaming ${animeData.title} ${currentEpisodeNumber}`}
@@ -265,7 +271,7 @@ export default function AnimeDetailPage({ params }: { params: { slug: string } }
                     rel="noopener noreferrer"
                     className="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold text-xs hover:bg-amber-300 transition-colors shadow-lg"
                   >
-                    Buka Video di Sumber Resmi
+                    Buka Video di Sumber Resmi (Tab Baru)
                   </a>
                 )}
               </div>
@@ -278,19 +284,23 @@ export default function AnimeDetailPage({ params }: { params: { slug: string } }
               <span className="text-gray-400 flex items-center gap-1 mr-1">
                 <Server className="w-3.5 h-3.5 text-amber-400" /> Pilihan Server:
               </span>
-              {servers.map((srv, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedServer(idx)}
-                  className={`px-3 py-1 rounded-md transition-colors ${
-                    selectedServer === idx
-                      ? "bg-amber-400 text-black font-bold shadow-md shadow-amber-400/20"
-                      : "bg-white/5 text-gray-300 hover:bg-white/10"
-                  }`}
-                >
-                  {srv.name}
-                </button>
-              ))}
+              {servers.length > 0 ? (
+                servers.map((srv, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedServer(idx)}
+                    className={`px-3 py-1 rounded-md transition-colors ${
+                      selectedServer === idx
+                        ? "bg-amber-400 text-black font-bold shadow-md shadow-amber-400/20"
+                        : "bg-white/5 text-gray-300 hover:bg-white/10"
+                    }`}
+                  >
+                    {srv.name}
+                  </button>
+                ))
+              ) : (
+                <span className="text-gray-500 font-normal">Tidak ada server langsung (putar via tombol sumber)</span>
+              )}
             </div>
 
             <div className="flex items-center gap-2 text-xs">

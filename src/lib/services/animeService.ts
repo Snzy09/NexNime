@@ -12,7 +12,12 @@ if (typeof process !== "undefined") {
 import * as cheerio from "cheerio";
 import { REAL_SCHEDULE } from "./realDataFallback";
 import { getAnichinPopular } from "./anichinService";
-import { searchSamehadaku } from "./samehadakuService";
+import { searchSamehadaku, getSamehadakuDetail } from "./samehadakuService";
+import {
+  searchAnimeSail,
+  getAnimeSailDetail,
+  getAnimeSailEpisode,
+} from "./animesailService";
 
 const ANIMEINDO_BASE = "https://ww2.animeindo.pro";
 const ANICHIN_BASE = "https://anichin.moe";
@@ -421,34 +426,73 @@ export async function getAnimeDetail(slugOrUrl: string): Promise<AnimeDetail | n
         const epTitle =
           $w("h1").text().trim() ||
           $w("title").text().replace(/Subtitle Indonesia.*$/i, "").trim() ||
-          "Episode 1";
+          "Episode";
         const epPoster =
           $w(".ai-det-poster img, .poster img").attr("src") ||
           $w('meta[property="og:image"]').attr("content") ||
           "";
 
+        // Extract ALL episodes from the watch page (e.g. EP 1, EP 2, EP 3 buttons)
+        const watchEpisodes: { episode: string; url: string; slug: string }[] = [];
+        $w('a[href*="/nonton/"]').each((_, el) => {
+          const a = $w(el);
+          const href = a.attr("href") || "";
+          const text = a.text().trim();
+          if (
+            href &&
+            !href.includes("#respond") &&
+            !href.includes("?replytocom") &&
+            !text.includes("‹") &&
+            !text.includes("›") &&
+            !text.toLowerCase().includes("prev") &&
+            !text.toLowerCase().includes("next")
+          ) {
+            const numMatch = text.match(/EP\s*(\d+)/i) || text.match(/Episode\s*(\d+)/i) || text.match(/\b(\d+)\b/);
+            const num = numMatch ? numMatch[1] : "";
+            const epLabel = num ? `Episode ${num}` : text;
+            const fullUrl = abs(href, ANIMEINDO_BASE);
+            const epSlug = fullUrl.replace(ANIMEINDO_BASE, "").replace(/^\/nonton\//, "").replace(/\/$/, "");
+            if (!watchEpisodes.some((e) => e.url === fullUrl || e.slug === epSlug)) {
+              watchEpisodes.push({
+                episode: epLabel,
+                url: fullUrl,
+                slug: epSlug,
+              });
+            }
+          }
+        });
+
+        if (watchEpisodes.length > 1) {
+          watchEpisodes.sort((a, b) => {
+            const na = parseInt(a.episode.match(/\d+/)?.[0] || "0", 10);
+            const nb = parseInt(b.episode.match(/\d+/)?.[0] || "0", 10);
+            return na - nb;
+          });
+        }
+
+        const cleanSeriesTitle = epTitle
+          .replace(/\s*Episode\s*\d+.*$/i, "")
+          .replace(/\s*Sub\s*Indo.*$/i, "")
+          .trim() || epTitle;
+
         fallbackEpisodeDetail = {
-          title: epTitle.replace(/\s*Episode\s*\d+.*$/i, "").trim() || epTitle,
-          url: watchUrl,
-          slug: cleanSlug,
+          title: cleanSeriesTitle,
+          url: seriesUrl ? abs(seriesUrl, ANIMEINDO_BASE) : watchUrl,
+          slug: seriesUrl
+            ? seriesUrl.replace(ANIMEINDO_BASE, "").replace(/^\/anime\//, "").replace(/\/$/, "")
+            : cleanSlug,
           poster: epPoster,
           synopsis:
-            $w(".ai-syn, .sinopsis, .entry-content").text().trim() ||
-            "Tonton tayangan anime subtitle Indonesia.",
+            $w(".ai-syn, .sinopsis, .entry-content, .desc").text().trim() ||
+            `Nonton anime ${cleanSeriesTitle} subtitle Indonesia lengkap.`,
           genres: ["Action", "Fantasy", "Animation"],
           facts: { Tipe: "TV", Status: "Ongoing" },
-          total_episode: 1,
-          episodes: [
-            {
-              episode: epTitle,
-              url: watchUrl,
-              slug: cleanSlug,
-            },
-          ],
+          total_episode: watchEpisodes.length || 1,
+          episodes: watchEpisodes.length > 0 ? watchEpisodes : [{ episode: epTitle, url: watchUrl, slug: cleanSlug }],
         };
 
         if (seriesUrl) {
-          url = seriesUrl;
+          url = abs(seriesUrl, ANIMEINDO_BASE);
           try {
             html = await fetchHtml(url, ANIMEINDO_BASE);
           } catch {
@@ -473,7 +517,7 @@ export async function getAnimeDetail(slugOrUrl: string): Promise<AnimeDetail | n
           const $w = cheerio.load(watchHtml);
           const seriesUrl = $w('a[href*="/anime/"]').first().attr("href");
           if (seriesUrl) {
-            url = seriesUrl;
+            url = abs(seriesUrl, ANIMEINDO_BASE);
             html = await fetchHtml(url, ANIMEINDO_BASE);
           }
         } catch {
@@ -489,7 +533,7 @@ export async function getAnimeDetail(slugOrUrl: string): Promise<AnimeDetail | n
               const $s = cheerio.load(sHtml);
               const foundUrl = $s('a[href*="/anime/"]').first().attr("href");
               if (foundUrl) {
-                url = foundUrl;
+                url = abs(foundUrl, ANIMEINDO_BASE);
                 html = await fetchHtml(url, ANIMEINDO_BASE);
               }
             } catch (err) {
@@ -497,6 +541,68 @@ export async function getAnimeDetail(slugOrUrl: string): Promise<AnimeDetail | n
             }
           }
         }
+      }
+    }
+
+    // 3. Fallback to AnimeSail or Samehadaku if AnimeIndo was blocked or returned no episodes
+    if (!html && (!fallbackEpisodeDetail || fallbackEpisodeDetail.episodes.length <= 1)) {
+      const searchTitle = cleanSlug
+        .replace(/[-_]/g, " ")
+        .replace(/\b(h\w+|x\w+|[0-9a-z]{7,})\b/gi, "")
+        .replace(/\b(episode|\d+|sub|indo|season)\b/gi, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (searchTitle) {
+        // Try AnimeSail
+        try {
+          const sailRes = await searchAnimeSail(searchTitle);
+          if (sailRes.items && sailRes.items.length > 0) {
+            const sailDetail = await getAnimeSailDetail(sailRes.items[0].slug);
+            if (sailDetail && sailDetail.episodes && sailDetail.episodes.length > 0) {
+              return {
+                title: sailDetail.title,
+                url: sailDetail.url,
+                slug: sailRes.items[0].slug,
+                poster: sailDetail.thumbnail || fallbackEpisodeDetail?.poster || "",
+                synopsis: sailDetail.synopsis || fallbackEpisodeDetail?.synopsis || "",
+                genres: ["Action", "Fantasy", "Animation"],
+                facts: { Tipe: "TV", Status: "Ongoing" },
+                total_episode: sailDetail.totalEpisodesCount || sailDetail.episodes.length,
+                episodes: sailDetail.episodes.map((ep) => ({
+                  episode: ep.episode ? `Episode ${ep.episode}` : ep.title,
+                  url: ep.url,
+                  slug: ep.slug,
+                })),
+              };
+            }
+          }
+        } catch {}
+
+        // Try Samehadaku
+        try {
+          const sameRes = await searchSamehadaku(searchTitle);
+          if (sameRes && sameRes.length > 0) {
+            const sameDetail = await getSamehadakuDetail(sameRes[0].slug);
+            if (sameDetail && sameDetail.episodes && sameDetail.episodes.length > 0) {
+              return {
+                title: sameDetail.title,
+                url: sameDetail.url,
+                slug: sameDetail.slug,
+                poster: sameDetail.thumb || fallbackEpisodeDetail?.poster || "",
+                synopsis: sameDetail.synopsis || fallbackEpisodeDetail?.synopsis || "",
+                genres: sameDetail.genres || ["Action", "Fantasy", "Animation"],
+                facts: { Tipe: sameDetail.type || "TV", Status: sameDetail.status || "Ongoing" },
+                total_episode: sameDetail.totalEpisodes || sameDetail.episodes.length,
+                episodes: sameDetail.episodes.map((ep) => ({
+                  episode: ep.episode ? `Episode ${ep.episode}` : ep.title,
+                  url: ep.url,
+                  slug: ep.slug,
+                })),
+              };
+            }
+          }
+        } catch {}
       }
     }
 
@@ -545,13 +651,27 @@ export async function getAnimeDetail(slugOrUrl: string): Promise<AnimeDetail | n
     $('a[href*="/nonton/"]').each((_, el) => {
       const a = $(el);
       const href = a.attr("href") || "";
-      const epTitle = a.text().trim() || a.attr("title") || "Episode";
-      if (href && !rawEpisodes.some((e) => e.url === href)) {
-        rawEpisodes.push({
-          episode: epTitle,
-          url: href,
-          slug: href.replace(ANIMEINDO_BASE, "").replace(/^\/nonton\//, "").replace(/\/$/, ""),
-        });
+      const text = a.text().trim();
+      if (
+        href &&
+        !href.includes("#respond") &&
+        !href.includes("?replytocom") &&
+        !text.includes("‹") &&
+        !text.includes("›") &&
+        !text.toLowerCase().includes("prev") &&
+        !text.toLowerCase().includes("next")
+      ) {
+        const numMatch = text.match(/EP\s*(\d+)/i) || text.match(/Episode\s*(\d+)/i) || text.match(/\b(\d+)\b/);
+        const epTitle = numMatch ? `Episode ${numMatch[1]}` : (text || a.attr("title") || "Episode");
+        const fullHref = abs(href, ANIMEINDO_BASE);
+        const epSlug = fullHref.replace(ANIMEINDO_BASE, "").replace(/^\/nonton\//, "").replace(/\/$/, "");
+        if (!rawEpisodes.some((e) => e.url === fullHref || e.slug === epSlug)) {
+          rawEpisodes.push({
+            episode: epTitle,
+            url: fullHref,
+            slug: epSlug,
+          });
+        }
       }
     });
 
@@ -571,7 +691,7 @@ export async function getAnimeDetail(slugOrUrl: string): Promise<AnimeDetail | n
       synopsis,
       genres: genres.length > 0 ? genres : ["Action", "Fantasy", "Animation"],
       facts,
-      total_episode: episodes.length,
+      total_episode: episodes.length || fallbackEpisodeDetail?.total_episode || 1,
       episodes: episodes.length > 0 ? episodes : fallbackEpisodeDetail?.episodes || [],
     };
   } catch (err) {
@@ -591,32 +711,92 @@ export async function getAnimeWatch(url: string): Promise<AnimeStream | null> {
     const title = $("h1").text().trim() || $("title").text().trim();
     const streams: { name: string; url: string }[] = [];
 
+    // 1. Extract valid video iframe URLs (must not be website shell)
     $("iframe").each((i, el) => {
       const u = $(el).attr("src") || $(el).attr("data-src") || $(el).attr("data-lazy-src");
-      if (u && !streams.some((s) => s.url === u)) {
-        streams.push({
-          name: i === 0 ? "Server Utama (HD)" : `Server Alternatif ${i + 1}`,
-          url: abs(u, ANIMEINDO_BASE),
-        });
+      if (u && !u.includes("/nonton/") && !u.includes("/anime/")) {
+        const full = abs(u, ANIMEINDO_BASE);
+        if (!streams.some((s) => s.url === full)) {
+          streams.push({
+            name: i === 0 ? "Server Utama (HD)" : `Server Alternatif ${i + 1}`,
+            url: full,
+          });
+        }
       }
     });
 
-    // If targetUrl was an anime series page instead of nonton, resolve first episode
-    if (streams.length === 0) {
-      const firstEp = $('a[href*="/nonton/"]').first().attr("href");
-      if (firstEp) {
-        return await getAnimeWatch(firstEp);
+    // 2. Regex for putarin / player iframe URLs
+    const putarinMatches = Array.from(
+      html.matchAll(/https?:\/\/(?:putarin\.(?:xyz|biz|org|me|net)|streamtape\.com|mp4upload\.com|fembed\.com)[^\s"'<>]+/gi)
+    );
+    for (const pm of putarinMatches) {
+      const pu = pm[0];
+      if (!streams.some((s) => s.url === pu)) {
+        streams.push({
+          name: streams.length === 0 ? "Server Utama (HD)" : `Server Alternatif ${streams.length + 1}`,
+          url: pu,
+        });
       }
     }
 
-    return {
-      title,
-      url: targetUrl,
-      streams: streams.length ? streams : [{ name: "Server Utama (HD)", url: targetUrl }],
-      downloads: [],
-    };
+    // If streams found, return immediately
+    if (streams.length > 0) {
+      return {
+        title,
+        url: targetUrl,
+        streams,
+        downloads: [],
+      };
+    }
   } catch (err) {
     console.error("Anime watch error:", err);
-    return null;
   }
+
+  // 3. Resilient fallback: search matching episode stream on AnimeSail
+  try {
+    const clean = url
+      .replace(/^https?:\/\/[^\/]+/i, "")
+      .replace(/^\/(anime|nonton)\//, "")
+      .replace(/\/$/, "");
+    const epNumMatch = clean.match(/episode-(\d+)/i) || clean.match(/ep-(\d+)/i);
+    const epNum = epNumMatch ? epNumMatch[1] : "";
+    const animeTitle = clean
+      .replace(/[-_]/g, " ")
+      .replace(/\b(h\w+|x\w+|[0-9a-z]{7,})\b/gi, "")
+      .replace(/\b(episode|\d+|sub|indo|season)\b/gi, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (animeTitle) {
+      const sailRes = await searchAnimeSail(animeTitle);
+      if (sailRes.items && sailRes.items.length > 0) {
+        const sailDetail = await getAnimeSailDetail(sailRes.items[0].slug);
+        const matchEp = sailDetail?.episodes?.find((e) =>
+          epNum ? e.episode === epNum || e.slug.endsWith(`episode-${epNum}`) : true
+        );
+        if (matchEp) {
+          const sailEp = await getAnimeSailEpisode(matchEp.slug);
+          if (sailEp.embeds && sailEp.embeds.length > 0) {
+            const sList = sailEp.embeds
+              .filter((emb) => emb.streamUrl && !emb.streamUrl.includes("/nonton/"))
+              .map((emb, idx) => ({
+                name: emb.server || (idx === 0 ? "Server Utama (HD)" : `Server Alternatif ${idx + 1}`),
+                url: emb.streamUrl || emb.iframe,
+              }));
+            if (sList.length > 0) {
+              return {
+                title: sailEp.title || "Streaming Anime",
+                url: matchEp.url,
+                streams: sList,
+                downloads: [],
+              };
+            }
+          }
+        }
+      }
+    }
+  } catch {}
+
+  // Never return an HTML webpage URL as a stream
+  return null;
 }
