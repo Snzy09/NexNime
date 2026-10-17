@@ -11,6 +11,7 @@ import {
   Clapperboard,
   Video,
   BookOpen,
+  BookMarked,
   Calendar,
   Settings,
   X,
@@ -19,6 +20,7 @@ import {
   Trash2,
   LogIn,
   UserPlus,
+  ChevronRight,
 } from "lucide-react";
 
 interface NavbarProps {
@@ -27,6 +29,7 @@ interface NavbarProps {
 
 export default function Navbar({ onOpenSearch }: NavbarProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isOtherOpen, setIsOtherOpen] = useState(false);
   const pathname = usePathname();
 
   // Desktop navigation items
@@ -37,7 +40,7 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
       label: "Anime",
       icon: Tv,
       match: (p: string) =>
-        p.startsWith("/anime") ||
+        (p.startsWith("/anime") && !p.includes("#jadwal")) ||
         p.startsWith("/animesail") ||
         p.startsWith("/animexin") ||
         p.startsWith("/donghuafilm") ||
@@ -79,64 +82,78 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
     },
   ];
 
-  // Mobile bottom navigation items (Strict 8 items as requested)
-  const mobileNavItems = [
+  // Detect active tab index for the 5-item mobile dock (0: Home, 1: Anime, 2: Other, 3: Jadwal, 4: Setting)
+  const isOtherActive =
+    pathname.startsWith("/manga") ||
+    pathname.startsWith("/film") ||
+    pathname.startsWith("/vidbox") ||
+    pathname.startsWith("/dracin") ||
+    pathname.startsWith("/reelshort") ||
+    pathname.startsWith("/netshort") ||
+    pathname.startsWith("/drakor") ||
+    pathname.startsWith("/oppadrama") ||
+    pathname.startsWith("/novel");
+
+  let activeTabIdx = 0;
+  if (isSettingsOpen) {
+    activeTabIdx = 4;
+  } else if (isOtherOpen || isOtherActive) {
+    activeTabIdx = 2;
+  } else if (pathname.includes("#jadwal")) {
+    activeTabIdx = 3;
+  } else if (
+    pathname.startsWith("/anime") ||
+    pathname.startsWith("/animesail") ||
+    pathname.startsWith("/animexin") ||
+    pathname.startsWith("/donghuafilm") ||
+    pathname.startsWith("/samehadaku")
+  ) {
+    activeTabIdx = 1;
+  } else {
+    activeTabIdx = 0;
+  }
+
+  // Items for the "Other" categories bottom sheet modal
+  const otherCategories = [
     {
-      label: "Home",
-      href: "/",
-      icon: Home,
-      match: (p: string) => p === "/",
-    },
-    {
-      label: "Anime",
-      href: "/anime",
-      icon: Tv,
-      match: (p: string) =>
-        (p.startsWith("/anime") && !p.includes("#jadwal")) ||
-        p.startsWith("/animesail") ||
-        p.startsWith("/animexin") ||
-        p.startsWith("/donghuafilm") ||
-        p.startsWith("/samehadaku"),
-    },
-    {
-      label: "Manga",
+      title: "Manga & Komik",
+      desc: "Manga, Manhwa & Manhua Sub Indo",
       href: "/manga",
       icon: BookOpen,
-      match: (p: string) => p.startsWith("/manga") || p.startsWith("/novel"),
+      color: "text-emerald-400",
+      bgColor: "bg-emerald-500/10 border-emerald-500/20 group-hover:border-emerald-400/50",
     },
     {
-      label: "Film",
+      title: "Film Bioskop HD",
+      desc: "Box Office & Serial TV Barat",
       href: "/film",
       icon: Film,
-      match: (p: string) => p.startsWith("/film") || p.startsWith("/vidbox"),
+      color: "text-rose-400",
+      bgColor: "bg-rose-500/10 border-rose-500/20 group-hover:border-rose-400/50",
     },
     {
-      label: "Jadwal",
-      href: "/anime#jadwal",
-      icon: Calendar,
-      match: (p: string) => p.includes("#jadwal"),
-    },
-    {
-      label: "Dracin",
+      title: "Dracin Short 9:16",
+      desc: "Drama Vertikal AsiaBox & ReelShort",
       href: "/dracin",
       icon: Video,
-      match: (p: string) =>
-        p.startsWith("/dracin") ||
-        p.startsWith("/reelshort") ||
-        p.startsWith("/netshort"),
+      color: "text-purple-400",
+      bgColor: "bg-purple-500/10 border-purple-500/20 group-hover:border-purple-400/50",
     },
     {
-      label: "Drakor",
+      title: "Drakor Asia",
+      desc: "Serial Drama Korea & Asia Lengkap",
       href: "/drakor",
       icon: Clapperboard,
-      match: (p: string) =>
-        p.startsWith("/drakor") || p.startsWith("/oppadrama"),
+      color: "text-blue-400",
+      bgColor: "bg-blue-500/10 border-blue-500/20 group-hover:border-blue-400/50",
     },
     {
-      label: "Setting",
-      href: "#",
-      icon: Settings,
-      onClick: () => setIsSettingsOpen(true),
+      title: "Light Novel",
+      desc: "Novel & Web Novel Terjemahan",
+      href: "/novel",
+      icon: BookMarked,
+      color: "text-amber-400",
+      bgColor: "bg-amber-500/10 border-amber-500/20 group-hover:border-amber-400/50",
     },
   ];
 
@@ -193,7 +210,7 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
 
           {/* Right: Search Bar & Auth Buttons */}
           <div className="flex items-center gap-2 sm:gap-2.5 flex-1 lg:flex-initial justify-end">
-            {/* Search Trigger Button (Takes available width on mobile) */}
+            {/* Search Trigger Button */}
             <button
               onClick={onOpenSearch}
               className="h-9 w-full max-w-[220px] sm:max-w-[280px] lg:w-48 xl:w-56 flex items-center justify-between gap-2 bg-[#12121A] hover:bg-[#181824] text-gray-400 hover:text-white px-2.5 sm:px-3 rounded-xl border border-white/10 hover:border-amber-400/40 transition-all text-xs group shrink-0"
@@ -228,59 +245,225 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation Bar (8 Menu Items: Home, Anime, Manga, Film, Jadwal, Dracin, Drakor, Setting) */}
+      {/* Redesigned Minimalist 5-Item Mobile Bottom Navigation Dock */}
       <nav
         aria-label="Mobile Navigation"
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0B0B12]/95 backdrop-blur-xl border-t border-white/10 shadow-[0_-4px_25px_rgba(0,0,0,0.65)] select-none"
+        className="lg:hidden fixed bottom-3 sm:bottom-4 left-3 right-3 sm:left-4 sm:right-4 z-50 max-w-md mx-auto select-none"
       >
-        <div className="max-w-lg mx-auto grid grid-cols-8 items-center px-1 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
-          {mobileNavItems.map((item) => {
-            const isMatched = item.match ? item.match(pathname || "") : false;
-            const Icon = item.icon;
+        <div className="relative rounded-2xl sm:rounded-3xl bg-[#0C0C14]/90 backdrop-blur-2xl border border-white/10 shadow-[0_12px_36px_rgba(0,0,0,0.8)] px-1.5 py-1">
+          {/* Smooth Sliding Switch Indicator Pill (Geser Animasi) */}
+          <div
+            className="absolute top-1.5 bottom-1.5 w-[20%] rounded-xl sm:rounded-2xl bg-gradient-to-b from-amber-400/20 to-amber-500/10 border border-amber-400/30 shadow-sm shadow-amber-400/15 pointer-events-none transition-all duration-300"
+            style={{
+              transform: `translateX(${activeTabIdx * 100}%)`,
+              transitionTimingFunction: "cubic-bezier(0.34, 1.3, 0.64, 1)",
+              opacity: activeTabIdx === 2 ? 0 : 1, // Sembunyikan pill di belakang tombol Other yang melayang
+            }}
+          />
 
-            if (item.onClick) {
-              return (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={item.onClick}
-                  className={`flex flex-col items-center justify-center py-0.5 px-0.5 rounded-lg transition-all ${
-                    isSettingsOpen
-                      ? "text-amber-400 font-bold"
-                      : "text-gray-400 hover:text-gray-200"
+          {/* 5 Menu Items Grid */}
+          <div className="relative z-10 grid grid-cols-5 items-center">
+            {/* 1. HOME */}
+            <Link
+              href="/"
+              onClick={() => {
+                setIsOtherOpen(false);
+                setIsSettingsOpen(false);
+              }}
+              className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition-all duration-200 ${
+                activeTabIdx === 0
+                  ? "text-amber-400 font-bold"
+                  : "text-gray-400 hover:text-gray-200"
+              }`}
+            >
+              <Home
+                className={`w-5 h-5 transition-transform duration-200 ${
+                  activeTabIdx === 0 ? "scale-110 text-amber-400" : ""
+                }`}
+              />
+              <span className="text-[10px] tracking-tight leading-none mt-1">
+                Home
+              </span>
+            </Link>
+
+            {/* 2. ANIME */}
+            <Link
+              href="/anime"
+              onClick={() => {
+                setIsOtherOpen(false);
+                setIsSettingsOpen(false);
+              }}
+              className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition-all duration-200 ${
+                activeTabIdx === 1
+                  ? "text-amber-400 font-bold"
+                  : "text-gray-400 hover:text-gray-200"
+              }`}
+            >
+              <Tv
+                className={`w-5 h-5 transition-transform duration-200 ${
+                  activeTabIdx === 1 ? "scale-110 text-amber-400" : ""
+                }`}
+              />
+              <span className="text-[10px] tracking-tight leading-none mt-1">
+                Anime
+              </span>
+            </Link>
+
+            {/* 3. OTHER (CENTER FLOATING SPECIAL SPARKLES BUTTON) */}
+            <div className="flex flex-col items-center justify-center relative -mt-5">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSettingsOpen(false);
+                  setIsOtherOpen(!isOtherOpen);
+                }}
+                className={`w-13 h-13 sm:w-14 sm:h-14 rounded-full p-1 transition-all duration-300 shadow-xl ${
+                  isOtherOpen || isOtherActive
+                    ? "bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 shadow-amber-500/50 scale-105 ring-4 ring-[#0C0C14]"
+                    : "bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-200 shadow-amber-500/35 hover:scale-105 active:scale-95 ring-4 ring-[#0C0C14]"
+                }`}
+                aria-label="Kategori Lainnya (Other)"
+              >
+                <div
+                  className={`w-full h-full rounded-full flex items-center justify-center transition-all ${
+                    isOtherOpen || isOtherActive
+                      ? "bg-gradient-to-tr from-amber-400 to-yellow-300 text-black shadow-inner"
+                      : "bg-[#11111A] text-amber-400 group-hover:text-amber-300"
                   }`}
                 >
-                  <div className={`p-1 rounded-lg transition-all ${isSettingsOpen ? "bg-amber-400/15" : ""}`}>
-                    <Icon className={`w-4 h-4 transition-transform ${isSettingsOpen ? "text-amber-400 scale-110" : "text-gray-400"}`} />
-                  </div>
-                  <span className="text-[9px] font-medium leading-none mt-0.5 truncate max-w-full">
-                    {item.label}
-                  </span>
-                </button>
-              );
-            }
-
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={`flex flex-col items-center justify-center py-0.5 px-0.5 rounded-lg transition-all ${
-                  isMatched
-                    ? "text-amber-400 font-bold"
-                    : "text-gray-400 hover:text-gray-200"
+                  <Sparkles
+                    className={`w-6 h-6 transition-transform duration-300 ${
+                      isOtherOpen
+                        ? "rotate-45 scale-110"
+                        : "animate-pulse"
+                    }`}
+                  />
+                </div>
+              </button>
+              <span
+                className={`text-[10px] tracking-tight font-bold leading-none mt-1 transition-colors ${
+                  isOtherOpen || isOtherActive ? "text-amber-400" : "text-gray-400"
                 }`}
               >
-                <div className={`p-1 rounded-lg transition-all ${isMatched ? "bg-amber-400/15" : ""}`}>
-                  <Icon className={`w-4 h-4 transition-transform ${isMatched ? "text-amber-400 scale-110" : "text-gray-400"}`} />
-                </div>
-                <span className="text-[9px] font-medium leading-none mt-0.5 truncate max-w-full">
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
+                Other
+              </span>
+            </div>
+
+            {/* 4. JADWAL */}
+            <Link
+              href="/anime#jadwal"
+              onClick={() => {
+                setIsOtherOpen(false);
+                setIsSettingsOpen(false);
+                if (pathname === "/anime") {
+                  document.getElementById("jadwal")?.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition-all duration-200 ${
+                activeTabIdx === 3
+                  ? "text-amber-400 font-bold"
+                  : "text-gray-400 hover:text-gray-200"
+              }`}
+            >
+              <Calendar
+                className={`w-5 h-5 transition-transform duration-200 ${
+                  activeTabIdx === 3 ? "scale-110 text-amber-400" : ""
+                }`}
+              />
+              <span className="text-[10px] tracking-tight leading-none mt-1">
+                Jadwal
+              </span>
+            </Link>
+
+            {/* 5. SETTING */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsOtherOpen(false);
+                setIsSettingsOpen(!isSettingsOpen);
+              }}
+              className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition-all duration-200 ${
+                activeTabIdx === 4
+                  ? "text-amber-400 font-bold"
+                  : "text-gray-400 hover:text-gray-200"
+              }`}
+            >
+              <Settings
+                className={`w-5 h-5 transition-transform duration-200 ${
+                  activeTabIdx === 4 ? "scale-110 text-amber-400 rotate-45" : ""
+                }`}
+              />
+              <span className="text-[10px] tracking-tight leading-none mt-1">
+                Setting
+              </span>
+            </button>
+          </div>
         </div>
       </nav>
+
+      {/* "Other" Categories Bottom Sheet Modal */}
+      {isOtherOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setIsOtherOpen(false)}
+        >
+          <div
+            className="w-full max-w-md bg-[#111119] border border-white/10 rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 animate-in slide-in-from-bottom duration-300 max-h-[85vh] overflow-y-auto no-scrollbar pb-24 sm:pb-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 to-yellow-300 p-0.5 shadow-md shadow-amber-500/20">
+                  <div className="w-full h-full bg-[#0E0E16] rounded-[10px] flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Kategori Hiburan</h3>
+                  <p className="text-[11px] text-gray-400">Pilih jenis tontonan &amp; bacaan</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsOtherOpen(false)}
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+                aria-label="Tutup kategori"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Other Categories Cards Grid */}
+            <div className="grid grid-cols-1 gap-2.5">
+              {otherCategories.map((cat) => {
+                const Icon = cat.icon;
+                return (
+                  <Link
+                    key={cat.href}
+                    href={cat.href}
+                    onClick={() => setIsOtherOpen(false)}
+                    className={`group p-3 sm:p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${cat.bgColor}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-black/40 border border-white/10 flex items-center justify-center shrink-0">
+                        <Icon className={`w-5 h-5 ${cat.color}`} />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">
+                          {cat.title}
+                        </h4>
+                        <p className="text-[11px] text-gray-400">{cat.desc}</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Settings Modal (Interactive Sheet for Setting Menu) */}
       {isSettingsOpen && (
@@ -289,7 +472,7 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
           onClick={() => setIsSettingsOpen(false)}
         >
           <div
-            className="w-full max-w-md bg-[#111119] border border-white/10 rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-5 animate-in slide-in-from-bottom duration-300 max-h-[85vh] overflow-y-auto no-scrollbar"
+            className="w-full max-w-md bg-[#111119] border border-white/10 rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 animate-in slide-in-from-bottom duration-300 max-h-[85vh] overflow-y-auto no-scrollbar pb-24 sm:pb-6"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
