@@ -52,7 +52,7 @@ const HERO_SLIDES_FALLBACK: HeroSlide[] = [
     rating: "9.9",
     quality: "ULTRA HD",
     badgeStatus: "Ongoing",
-    title: "Luoyiv Universe — Streaming Anime & Donghua",
+    title: "NexNime Universe — Streaming Anime & Donghua",
     subtitle:
       "Platform streaming terlengkap dengan ribuan judul Anime, Donghua, Manga, Drakor, dan Dracin kualitas Full HD 1080p audio jernih dan bebas gangguan.",
     ctaText: "Jelajahi Anime",

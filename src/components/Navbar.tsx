@@ -167,12 +167,12 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
             <Link href="/" className="flex items-center gap-2 group shrink-0">
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-200 flex items-center justify-center p-0.5 shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
                 <div className="w-full h-full bg-[#0E0E14] rounded-[10px] flex items-center justify-center font-black text-amber-400 text-[11px] sm:text-xs tracking-tighter">
-                  LV
+                  NN
                 </div>
               </div>
               <div className="flex flex-col">
                 <span className="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent group-hover:opacity-90 leading-tight">
-                  LuoyiV<span className="text-white font-light text-xs sm:text-sm">Bond</span>
+                  Nex<span className="text-white font-light text-xs sm:text-sm">Nime</span>
                 </span>
                 <span className="text-[7px] sm:text-[8px] tracking-widest uppercase text-amber-400/70 font-semibold -mt-0.5 hidden xs:block">
                   Streaming &amp; Manga
@@ -310,17 +310,17 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
             </Link>
 
             {/* 3. OTHER (CENTER FLOATING SPECIAL SPARKLES BUTTON) */}
-            <div className="flex flex-col items-center justify-center relative -mt-5">
+            <div className="flex flex-col items-center justify-center relative -mt-2.5">
               <button
                 type="button"
                 onClick={() => {
                   setIsSettingsOpen(false);
                   setIsOtherOpen(!isOtherOpen);
                 }}
-                className={`w-13 h-13 sm:w-14 sm:h-14 rounded-full p-1 transition-all duration-300 shadow-xl ${
+                className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full p-0.5 transition-all duration-300 shadow-md ${
                   isOtherOpen || isOtherActive
-                    ? "bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 shadow-amber-500/50 scale-105 ring-4 ring-[#0C0C14]"
-                    : "bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-200 shadow-amber-500/35 hover:scale-105 active:scale-95 ring-4 ring-[#0C0C14]"
+                    ? "bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 shadow-amber-500/40 scale-105 ring-2 ring-[#0C0C14]"
+                    : "bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-200 shadow-amber-500/25 hover:scale-105 active:scale-95 ring-2 ring-[#0C0C14]"
                 }`}
                 aria-label="Kategori Lainnya (Other)"
               >
@@ -332,7 +332,7 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
                   }`}
                 >
                   <Sparkles
-                    className={`w-6 h-6 transition-transform duration-300 ${
+                    className={`w-5 h-5 transition-transform duration-300 ${
                       isOtherOpen
                         ? "rotate-45 scale-110"
                         : "animate-pulse"
@@ -341,7 +341,7 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
                 </div>
               </button>
               <span
-                className={`text-[10px] tracking-tight font-bold leading-none mt-1 transition-colors ${
+                className={`text-[9px] tracking-tight font-bold leading-none mt-0.5 transition-colors ${
                   isOtherOpen || isOtherActive ? "text-amber-400" : "text-gray-400"
                 }`}
               >
@@ -483,7 +483,7 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white">Pengaturan Aplikasi</h3>
-                  <p className="text-[10px] text-gray-400">Preferensi &amp; Akun LuoyiVBond</p>
+                  <p className="text-[10px] text-gray-400">Preferensi &amp; Akun NexNime</p>
                 </div>
               </div>
               <button
@@ -571,7 +571,7 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
             {/* Versi Info */}
             <div className="pt-2 border-t border-white/5 text-center">
               <p className="text-[10px] text-gray-500">
-                LuoyiVBond Hub v2.5.0 • Web App Ready
+                NexNime Hub v2.5.0 • Web App Ready
               </p>
             </div>
           </div>
