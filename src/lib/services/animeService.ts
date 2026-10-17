@@ -11,9 +11,10 @@ if (typeof process !== "undefined") {
 
 import * as cheerio from "cheerio";
 import { REAL_SCHEDULE } from "./realDataFallback";
+import { getAnichinPopular } from "./anichinService";
 
 const ANIMEINDO_BASE = "https://ww2.animeindo.pro";
-const ANICHIN_BASE = "https://anichin.co";
+const ANICHIN_BASE = "https://anichin.moe";
 
 export interface AnimeItem {
   title: string;
@@ -307,39 +308,21 @@ export async function getAnimeHome(): Promise<AnimeItem[]> {
  */
 export async function getDonghuaHome(): Promise<AnimeItem[]> {
   try {
-    const html = await fetchHtml(ANICHIN_BASE + "/", ANICHIN_BASE);
-    const out: AnimeItem[] = [];
-    const re = /<article\b[^>]*>([\s\S]*?)<\/article>/gi;
-    let m;
-    while ((m = re.exec(html)) !== null && out.length < 15) {
-      const inner = m[1];
-      const linkMatch = inner.match(/<a\b[^>]*href="([^"]+)"/i);
-      const titleMatch =
-        inner.match(/<h2[^>]*>([\s\S]*?)<\/h2>/i) || inner.match(/title="([^"]+)"/i);
-      const imgMatch =
-        inner.match(/<img[^>]*src="([^"]+)"/i) || inner.match(/<img[^>]*data-src="([^"]+)"/i);
-
-      const title = titleMatch ? txt(titleMatch[1]) : "";
-      const url = linkMatch ? linkMatch[1] : "";
-      const poster = imgMatch ? imgMatch[1] : "";
-      const slug = url.split("/").filter(Boolean).pop() || "";
-
-      if (title && poster) {
-        out.push({
-          title: title.replace(/Subtitle Indonesia/gi, "").trim(),
-          url,
-          slug,
-          poster,
-          episode: "Ongoing",
-          info: "Donghua",
-          rating: "9.20",
-          status: "Ongoing",
-          type: "Donghua",
-          genres: ["Cultivation", "Action", "Fantasy", "Donghua"],
-        });
-      }
+    const popular = await getAnichinPopular(1);
+    if (popular.length > 0) {
+      return popular.map((item) => ({
+        title: item.title.replace(/Subtitle Indonesia/gi, "").trim(),
+        url: item.url,
+        slug: item.slug,
+        poster: item.poster,
+        episode: item.episode || "Ongoing",
+        info: item.type || "Donghua",
+        rating: "9.20",
+        status: "Ongoing",
+        type: "Donghua" as const,
+        genres: ["Cultivation", "Action", "Fantasy", "Donghua"],
+      }));
     }
-    if (out.length > 0) return out;
   } catch (err) {
     console.error("getDonghuaHome error:", err);
   }

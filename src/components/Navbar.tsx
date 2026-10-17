@@ -41,6 +41,7 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
       icon: Tv,
       match: (p: string) =>
         (p.startsWith("/anime") && !p.includes("#jadwal")) ||
+        p.startsWith("/anichin") ||
         p.startsWith("/animesail") ||
         p.startsWith("/animexin") ||
         p.startsWith("/donghuafilm") ||
@@ -103,6 +104,7 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
     activeTabIdx = 3;
   } else if (
     pathname.startsWith("/anime") ||
+    pathname.startsWith("/anichin") ||
     pathname.startsWith("/animesail") ||
     pathname.startsWith("/animexin") ||
     pathname.startsWith("/donghuafilm") ||

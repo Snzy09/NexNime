@@ -20,10 +20,15 @@ import { SamehadakuItem } from "@/lib/services/samehadakuService";
 import { AnimeSailCard } from "@/lib/services/animesailService";
 import { AnimeXinItem } from "@/lib/services/animexinService";
 import { DonghuaFilmItem } from "@/lib/services/donghuaFilmService";
+import { AnichinItem } from "@/lib/services/anichinService";
 
 export default function AnimePage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // AniChin Live State
+  const [anichinItems, setAnichinItems] = useState<AnichinItem[]>([]);
+  const [loadingAnichin, setLoadingAnichin] = useState(true);
 
   // Samehadaku Live State
   const [samehadakuItems, setSamehadakuItems] = useState<SamehadakuItem[]>([]);
@@ -56,6 +61,26 @@ export default function AnimePage() {
       }
     }
   }, []);
+
+  // Fetch AniChin Data
+  useEffect(() => {
+    setLoadingAnichin(true);
+    const url = searchQuery.trim()
+      ? `/api/anichin?action=search&q=${encodeURIComponent(searchQuery.trim())}`
+      : `/api/anichin?action=home`;
+
+    fetch(url)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.rilisan_terbaru && Array.isArray(d.rilisan_terbaru)) {
+          setAnichinItems(d.rilisan_terbaru);
+        } else if (d.items && Array.isArray(d.items)) {
+          setAnichinItems(d.items);
+        }
+      })
+      .catch((e) => console.error("Error fetching AniChin:", e))
+      .finally(() => setLoadingAnichin(false));
+  }, [searchQuery]);
 
   // Fetch Samehadaku Data
   useEffect(() => {
@@ -171,6 +196,132 @@ export default function AnimePage() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Provider Quick Jump Bar */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 text-xs">
+            <span className="text-gray-400 font-semibold shrink-0">Provider:</span>
+            <a
+              href="#anichin"
+              className="px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 font-bold hover:bg-rose-500/25 transition-all shrink-0 flex items-center gap-1.5"
+            >
+              <Sparkles className="w-3 h-3 text-rose-400" /> AniChin (Moe)
+            </a>
+            <a
+              href="#samehadaku"
+              className="px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-bold hover:bg-amber-500/25 transition-all shrink-0 flex items-center gap-1.5"
+            >
+              <Tv className="w-3 h-3 text-amber-400" /> Samehadaku
+            </a>
+            <a
+              href="#donghuafilm"
+              className="px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 font-bold hover:bg-purple-500/25 transition-all shrink-0 flex items-center gap-1.5"
+            >
+              <Film className="w-3 h-3 text-purple-400" /> DonghuaFilm
+            </a>
+            <a
+              href="#animesail"
+              className="px-3 py-1 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 font-bold hover:bg-sky-500/25 transition-all shrink-0 flex items-center gap-1.5"
+            >
+              <Compass className="w-3 h-3 text-sky-400" /> AnimeSail
+            </a>
+            <a
+              href="#animexin"
+              className="px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-bold hover:bg-cyan-500/25 transition-all shrink-0 flex items-center gap-1.5"
+            >
+              <Layers className="w-3 h-3 text-cyan-400" /> AnimeXin
+            </a>
+            <a
+              href="#animeindo"
+              className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold hover:bg-emerald-500/25 transition-all shrink-0 flex items-center gap-1.5"
+            >
+              <Tv className="w-3 h-3 text-emerald-400" /> AnimeIndo
+            </a>
+          </div>
+        </div>
+
+        {/* PROVIDER 0: ANICHIN */}
+        <div id="anichin" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-20">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10">
+            <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-rose-400" />
+              <span>
+                {searchQuery
+                  ? `Hasil Pencarian AniChin: "${searchQuery}"`
+                  : "AniChin - Donghua Rilisan Terbaru (Streaming HD Sub Indo)"}
+              </span>
+            </h2>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/anichin"
+                className="text-xs text-rose-400 hover:text-rose-300 transition-colors font-semibold flex items-center gap-1"
+              >
+                Halaman AniChin &rarr;
+              </Link>
+              <span className="text-xs text-gray-400">
+                {loadingAnichin ? "Memuat live data..." : `${anichinItems.length} Judul Real`}
+              </span>
+            </div>
+          </div>
+
+          {loadingAnichin && <CatalogGridSkeleton count={12} />}
+
+          {!loadingAnichin && anichinItems.length === 0 && (
+            <div className="rounded-2xl bg-[#12121A] border border-white/10 p-12 text-center space-y-3">
+              <AlertCircle className="w-10 h-10 text-rose-400 mx-auto" />
+              <h3 className="text-base font-bold text-white">Tidak ada donghua AniChin ditemukan</h3>
+              <p className="text-xs text-gray-400">
+                Coba kata kunci lain atau periksa tab provider lainnya.
+              </p>
+            </div>
+          )}
+
+          {!loadingAnichin && anichinItems.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              {anichinItems.map((item, idx) => (
+                <Link
+                  key={idx}
+                  href={`/anichin/watch?url=${encodeURIComponent(item.url || item.href)}&title=${encodeURIComponent(item.title)}`}
+                  className="group relative rounded-xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-rose-400/40 transition-all flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60"
+                >
+                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
+                    {item.poster ? (
+                      <img
+                        src={item.poster}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A24] to-[#101018]">
+                        <Tv className="w-10 h-10 text-rose-400/40" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40" />
+                    <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-rose-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase border border-rose-400/30">
+                      ANICHIN
+                    </div>
+                    {item.episode && (
+                      <div className="absolute bottom-2 right-2 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
+                        {item.episode}
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3 flex flex-col justify-between flex-1 space-y-2">
+                    <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-rose-300">
+                      {item.title}
+                    </h3>
+                    <div className="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-white/5">
+                      <span className="text-emerald-400">{item.sub || "Sub Indo"}</span>
+                      <span className="text-rose-400 font-bold flex items-center gap-1">
+                        <Play className="w-2.5 h-2.5 fill-current" /> Nonton
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* PROVIDER 1: SAMEHADAKU */}
