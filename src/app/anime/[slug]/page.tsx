@@ -179,7 +179,7 @@ function isValidEmbedUrl(url?: string): boolean {
   const { isMini, sentinelRef, scrollToPlayer, dismissMini } = useMiniPlayer();
   const playerContainerRef = useRef<HTMLDivElement>(null);
 
-  const { toast: shortcutToast } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
     containerRef: playerContainerRef,
     onNext: () =>
       setSelectedEpIndex((prev) =>
@@ -389,8 +389,12 @@ function isValidEmbedUrl(url?: string): boolean {
               onCancel={() => setShowAutoNext(false)}
             />
 
-            {/* Keyboard Shortcuts Feedback Toast */}
-            <VideoShortcutToast toast={shortcutToast} />
+            {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}
+            <VideoShortcutToast
+              toast={shortcutToast}
+              isIframeFocused={isIframeFocused}
+              onRefocus={refocus}
+            />
           </div>
 
           {/* Server Selector Bar */}

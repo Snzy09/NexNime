@@ -114,7 +114,7 @@ function AnichinWatchContent() {
   const { isMini, sentinelRef, scrollToPlayer, dismissMini } = useMiniPlayer();
   const playerContainerRef = useRef<HTMLDivElement>(null);
 
-  const { toast: shortcutToast } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
     containerRef: playerContainerRef,
     onNext: () => {
       if (nextEp) {
@@ -324,8 +324,12 @@ function AnichinWatchContent() {
                 onCancel={() => setShowAutoNext(false)}
               />
 
-              {/* Keyboard Shortcuts Feedback Toast */}
-              <VideoShortcutToast toast={shortcutToast} />
+              {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}
+              <VideoShortcutToast
+                toast={shortcutToast}
+                isIframeFocused={isIframeFocused}
+                onRefocus={refocus}
+              />
             </div>
 
             {/* Video Title & Actions */}

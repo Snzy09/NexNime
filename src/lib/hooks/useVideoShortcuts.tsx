@@ -27,12 +27,63 @@ export function useVideoShortcuts({
   enabled = true,
 }: VideoShortcutsOptions) {
   const [toast, setToast] = useState<ShortcutToastInfo | null>(null);
+  const [isIframeFocused, setIsIframeFocused] = useState(false);
 
   const showToast = useCallback((info: ShortcutToastInfo) => {
     setToast(info);
     const timer = setTimeout(() => setToast(null), 900);
     return () => clearTimeout(timer);
   }, []);
+
+  const refocus = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.focus();
+      setIsIframeFocused(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    // Detect when iframe takes focus (window blur)
+    const handleWindowBlur = () => {
+      setTimeout(() => {
+        if (typeof document !== "undefined" && document.activeElement?.tagName === "IFRAME") {
+          setIsIframeFocused(true);
+        }
+      }, 50);
+    };
+
+    const handleWindowFocus = () => {
+      setIsIframeFocused(false);
+    };
+
+    window.addEventListener("blur", handleWindowBlur);
+    window.addEventListener("focus", handleWindowFocus);
+
+    // Auto-reclaim window focus whenever user points or moves mouse over the player area
+    const container = containerRef?.current;
+    const handlePointerOver = () => {
+      if (document.activeElement?.tagName === "IFRAME") {
+        window.focus();
+      }
+      setIsIframeFocused(false);
+    };
+
+    if (container) {
+      container.addEventListener("mouseenter", handlePointerOver);
+      container.addEventListener("mousemove", handlePointerOver);
+    }
+
+    return () => {
+      window.removeEventListener("blur", handleWindowBlur);
+      window.removeEventListener("focus", handleWindowFocus);
+      if (container) {
+        container.removeEventListener("mouseenter", handlePointerOver);
+        container.removeEventListener("mousemove", handlePointerOver);
+      }
+    };
+  }, [enabled, containerRef]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -178,16 +229,40 @@ export function useVideoShortcuts({
     showToast,
   ]);
 
-  return { toast };
+  return { toast, isIframeFocused, refocus };
 }
 
-export function VideoShortcutToast({ toast }: { toast: ShortcutToastInfo | null }) {
-  if (!toast) return null;
+export function VideoShortcutToast({
+  toast,
+  isIframeFocused,
+  onRefocus,
+}: {
+  toast: ShortcutToastInfo | null;
+  isIframeFocused?: boolean;
+  onRefocus?: () => void;
+}) {
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none animate-in fade-in zoom-in-95 duration-150">
-      <div className="px-5 py-2.5 rounded-2xl bg-black/85 backdrop-blur-md border border-white/20 text-white font-black text-sm tracking-wide shadow-2xl flex items-center gap-2">
-        <span>{toast.text}</span>
-      </div>
-    </div>
+    <>
+      {/* Toast Feedback */}
+      {toast && (
+        <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none animate-in fade-in zoom-in-95 duration-150">
+          <div className="px-5 py-2.5 rounded-2xl bg-black/85 backdrop-blur-md border border-white/20 text-white font-black text-sm tracking-wide shadow-2xl flex items-center gap-2">
+            <span>{toast.text}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Iframe Focus Recovery Pill */}
+      {isIframeFocused && (
+        <div
+          onClick={onRefocus}
+          className="absolute top-3 inset-x-0 mx-auto w-fit z-40 px-3.5 py-1.5 rounded-full bg-black/85 hover:bg-black text-amber-300 hover:text-amber-200 border border-amber-500/40 backdrop-blur-md shadow-xl text-[11px] font-semibold flex items-center gap-2 cursor-pointer animate-in fade-in slide-in-from-top-2 duration-200 transition-all active:scale-95"
+          title="Klik di sini untuk mengaktifkan shortcut keyboard (Spasi, F, N, P)"
+        >
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+          <span>Iframe Aktif • Klik di sini / geser mouse untuk aktifkan Hotkey [Spasi / F / N / P]</span>
+        </div>
+      )}
+    </>
   );
 }

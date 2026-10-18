@@ -451,7 +451,7 @@ function DracinWatchContent() {
     resumeHandledRef.current = true;
   };
 
-  const { toast: shortcutToast } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
     videoRef,
     containerRef: playerContainerRef,
     onTogglePlay: togglePlay,
@@ -881,8 +881,12 @@ function DracinWatchContent() {
             onCancel={() => setShowAutoNext(false)}
           />
 
-          {/* Keyboard Shortcuts Feedback Toast */}
-          <VideoShortcutToast toast={shortcutToast} />
+          {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}
+          <VideoShortcutToast
+            toast={shortcutToast}
+            isIframeFocused={isIframeFocused}
+            onRefocus={refocus}
+          />
         </div>
       </main>
 

@@ -104,7 +104,7 @@ function DonghuaFilmWatchContent() {
   const { isMini, sentinelRef, scrollToPlayer, dismissMini } = useMiniPlayer();
   const playerContainerRef = useRef<HTMLDivElement>(null);
 
-  const { toast: shortcutToast } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
     containerRef: playerContainerRef,
     onNext: () => {
       if (nextEp) handleSelectEpisode(nextEp.number);
@@ -283,8 +283,12 @@ function DonghuaFilmWatchContent() {
                 onCancel={() => setShowAutoNext(false)}
               />
 
-              {/* Keyboard Shortcuts Feedback Toast */}
-              <VideoShortcutToast toast={shortcutToast} />
+              {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}
+              <VideoShortcutToast
+                toast={shortcutToast}
+                isIframeFocused={isIframeFocused}
+                onRefocus={refocus}
+              />
             </div>
 
             {/* Video Player Toolbar & Controls */}
