@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   ChevronLeft,
-  ZoomIn,
-  ZoomOut,
   Maximize2,
   Film,
   Play,
@@ -39,10 +37,6 @@ function FilmWatchContent() {
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [selectedEpisode, setSelectedEpisode] = useState(1);
   const [episodePlayerUrl, setEpisodePlayerUrl] = useState<string | null>(null);
-
-  // Responsive Zoom & Speed
-  const [zoomLevel, setZoomLevel] = useState<number>(100);
-  const [playbackSpeed, setPlaybackSpeed] = useState<1 | 2 | 3>(1);
 
   useEffect(() => {
     if (!rawUrl) return;
@@ -111,55 +105,6 @@ function FilmWatchContent() {
               </h1>
             </div>
           </div>
-
-          {/* Controls: Zoom In/Out & Speed */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center bg-[#151520] p-1 rounded-lg border border-white/5 text-xs">
-              <span className="text-[10px] text-gray-400 px-1.5 font-bold hidden sm:inline">
-                SPEED:
-              </span>
-              {([1, 2, 3] as const).map((spd) => (
-                <button
-                  key={spd}
-                  onClick={() => setPlaybackSpeed(spd)}
-                  className={`px-2 py-0.5 rounded text-[11px] font-bold transition-colors ${
-                    playbackSpeed === spd
-                      ? "bg-red-500 text-white shadow"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  {spd}x
-                </button>
-              ))}
-            </div>
-
-            {/* Zoom Controls */}
-            <div className="flex items-center bg-[#151520] p-1 rounded-lg border border-white/5 text-xs">
-              <button
-                onClick={() => setZoomLevel((prev) => Math.max(80, prev - 10))}
-                disabled={zoomLevel <= 80}
-                className="p-1 rounded hover:bg-white/10 text-gray-300 disabled:opacity-30"
-                title="Perkecil Tampilan"
-              >
-                <ZoomOut className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setZoomLevel(100)}
-                className="px-2 text-[10px] font-mono text-red-400"
-                title="Reset Zoom 100%"
-              >
-                {zoomLevel}%
-              </button>
-              <button
-                onClick={() => setZoomLevel((prev) => Math.min(150, prev + 10))}
-                disabled={zoomLevel >= 150}
-                className="p-1 rounded hover:bg-white/10 text-gray-300 disabled:opacity-30"
-                title="Perbesar Tampilan (Zoom)"
-              >
-                <ZoomIn className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
         </div>
       </header>
 
@@ -199,10 +144,7 @@ function FilmWatchContent() {
 
         {/* Real Stream Player & Detail */}
         {!loading && detail && (
-          <div
-            style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: "top center" }}
-            className="transition-transform duration-300 space-y-6"
-          >
+          <div className="space-y-6">
             {/* Video Player Frame */}
             <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl">
               {activeServerUrl ? (

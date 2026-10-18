@@ -22,6 +22,7 @@ import {
   Info,
   Maximize2,
   X,
+  PictureInPicture2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -101,8 +102,19 @@ function DonghuaFilmWatchContent() {
   const prevEp = currentIndex > 0 ? sortedEpisodes[currentIndex - 1] : null;
   const nextEp = currentIndex >= 0 && currentIndex < sortedEpisodes.length - 1 ? sortedEpisodes[currentIndex + 1] : null;
 
-  const { isMini, sentinelRef, scrollToPlayer, dismissMini } = useMiniPlayer();
   const playerContainerRef = useRef<HTMLDivElement>(null);
+  const {
+    isMini,
+    sentinelRef,
+    scrollToPlayer,
+    dismissMini,
+    togglePictureInPicture,
+    isPipActive,
+  } = useMiniPlayer({
+    containerRef: playerContainerRef,
+    title: detail?.title ? `${detail.title} - Episode ${currentEpNum}` : "Donghua Film",
+    poster: detail?.poster || "",
+  });
 
   const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
     containerRef: playerContainerRef,
@@ -355,6 +367,20 @@ function DonghuaFilmWatchContent() {
                     <span>⚡ Auto-Next</span>
                   </button>
                 )}
+
+                <button
+                  type="button"
+                  onClick={togglePictureInPicture}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1 transition-colors ${
+                    isPipActive
+                      ? "bg-amber-400/25 border-amber-400/40 text-amber-300"
+                      : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-300"
+                  }`}
+                  title={isPipActive ? "Tutup Mini Player" : "Aktifkan Mini / Floating Player (bisa diminimize)"}
+                >
+                  <PictureInPicture2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Mini Player</span>
+                </button>
 
                 <button
                   onClick={() => setShowDownloads(!showDownloads)}

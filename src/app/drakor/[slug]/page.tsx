@@ -20,6 +20,7 @@ import {
   Film,
   Maximize2,
   X,
+  PictureInPicture2,
 } from "lucide-react";
 import { REAL_DRAKOR_TRENDING } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
@@ -131,8 +132,22 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
     currentEpData?.embed?.download_lite ||
     `https://drakorid.co/download-fast/${params.slug}/${currentEpisode}`;
 
-  const { isMini, sentinelRef, scrollToPlayer, dismissMini } = useMiniPlayer();
   const playerContainerRef = useRef<HTMLDivElement>(null);
+  const {
+    isMini,
+    sentinelRef,
+    scrollToPlayer,
+    dismissMini,
+    togglePictureInPicture,
+    isPipActive,
+  } = useMiniPlayer({
+    videoRef,
+    containerRef: playerContainerRef,
+    title: `${currentDrama.title} - Episode ${currentEpisode}`,
+    poster: currentDrama.poster || "",
+    onNext: () => setCurrentEpisode((prev) => Math.min(episodes.length, prev + 1)),
+    onPrev: () => setCurrentEpisode((prev) => Math.max(1, prev - 1)),
+  });
 
   const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
     videoRef,
@@ -366,6 +381,20 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={togglePictureInPicture}
+                className={`px-3 py-1 rounded transition-colors flex items-center gap-1.5 text-xs font-semibold ${
+                  isPipActive
+                    ? "bg-blue-600 text-white"
+                    : "bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white"
+                }`}
+                title="Mini Player / Picture-in-Picture (Tetap Berjalan saat Minimize)"
+              >
+                <PictureInPicture2 className="w-3.5 h-3.5 text-blue-400" />
+                <span>Mini Player / PiP</span>
+              </button>
+
               <a
                 href={downloadUrl}
                 target="_blank"

@@ -19,6 +19,7 @@ import {
   Moon,
   Maximize2,
   X,
+  PictureInPicture2,
 } from "lucide-react";
 import { REAL_ANIME_POPULAR } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
@@ -176,8 +177,24 @@ function isValidEmbedUrl(url?: string): boolean {
       .finally(() => setStreamLoading(false));
   }, [animeData, selectedEpIndex]);
 
-  const { isMini, sentinelRef, scrollToPlayer, dismissMini } = useMiniPlayer();
   const playerContainerRef = useRef<HTMLDivElement>(null);
+  const {
+    isMini,
+    sentinelRef,
+    scrollToPlayer,
+    dismissMini,
+    togglePictureInPicture,
+    isPipActive,
+  } = useMiniPlayer({
+    containerRef: playerContainerRef,
+    title: animeData ? `${animeData.title} - Episode ${selectedEpIndex + 1}` : undefined,
+    poster: animeData?.poster || "",
+    onNext: () =>
+      setSelectedEpIndex((prev) =>
+        Math.min((animeData?.episodes?.length || 1) - 1, prev + 1)
+      ),
+    onPrev: () => setSelectedEpIndex((prev) => Math.max(0, prev - 1)),
+  });
 
   const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
     containerRef: playerContainerRef,
@@ -423,6 +440,20 @@ function isValidEmbedUrl(url?: string): boolean {
             </div>
 
             <div className="flex items-center gap-2 text-xs">
+              <button
+                type="button"
+                onClick={togglePictureInPicture}
+                className={`px-3 py-1 rounded transition-colors flex items-center gap-1.5 font-semibold ${
+                  isPipActive
+                    ? "bg-amber-400 text-black font-bold"
+                    : "bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white"
+                }`}
+                title="Mini Player / Picture-in-Picture (Tetap Berjalan saat Minimize)"
+              >
+                <PictureInPicture2 className="w-3.5 h-3.5 text-amber-400" />
+                <span>Mini Player / PiP</span>
+              </button>
+
               {currentEp?.url && (
                 <a
                   href={currentEp.url}
