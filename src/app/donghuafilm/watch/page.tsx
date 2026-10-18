@@ -229,6 +229,14 @@ function DonghuaFilmWatchContent() {
                   </button>
                   <button
                     type="button"
+                    onClick={togglePictureInPicture}
+                    className="p-1.5 rounded-lg bg-black/70 hover:bg-white/20 text-white shadow-lg transition-colors"
+                    title="Pop-out Floating Window (Tetap mengambang saat Chrome diminimalkan)"
+                  >
+                    <PictureInPicture2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
                     onClick={dismissMini}
                     className="p-1.5 rounded-lg bg-black/70 hover:bg-white/20 text-white shadow-lg transition-colors"
                     title="Tutup Mini Player"
