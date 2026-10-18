@@ -238,6 +238,14 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                 </button>
                 <button
                   type="button"
+                  onClick={togglePictureInPicture}
+                  className="p-1.5 rounded-lg bg-black/60 hover:bg-white/20 text-white transition-colors"
+                  title="Pop-out Floating Window (Tetap mengambang saat Chrome diminimalkan)"
+                >
+                  <PictureInPicture2 className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
                   onClick={dismissMini}
                   className="p-1.5 rounded-lg bg-white/10 hover:bg-rose-600 text-white transition-colors"
                   title="Tutup Mini Player"
