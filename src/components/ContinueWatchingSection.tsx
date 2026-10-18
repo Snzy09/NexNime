@@ -11,6 +11,7 @@ import {
   importWatchHistory,
 } from "@/lib/services/watchHistory";
 import SyncHistoryModal from "@/components/SyncHistoryModal";
+import DraggableCarousel from "@/components/DraggableCarousel";
 
 function formatDuration(sec: number): string {
   if (!sec || isNaN(sec)) return "00:00";
@@ -72,48 +73,51 @@ export default function ContinueWatchingSection() {
   };
 
   return (
-    <section className="space-y-3 pt-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30">
-            <Clock className="w-4 h-4" />
-          </div>
-          <div>
-            <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Section Header */}
+      <div className="flex items-end justify-between mb-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-rose-400" />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
               <span>Lanjutkan Menonton</span>
-              <span className="text-xs font-semibold text-rose-400 font-mono bg-rose-950/60 px-2 py-0.5 rounded-full border border-rose-500/20">
+              <span className="text-xs font-semibold text-rose-400 font-mono bg-rose-950/60 px-2.5 py-0.5 rounded-full border border-rose-500/20">
                 {history.length}
               </span>
             </h2>
-            <p className="text-[11px] text-gray-400">
+          </div>
+          <div className="mt-1">
+            <p className="text-xs sm:text-sm text-gray-400">
               Lanjutkan video dari menit terakhir kamu menonton
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => setIsSyncModalOpen(true)}
-            className="text-[11px] text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg"
+            className="text-xs font-semibold text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-xl"
             title="Sinkronisasi riwayat ke HP atau perangkat lain"
           >
-            <Share2 className="w-3 h-3 text-cyan-400" />
+            <Share2 className="w-3.5 h-3.5 text-cyan-400" />
             <span className="hidden xs:inline">Sinkronisasi</span>
           </button>
 
           <button
             onClick={handleClearAll}
-            className="text-[11px] text-gray-400 hover:text-rose-400 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg hover:bg-white/5"
+            className="text-xs font-semibold text-gray-400 hover:text-rose-400 flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-xl hover:bg-white/5 border border-transparent hover:border-rose-500/20"
             title="Hapus riwayat tontonan"
           >
-            <Trash2 className="w-3 h-3" />
+            <Trash2 className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Bersihkan</span>
           </button>
         </div>
       </div>
 
-      {/* Horizontal Carousel */}
-      <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
+      {/* Horizontal Draggable Carousel */}
+      <DraggableCarousel className="pb-2">
         {history.map((item) => {
           const catStyle = categoryColors[item.category] || categoryColors.dracin;
           const targetUrl = item.watchUrl.includes("?")
@@ -123,7 +127,7 @@ export default function ContinueWatchingSection() {
           return (
             <div
               key={item.id}
-              className="group relative flex-none w-56 sm:w-64 rounded-2xl overflow-hidden bg-[#101018] border border-white/10 hover:border-white/30 transition-all shadow-lg hover:shadow-2xl flex flex-col justify-between"
+              className="group relative flex-none w-56 sm:w-64 rounded-2xl overflow-hidden bg-[#101018] border border-white/10 hover:border-white/30 transition-all shadow-lg hover:shadow-2xl flex flex-col justify-between shrink-0"
             >
               <Link href={targetUrl} className="block relative aspect-video bg-black/80 overflow-hidden">
                 {item.poster ? (
@@ -202,7 +206,7 @@ export default function ContinueWatchingSection() {
             </div>
           );
         })}
-      </div>
+      </DraggableCarousel>
 
       {/* Sync History Modal */}
       <SyncHistoryModal
