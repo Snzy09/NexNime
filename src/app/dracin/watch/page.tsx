@@ -30,11 +30,13 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 import { DracinItem, DracinDetail } from "@/lib/services/dracinService";
 import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
 import { saveWatchHistory, getSavedResumeTime } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 
 interface SubtitleTrack {
   language: string;
@@ -471,6 +473,11 @@ function DracinWatchContent() {
     onPrev: handlePrevEp,
   });
 
+  const sleepTimer = useSleepTimer({
+    videoRef,
+    onSleep: () => setShowAutoNext(false),
+  });
+
   const selectedSub = subtitles.find((s) => s.language === selectedSubLang);
 
   return (
@@ -565,6 +572,15 @@ function DracinWatchContent() {
                 </select>
               )}
 
+              <SleepTimerButton
+                sleepOption={sleepTimer.sleepOption}
+                formattedRemaining={sleepTimer.formattedRemaining}
+                isMenuOpen={sleepTimer.isMenuOpen}
+                onToggleMenu={sleepTimer.toggleMenu}
+                onSelectOption={sleepTimer.setTimer}
+                accentColor="rose"
+              />
+
               <button
                 type="button"
                 onClick={() => setShowInfoModal(true)}
@@ -627,7 +643,8 @@ function DracinWatchContent() {
                   }
                 }}
                 onEnded={() => {
-                  if (currentEpisodeNum < totalEpisodesCount) {
+                  const slept = sleepTimer.notifyEpisodeEnded();
+                  if (!slept && currentEpisodeNum < totalEpisodesCount) {
                     setShowAutoNext(true);
                   }
                 }}
@@ -905,6 +922,13 @@ function DracinWatchContent() {
               handleNextEp();
             }}
             onCancel={() => setShowAutoNext(false)}
+          />
+
+          {/* Sleep Timer Overlay */}
+          <SleepTimerOverlay
+            show={sleepTimer.isSleeping}
+            onWakeUp={sleepTimer.wakeUp}
+            accentColor="rose"
           />
 
           {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}

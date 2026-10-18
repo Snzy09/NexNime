@@ -23,9 +23,11 @@ import {
 } from "lucide-react";
 import { REAL_ANIME_POPULAR } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 import { saveWatchHistory } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 
 export default function AnimeDetailPage({ params }: { params: { slug: string } }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -205,6 +207,10 @@ function isValidEmbedUrl(url?: string): boolean {
     onPrev: () => setSelectedEpIndex((prev) => Math.max(0, prev - 1)),
   });
 
+  const sleepTimer = useSleepTimer({
+    onSleep: () => setShowAutoNext(false),
+  });
+
   useEffect(() => {
     if (!animeData?.title) return;
     const epNum = selectedEpIndex + 1;
@@ -358,6 +364,15 @@ function isValidEmbedUrl(url?: string): boolean {
                     <span>⚡ Auto-Next</span>
                   </button>
                 )}
+
+                <SleepTimerButton
+                  sleepOption={sleepTimer.sleepOption}
+                  formattedRemaining={sleepTimer.formattedRemaining}
+                  isMenuOpen={sleepTimer.isMenuOpen}
+                  onToggleMenu={sleepTimer.toggleMenu}
+                  onSelectOption={sleepTimer.setTimer}
+                  accentColor="amber"
+                />
               </div>
             )}
           </div>
@@ -412,6 +427,13 @@ function isValidEmbedUrl(url?: string): boolean {
                 );
               }}
               onCancel={() => setShowAutoNext(false)}
+            />
+
+            {/* Sleep Timer Overlay */}
+            <SleepTimerOverlay
+              show={sleepTimer.isSleeping}
+              onWakeUp={sleepTimer.wakeUp}
+              accentColor="amber"
             />
 
             {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}

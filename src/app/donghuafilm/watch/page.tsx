@@ -28,10 +28,12 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 import { DonghuaFilmDetail, DonghuaFilmEpisode } from "@/lib/services/donghuaFilmService";
 import { saveWatchHistory } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 
 function DonghuaFilmWatchContent() {
   const searchParams = useSearchParams();
@@ -124,6 +126,10 @@ function DonghuaFilmWatchContent() {
     onPrev: () => {
       if (prevEp) handleSelectEpisode(prevEp.number);
     },
+  });
+
+  const sleepTimer = useSleepTimer({
+    onSleep: () => setShowAutoNext(false),
   });
 
   useEffect(() => {
@@ -303,6 +309,13 @@ function DonghuaFilmWatchContent() {
                 onCancel={() => setShowAutoNext(false)}
               />
 
+              {/* Sleep Timer Overlay */}
+              <SleepTimerOverlay
+                show={sleepTimer.isSleeping}
+                onWakeUp={sleepTimer.wakeUp}
+                accentColor="amber"
+              />
+
               {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}
               <VideoShortcutToast
                 toast={shortcutToast}
@@ -375,6 +388,15 @@ function DonghuaFilmWatchContent() {
                     <span>⚡ Auto-Next</span>
                   </button>
                 )}
+
+                <SleepTimerButton
+                  sleepOption={sleepTimer.sleepOption}
+                  formattedRemaining={sleepTimer.formattedRemaining}
+                  isMenuOpen={sleepTimer.isMenuOpen}
+                  onToggleMenu={sleepTimer.toggleMenu}
+                  onSelectOption={sleepTimer.setTimer}
+                  accentColor="amber"
+                />
 
                 <button
                   type="button"

@@ -20,6 +20,8 @@ import {
 import { Suspense } from "react";
 import { SamehadakuEpisodeStream } from "@/lib/services/samehadakuService";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 
 function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
   const searchParams = useSearchParams();
@@ -36,6 +38,8 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
     containerRef: playerContainerRef,
     title: streamData?.title || animeTitle || params.slug,
   });
+
+  const sleepTimer = useSleepTimer();
 
   useEffect(() => {
     setLoading(true);
@@ -82,19 +86,30 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={togglePictureInPicture}
-            className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-              isPipActive
-                ? "bg-amber-400 text-black border-amber-400 font-bold"
-                : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
-            }`}
-            title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
-          >
-            <PictureInPicture2 className="w-4 h-4 text-amber-400" />
-            <span className="hidden sm:inline">Floating Player</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <SleepTimerButton
+              sleepOption={sleepTimer.sleepOption}
+              formattedRemaining={sleepTimer.formattedRemaining}
+              isMenuOpen={sleepTimer.isMenuOpen}
+              onToggleMenu={sleepTimer.toggleMenu}
+              onSelectOption={sleepTimer.setTimer}
+              accentColor="amber"
+            />
+
+            <button
+              type="button"
+              onClick={togglePictureInPicture}
+              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                isPipActive
+                  ? "bg-amber-400 text-black border-amber-400 font-bold"
+                  : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
+              }`}
+              title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
+            >
+              <PictureInPicture2 className="w-4 h-4 text-amber-400" />
+              <span className="hidden sm:inline">Floating Player</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -162,6 +177,13 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
                   </p>
                 </div>
               )}
+
+              {/* Sleep Timer Overlay */}
+              <SleepTimerOverlay
+                show={sleepTimer.isSleeping}
+                onWakeUp={sleepTimer.wakeUp}
+                accentColor="amber"
+              />
             </div>
 
             {/* Server Selector Bar */}

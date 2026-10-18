@@ -24,10 +24,12 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 import { AnichinStream, AnichinDetail } from "@/lib/services/anichinService";
 import { saveWatchHistory } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 
 function AnichinWatchContent() {
   const searchParams = useSearchParams();
@@ -143,6 +145,10 @@ function AnichinWatchContent() {
         }
       }
     },
+  });
+
+  const sleepTimer = useSleepTimer({
+    onSleep: () => setShowAutoNext(false),
   });
 
   useEffect(() => {
@@ -344,6 +350,13 @@ function AnichinWatchContent() {
                 onCancel={() => setShowAutoNext(false)}
               />
 
+              {/* Sleep Timer Overlay */}
+              <SleepTimerOverlay
+                show={sleepTimer.isSleeping}
+                onWakeUp={sleepTimer.wakeUp}
+                accentColor="rose"
+              />
+
               {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}
               <VideoShortcutToast
                 toast={shortcutToast}
@@ -374,6 +387,15 @@ function AnichinWatchContent() {
                     <span>⚡ Auto-Next</span>
                   </button>
                 )}
+
+                <SleepTimerButton
+                  sleepOption={sleepTimer.sleepOption}
+                  formattedRemaining={sleepTimer.formattedRemaining}
+                  isMenuOpen={sleepTimer.isMenuOpen}
+                  onToggleMenu={sleepTimer.toggleMenu}
+                  onSelectOption={sleepTimer.setTimer}
+                  accentColor="rose"
+                />
 
                 <button
                   type="button"

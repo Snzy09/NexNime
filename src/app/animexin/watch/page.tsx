@@ -22,6 +22,8 @@ import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import { AnimeXinDetail } from "@/lib/services/animexinService";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 
 function AnimeXinWatchContent() {
   const searchParams = useSearchParams();
@@ -67,6 +69,8 @@ function AnimeXinWatchContent() {
     poster: detail?.poster || "",
   });
 
+  const sleepTimer = useSleepTimer();
+
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-cyan-500 selection:text-black">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
@@ -84,6 +88,14 @@ function AnimeXinWatchContent() {
           </Link>
 
           <div className="flex items-center gap-2">
+            <SleepTimerButton
+              sleepOption={sleepTimer.sleepOption}
+              formattedRemaining={sleepTimer.formattedRemaining}
+              isMenuOpen={sleepTimer.isMenuOpen}
+              onToggleMenu={sleepTimer.toggleMenu}
+              onSelectOption={sleepTimer.setTimer}
+              accentColor="cyan"
+            />
             <button
               type="button"
               onClick={togglePictureInPicture}
@@ -152,6 +164,13 @@ function AnimeXinWatchContent() {
                     </p>
                   </div>
                 )}
+
+                {/* Sleep Timer Overlay */}
+                <SleepTimerOverlay
+                  show={sleepTimer.isSleeping}
+                  onWakeUp={sleepTimer.wakeUp}
+                  accentColor="cyan"
+                />
               </div>
 
               {/* Server Switcher Bar */}

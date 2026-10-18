@@ -23,6 +23,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 import {
   AnimeSailEpisodeDetail,
   AnimeSailAnimeDetail,
@@ -96,6 +98,8 @@ function AnimeSailWatchContent() {
     poster: animeDetail?.thumbnail || "",
   });
 
+  const sleepTimer = useSleepTimer();
+
   const handleShare = () => {
     if (typeof window !== "undefined") {
       navigator.clipboard.writeText(window.location.href);
@@ -167,6 +171,11 @@ function AnimeSailWatchContent() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                     sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
                     className="w-full h-full border-0"
+                  />
+                  <SleepTimerOverlay
+                    show={sleepTimer.isSleeping}
+                    onWakeUp={sleepTimer.wakeUp}
+                    accentColor="sky"
                   />
                 </div>
               ) : (
@@ -243,6 +252,15 @@ function AnimeSailWatchContent() {
                       <ChevronRight className="w-4 h-4" />
                     </Link>
                   )}
+
+                  <SleepTimerButton
+                    sleepOption={sleepTimer.sleepOption}
+                    formattedRemaining={sleepTimer.formattedRemaining}
+                    isMenuOpen={sleepTimer.isMenuOpen}
+                    onToggleMenu={sleepTimer.toggleMenu}
+                    onSelectOption={sleepTimer.setTimer}
+                    accentColor="sky"
+                  />
 
                   <button
                     type="button"

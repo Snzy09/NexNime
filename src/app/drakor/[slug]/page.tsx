@@ -24,9 +24,11 @@ import {
 } from "lucide-react";
 import { REAL_DRAKOR_TRENDING } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 import { saveWatchHistory, getSavedResumeTime } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 
 export default function DrakorDetailPage({ params }: { params: { slug: string } }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -156,6 +158,11 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
     onPrev: () => setCurrentEpisode((prev) => Math.max(1, prev - 1)),
   });
 
+  const sleepTimer = useSleepTimer({
+    videoRef,
+    onSleep: () => setShowAutoNext(false),
+  });
+
   useEffect(() => {
     if (!currentDrama?.title) return;
     saveWatchHistory({
@@ -280,6 +287,15 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                     <span>⚡ Auto-Next</span>
                   </button>
                 )}
+
+                <SleepTimerButton
+                  sleepOption={sleepTimer.sleepOption}
+                  formattedRemaining={sleepTimer.formattedRemaining}
+                  isMenuOpen={sleepTimer.isMenuOpen}
+                  onToggleMenu={sleepTimer.toggleMenu}
+                  onSelectOption={sleepTimer.setTimer}
+                  accentColor="blue"
+                />
               </div>
             )}
           </div>
@@ -301,7 +317,8 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                 playsInline
                 className="w-full h-full object-contain"
                 onEnded={() => {
-                  if (currentEpisode < episodes.length) {
+                  const slept = sleepTimer.notifyEpisodeEnded();
+                  if (!slept && currentEpisode < episodes.length) {
                     setShowAutoNext(true);
                   }
                 }}
@@ -333,6 +350,13 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                 setCurrentEpisode((prev) => Math.min(episodes.length, prev + 1));
               }}
               onCancel={() => setShowAutoNext(false)}
+            />
+
+            {/* Sleep Timer Overlay */}
+            <SleepTimerOverlay
+              show={sleepTimer.isSleeping}
+              onWakeUp={sleepTimer.wakeUp}
+              accentColor="blue"
             />
 
             {/* Keyboard Shortcuts Toast & Iframe Focus Recovery */}
