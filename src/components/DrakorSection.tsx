@@ -92,9 +92,9 @@ export default function DrakorSection({ items }: DrakorSectionProps) {
               </div>
 
               {/* Title & Footer Info */}
-              <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1 min-h-[5.5rem]">
+              <div className="p-2.5 sm:p-3.5 flex flex-col justify-between flex-1 min-h-[4.25rem] sm:min-h-[5.5rem]">
                 <h3
-                  className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-relaxed group-hover:text-blue-300 transition-colors"
+                  className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-snug break-words group-hover:text-blue-300 transition-colors"
                   title={drama.title}
                 >
                   {drama.title}

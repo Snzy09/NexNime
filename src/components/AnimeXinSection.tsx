@@ -92,7 +92,7 @@ export default function AnimeXinSection({ items }: AnimeXinSectionProps) {
 
               {/* Bottom Card Title Info */}
               <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-                <p className="text-xs font-bold text-white line-clamp-2 leading-snug group-hover:text-cyan-300 transition-colors">
+                <p className="text-xs font-bold text-white line-clamp-2 leading-snug break-words group-hover:text-cyan-300 transition-colors">
                   {item.title}
                 </p>
                 <p className="text-[10px] text-gray-400 mt-1 truncate">

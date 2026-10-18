@@ -170,7 +170,7 @@ export default function NovelCatalogPage() {
                         <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mt-2 shadow-sm">
                           <BookOpen className="w-4 h-4" />
                         </div>
-                        <p className="text-xs font-bold text-emerald-100 line-clamp-3 leading-snug drop-shadow-md px-1 z-10">
+                        <p className="text-xs font-bold text-emerald-100 line-clamp-3 leading-snug drop-shadow-md px-1 z-10 break-words">
                           {item.title}
                         </p>
                         <span className="text-[10px] font-semibold text-emerald-400/80 uppercase tracking-widest z-10">
@@ -208,7 +208,7 @@ export default function NovelCatalogPage() {
 
                     {/* Metadata */}
                     <div className="p-3 flex-1 flex flex-col justify-between">
-                      <h3 className="text-xs font-semibold text-gray-200 line-clamp-2 group-hover:text-emerald-300 transition-colors leading-snug">
+                      <h3 className="text-xs font-semibold text-gray-200 line-clamp-2 leading-snug break-words group-hover:text-emerald-300 transition-colors">
                         {item.title}
                       </h3>
                       <span className="text-[10px] text-emerald-400/90 font-medium mt-2 flex items-center gap-1">

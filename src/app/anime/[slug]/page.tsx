@@ -525,9 +525,9 @@ function isValidEmbedUrl(url?: string): boolean {
         {/* Content Details & Episode Selector Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column: Anime Synopsis & Info (8 cols) */}
-          <div className="lg:col-span-8 rounded-2xl bg-[#121218] border border-white/10 p-6 space-y-5">
-            <div className="flex flex-col sm:flex-row gap-5 items-start">
-              <div className="w-32 sm:w-36 aspect-[2/3] rounded-xl overflow-hidden bg-black/60 shrink-0 border border-white/10 shadow-lg">
+          <div className="lg:col-span-8 rounded-2xl bg-[#121218] border border-white/10 p-4 sm:p-6 space-y-4 sm:space-y-5">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start">
+              <div className="w-28 sm:w-36 aspect-[2/3] rounded-xl overflow-hidden bg-black/60 shrink-0 border border-white/10 shadow-lg">
                 {animeData.poster ? (
                   <img
                     src={animeData.poster}
@@ -546,8 +546,8 @@ function isValidEmbedUrl(url?: string): boolean {
                 )}
               </div>
 
-              <div className="flex-1">
-                <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                     {animeData.facts?.Status || "Ongoing"}
                   </span>
@@ -560,7 +560,7 @@ function isValidEmbedUrl(url?: string): boolean {
                   </span>
                 </div>
 
-                <h1 className="text-xl sm:text-2xl font-black text-white">{animeData.title}</h1>
+                <h1 className="text-lg sm:text-2xl font-black text-white break-words leading-tight">{animeData.title}</h1>
 
                 <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
                   {animeData.genres?.map((g: string, i: number) => (
@@ -573,7 +573,7 @@ function isValidEmbedUrl(url?: string): boolean {
                   ))}
                 </div>
 
-                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mt-4">
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mt-3 break-words line-clamp-3 sm:line-clamp-none">
                   {animeData.synopsis}
                 </p>
               </div>
@@ -581,7 +581,7 @@ function isValidEmbedUrl(url?: string): boolean {
           </div>
 
           {/* Right Column: Episode Playlist Drawer (4 cols) */}
-          <div className="lg:col-span-4 rounded-2xl bg-[#121218] border border-white/10 p-5 flex flex-col max-h-[520px]">
+          <div className="lg:col-span-4 rounded-2xl bg-[#121218] border border-white/10 p-4 sm:p-5 flex flex-col max-h-[520px]">
             <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <Play className="w-4 h-4 text-amber-400" />

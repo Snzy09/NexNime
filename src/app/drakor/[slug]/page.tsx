@@ -465,13 +465,13 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
 
         {/* Drama Info & Episode List */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-8 rounded-2xl bg-[#121218] border border-white/10 p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-5 items-start">
-              <div className="w-32 sm:w-36 aspect-[2/3] rounded-xl overflow-hidden bg-black/60 shrink-0 border border-white/10 shadow-lg">
+          <div className="lg:col-span-8 rounded-2xl bg-[#121218] border border-white/10 p-4 sm:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start">
+              <div className="w-28 sm:w-36 aspect-[2/3] rounded-xl overflow-hidden bg-black/60 shrink-0 border border-white/10 shadow-lg">
                 <img src={currentDrama.poster} alt={currentDrama.title} className="w-full h-full object-cover" />
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
                     K-Drama Ongoing
@@ -482,7 +482,7 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                   </span>
                 </div>
 
-                <h1 className="text-xl sm:text-2xl font-black text-white">{currentDrama.title}</h1>
+                <h1 className="text-lg sm:text-2xl font-black text-white break-words leading-tight">{currentDrama.title}</h1>
 
                 <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
                   {(currentDrama.genres || ["Romance", "Drama", "Crime", "Mystery"]).map(
@@ -497,7 +497,7 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                   )}
                 </div>
 
-                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mt-4">
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mt-3 break-words line-clamp-3 sm:line-clamp-none">
                   {currentDrama.synopsis ||
                     "Serial drama Korea pilihan dengan alur cerita menarik, kualitas visual sinematik, serta subtitle Indonesia terlengkap."}
                 </p>
@@ -506,7 +506,7 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
           </div>
 
           {/* Episode List */}
-          <div className="lg:col-span-4 rounded-2xl bg-[#121218] border border-white/10 p-5 flex flex-col max-h-[500px]">
+          <div className="lg:col-span-4 rounded-2xl bg-[#121218] border border-white/10 p-4 sm:p-5 flex flex-col max-h-[500px]">
             <h3 className="text-sm font-bold text-white pb-3 border-b border-white/10 mb-3 flex items-center gap-2">
               <Play className="w-4 h-4 text-blue-400" />
               <span>Daftar Episode ({episodes.length})</span>
