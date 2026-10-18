@@ -9,7 +9,7 @@ NexNime adalah platform hiburan digital terpadu modern yang menggabungkan stream
 ## 🌟 Fitur Utama
 
 ### 1. 🎬 Multi-Category Streaming & Reading
-- **Anime & Donghua**: Integrasi multi-provider (AnimeIndo, Samehadaku, AnimeSail, AnimeXin, Anichin, DonghuaFilm) dengan resolusi hingga 1080p FHD dan 4K Donghua ber-subtitle Indonesia. Dilengkapi sistem failover otomatis jika salah satu provider sedang tidak tersedia.
+- **Anime & Donghua**: Integrasi multi-provider (AnimeIndo, Samehadaku, AnimeSail, AnimeXin, DonghuaFilm) dengan resolusi hingga 1080p FHD dan 4K Donghua ber-subtitle Indonesia. Dilengkapi sistem failover otomatis jika salah satu provider sedang tidak tersedia.
 - **Dracin (Drama China)**: Pemutar drama pendek vertikal modern yang mendukung penyedia konten AsiaBox, ReelShort, NetShort, dan FreeReels. Dilengkapi dukungan gesture **swipe up / swipe down** di ponsel untuk navigasi episode instan.
 - **Drakor (Drama Korea)**: Serial trending dari DrakorID dan OppaDrama dengan metadata lengkap, daftar episode, dan pilihan server cadangan.
 - **Manga & Manhwa Reader**: Pembaca komik web interaktif bertenaga MangaDex dengan mode baca vertikal continuous-strip, daftar chapter, dan zoom gambar.
@@ -53,7 +53,6 @@ nexnime/
 │   ├── app/
 │   │   ├── (home)/         # Halaman Beranda & Hero Carousel
 │   │   ├── anime/          # Hub Anime & Player ([slug])
-│   │   ├── anichin/        # Donghua Anichin
 │   │   ├── animesail/      # AnimeSail Provider Hub
 │   │   ├── animexin/       # AnimeXin Donghua Hub
 │   │   ├── dracin/         # Hub Dracin & Reel Swipe Player

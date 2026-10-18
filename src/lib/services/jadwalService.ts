@@ -5,7 +5,6 @@
 
 import { getAnimeSchedule } from "./animeService";
 import { REAL_SCHEDULE } from "./realDataFallback";
-import { getAnichinJadwal } from "./anichinService";
 
 export type ScheduleCategory = "anime" | "donghua" | "dracin" | "drakor" | "manga";
 
@@ -126,7 +125,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-lord-of-ancient-god-grave",
     title: "Lord of Ancient God Grave",
     slug: "lord-of-ancient-god-grave",
-    href: "/anichin/watch?slug=lord-of-the-ancient-god-grave",
+    href: "/donghuafilm/watch?slug=lord-of-the-ancient-god-grave",
     poster: "https://anichin.moe/wp-content/uploads/2026/07/WAN-JIE-DU-ZUN-SUBTITLE-INDONESIA.webp",
     episode: "Ep 480",
     score: "9.2",
@@ -139,7 +138,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-wan-jie-xian-zong",
     title: "Wan Jie Xian Zong (Wonderland)",
     slug: "wan-jie-xian-zong",
-    href: "/anichin/watch?slug=wan-jie-xian-zong",
+    href: "/donghuafilm/watch?slug=wan-jie-xian-zong",
     poster: "https://anichin.moe/wp-content/uploads/2021/07/Against.webp",
     episode: "Ep 360",
     score: "8.9",
@@ -152,7 +151,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-wu-shen-zhu-zai",
     title: "Martial Master (Wu Shen Zhu Zai)",
     slug: "wu-shen-zhu-zai",
-    href: "/anichin/watch?slug=martial-master",
+    href: "/donghuafilm/watch?slug=martial-master",
     poster: "https://anichin.moe/wp-content/uploads/2026/07/MARTIAL-MASTER-SUBTITLE-INDONESIA.webp",
     episode: "Ep 490",
     score: "9.4",
@@ -167,7 +166,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-swallowed-star",
     title: "Swallowed Star (Tunshi Xingkong)",
     slug: "swallowed-star",
-    href: "/anichin/watch?slug=swallowed-star",
+    href: "/donghuafilm/watch?slug=swallowed-star",
     poster: "https://anichin.moe/wp-content/uploads/2020/11/Swallowed-Star-Subtitle-Indonesia.webp",
     episode: "Ep 239",
     score: "9.6",
@@ -180,7 +179,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-gu-an",
     title: "Gu An (One Slash to the Heavens)",
     slug: "gu-an",
-    href: "/anichin/watch?slug=gu-an",
+    href: "/donghuafilm/watch?slug=gu-an",
     poster: "https://anichin.moe/wp-content/uploads/2024/10/converted-107.webp",
     episode: "Ep 8",
     score: "9.1",
@@ -193,7 +192,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-peak-of-true-martial-arts",
     title: "Peak of True Martial Arts (Zhen Wu Dianfeng)",
     slug: "peak-of-true-martial-arts",
-    href: "/anichin/watch?slug=peak-of-true-martial-arts",
+    href: "/donghuafilm/watch?slug=peak-of-true-martial-arts",
     poster: "https://anichin.moe/wp-content/uploads/2026/07/WAN-JIE-DU-ZUN-SUBTITLE-INDONESIA.webp",
     episode: "Ep 160",
     score: "8.8",
@@ -208,7 +207,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-shrouding-the-heavens",
     title: "Shrouding the Heavens (Zhe Tian)",
     slug: "shrouding-the-heavens",
-    href: "/anichin/watch?slug=shrounding-the-heavens",
+    href: "/donghuafilm/watch?slug=shrounding-the-heavens",
     poster: "https://anichin.moe/wp-content/uploads/2023/05/Shrouding-the-Heavens-Subtitle-Indonesia-3-768x1077.webp",
     episode: "Ep 179",
     score: "9.5",
@@ -221,7 +220,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-against-the-gods",
     title: "Against the Gods (Ni Tian Xie Shen)",
     slug: "against-the-gods",
-    href: "/anichin/watch?slug=against-the-gods",
+    href: "/donghuafilm/watch?slug=against-the-gods",
     poster: "https://anichin.moe/wp-content/uploads/2026/04/Against-the-Gods-Nian-Fan-Subtitle-Indonesia.webp",
     episode: "Ep 65",
     score: "9.3",
@@ -234,7 +233,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-ten-thousand-worlds",
     title: "Ten Thousand Worlds (Wan Jie Du Zun)",
     slug: "ten-thousand-worlds",
-    href: "/anichin/watch?slug=lord-of-the-ancient-god-grave",
+    href: "/donghuafilm/watch?slug=lord-of-the-ancient-god-grave",
     poster: "https://anichin.moe/wp-content/uploads/2026/07/WAN-JIE-DU-ZUN-SUBTITLE-INDONESIA.webp",
     episode: "Ep 280",
     score: "8.7",
@@ -249,7 +248,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-jade-dynasty",
     title: "Jade Dynasty Season 4 (Zhu Xian)",
     slug: "jade-dynasty",
-    href: "/anichin/watch?slug=jade-dynasty",
+    href: "/donghuafilm/watch?slug=jade-dynasty",
     poster: "https://anichin.moe/wp-content/uploads/2022/08/Jade-Dynasty-Season-4-Subtitle-Indonesia-768x1077.webp",
     episode: "Ep 5",
     score: "9.5",
@@ -262,7 +261,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-tomb-of-fallen-gods",
     title: "Tomb of Fallen Gods (Shen Mu)",
     slug: "tomb-of-fallen-gods",
-    href: "/anichin/watch?slug=tomb-of-fallen-gods-season-3",
+    href: "/donghuafilm/watch?slug=tomb-of-fallen-gods-season-3",
     poster: "https://anichin.moe/wp-content/uploads/2025/08/Tomb-of-Fallen-Gods-Season-3-Subtitle-Indonesia.webp",
     episode: "Ep 42",
     score: "9.0",
@@ -275,7 +274,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-martial-universe",
     title: "Martial Universe Season 5 (Wu Dong Qian Kun)",
     slug: "martial-universe",
-    href: "/anichin/watch?slug=martial-universe",
+    href: "/donghuafilm/watch?slug=martial-universe",
     poster: "https://anichin.moe/wp-content/uploads/2025/11/WU-DONG-QIAN-KUN-SEASON-6-SUBTTLE-INDONESIA.webp",
     episode: "Ep 18",
     score: "9.4",
@@ -290,7 +289,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-perfect-world",
     title: "Perfect World (Wanmei Shijie)",
     slug: "perfect-world",
-    href: "/anichin/watch?slug=perfect-world-wanmei-shijie",
+    href: "/donghuafilm/watch?slug=perfect-world-wanmei-shijie",
     poster: "https://anichin.moe/wp-content/uploads/2021/01/Perfect-World-Subtitle-Indonesia-4.webp",
     episode: "Ep 285",
     score: "9.7",
@@ -303,7 +302,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-soul-land-2",
     title: "Soul Land 2: The Peerless Tang Clan",
     slug: "soul-land-2",
-    href: "/anichin/watch?slug=soul-land-2-the-unrivaled-tang-sect",
+    href: "/donghuafilm/watch?slug=soul-land-2-the-unrivaled-tang-sect",
     poster: "https://anichin.moe/wp-content/uploads/2023/06/Soul-Land-2-The-Unrivaled-Tang-Sect-1.webp",
     episode: "Ep 169",
     score: "9.6",
@@ -316,7 +315,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-the-great-ruler",
     title: "The Great Ruler (Da Zhu Zai)",
     slug: "the-great-ruler",
-    href: "/anichin/watch?slug=the-great-ruler-3d",
+    href: "/donghuafilm/watch?slug=the-great-ruler-3d",
     poster: "https://anichin.moe/wp-content/uploads/2023/06/The-Great-Ruler-3D-Subtitle-Indonesia.webp",
     episode: "Ep 89",
     score: "9.3",
@@ -331,7 +330,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-btth",
     title: "Battle Through the Heavens (BTTH S5)",
     slug: "battle-through-the-heavens",
-    href: "/anichin/watch?slug=oyen-pertempuran-akhir-sekte-misty-cloud",
+    href: "/donghuafilm/watch?slug=oyen-pertempuran-akhir-sekte-misty-cloud",
     poster: "https://anichin.moe/wp-content/uploads/2026/07/BTTH-SUBTITLE-INDONESIA.webp",
     episode: "Ep 209",
     score: "9.8",
@@ -344,7 +343,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-tales-of-demons-and-gods",
     title: "Tales of Demons and Gods (Yao Shen Ji)",
     slug: "tales-of-demons-and-gods",
-    href: "/anichin/watch?slug=tales-of-demons-and-gods",
+    href: "/donghuafilm/watch?slug=tales-of-demons-and-gods",
     poster: "https://anichin.moe/wp-content/uploads/2026/07/Tales-of-Demons-and-Gods-Season-10-Subtitle-Indonesia.webp",
     episode: "Ep 310",
     score: "8.9",
@@ -359,7 +358,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-renegade-immortal",
     title: "Renegade Immortal (Xian Ni)",
     slug: "renegade-immortal",
-    href: "/anichin/watch?slug=renegade-immortal",
+    href: "/donghuafilm/watch?slug=renegade-immortal",
     poster: "https://anichin.moe/wp-content/uploads/2023/09/RENEGADE-IMMORTAL-SUBTITLE-INDONESIA-3.webp",
     episode: "Ep 159",
     score: "9.8",
@@ -372,7 +371,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-apotheosis",
     title: "Apotheosis (Bai Lian Cheng Shen)",
     slug: "apotheosis",
-    href: "/anichin/watch?slug=apotheosis",
+    href: "/donghuafilm/watch?slug=apotheosis",
     poster: "https://anichin.moe/wp-content/uploads/2022/11/Apotheosis-Episode-105-Subtitle-Indonesia.webp",
     episode: "Ep 125",
     score: "9.2",
@@ -385,7 +384,7 @@ const CURATED_DONGHUA_SCHEDULE: Omit<UnifiedScheduleItem, "category" | "category
     id: "donghua-a-will-eternal",
     title: "A Will Eternal Season 3 (Yi Nian Yong Heng)",
     slug: "a-will-eternal",
-    href: "/anichin/watch?slug=a-will-eternal",
+    href: "/donghuafilm/watch?slug=a-will-eternal",
     poster: "https://anichin.moe/wp-content/uploads/2025/03/Yi-Nian-Yong-Heng-Season-3-Subtitle-Indonesia.webp",
     episode: "Ep 30",
     score: "9.4",
@@ -911,39 +910,8 @@ export async function getUnifiedSchedule(
     animeDays = REAL_SCHEDULE;
   }
 
-  // 2. Fetch live Donghua releases from Anichin
-  let liveDonghuaByDay: Record<string, any[]> = {};
-  try {
-    const anichinData = await getAnichinJadwal();
-    if (anichinData && anichinData.by_day) {
-      for (const [dayName, showList] of Object.entries(anichinData.by_day)) {
-        const k = normalizeDayKey(dayName);
-        liveDonghuaByDay[k] = liveDonghuaByDay[k] || [];
-        for (const show of showList) {
-          const cleanTitle = show.title.replace(/^\[SVIP\]\s*/i, "").trim();
-          const slug = show.href.replace(/^\/(anime\/)?/, "").replace(/\/$/, "");
-          const realPoster = getDonghuaPoster(cleanTitle || slug);
-          liveDonghuaByDay[k].push({
-            id: `donghua-${slug}`,
-            title: cleanTitle,
-            slug,
-            href: `/anichin/watch?slug=${slug}`,
-            poster: realPoster,
-            category: "donghua" as const,
-            categoryLabel: "Donghua",
-            episode: "Episode Baru",
-            score: "9.3",
-            day: k,
-            dayLabel: DAY_LABELS[k],
-            time: "Rilis Mingguan",
-            genres: ["Donghua", "Action", "Cultivation"],
-          });
-        }
-      }
-    }
-  } catch {
-    // Graceful fallback to curated donghua list
-  }
+  // 2. Live Donghua releases map (using curated Donghua schedule)
+  const liveDonghuaByDay: Record<string, any[]> = {};
 
   // Build the unified items per day
   const days: DaySchedule[] = DAYS_ORDER.map((dayKey) => {

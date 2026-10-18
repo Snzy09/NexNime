@@ -414,7 +414,7 @@ export default function JadwalPage() {
                         if (target.dataset.failed) return;
                         target.dataset.failed = "true";
                         if (item.category === "donghua") {
-                          target.src = "https://anichin.moe/wp-content/uploads/2023/09/RENEGADE-IMMORTAL-SUBTITLE-INDONESIA-3.webp";
+                          target.src = "https://static.anipop.xyz/poster/anime/one-piece.jpg?h=400";
                         } else if (item.category === "manga") {
                           target.src = "https://cdn.myanimelist.net/images/manga/2/253146.jpg";
                         } else if (item.category === "dracin") {
