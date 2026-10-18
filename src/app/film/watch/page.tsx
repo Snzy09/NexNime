@@ -15,12 +15,14 @@ import {
   User,
   AlertCircle,
   ExternalLink,
-  Tv
+  Tv,
+  PictureInPicture2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import { VidboxDetail } from "@/lib/services/vidboxService";
+import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 
 function FilmWatchContent() {
   const searchParams = useSearchParams();
@@ -79,6 +81,13 @@ function FilmWatchContent() {
     detail?.servers?.[activeServerIdx]?.url ||
     "";
 
+  const playerContainerRef = useRef<HTMLDivElement>(null);
+  const { isPipActive, togglePictureInPicture } = useMiniPlayer({
+    containerRef: playerContainerRef,
+    title: detail?.title || initialTitle || "VidBox Movie",
+    poster: detail?.poster || "",
+  });
+
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-red-500 selection:text-white">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
@@ -105,6 +114,20 @@ function FilmWatchContent() {
               </h1>
             </div>
           </div>
+
+          <button
+            type="button"
+            onClick={togglePictureInPicture}
+            className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+              isPipActive
+                ? "bg-red-600 text-white border-red-500 font-bold"
+                : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
+            }`}
+            title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
+          >
+            <PictureInPicture2 className="w-4 h-4 text-red-400" />
+            <span className="hidden sm:inline">Floating Player</span>
+          </button>
         </div>
       </header>
 
@@ -146,7 +169,10 @@ function FilmWatchContent() {
         {!loading && detail && (
           <div className="space-y-6">
             {/* Video Player Frame */}
-            <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl">
+            <div
+              ref={playerContainerRef}
+              className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl"
+            >
               {activeServerUrl ? (
                 <iframe
                   src={activeServerUrl}

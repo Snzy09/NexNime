@@ -22,11 +22,13 @@ import {
   Video,
   Maximize2,
   Minimize2,
+  PictureInPicture2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import { ReelShortDetail, ReelShortStream } from "@/lib/services/reelshortService";
+import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import Hls from "hls.js";
 
 function ReelShortWatchContent() {
@@ -204,6 +206,15 @@ function ReelShortWatchContent() {
       setCurrentEpisodeIndex((prev) => prev - 1);
     }
   };
+
+  const { isPipActive, togglePictureInPicture } = useMiniPlayer({
+    videoRef,
+    containerRef: playerContainerRef,
+    title: detail?.title ? `${detail.title} - Ep ${currentEpisodeIndex + 1}` : "ReelShort Drama",
+    poster: detail?.cover || "",
+    onNext: handleNextEpisode,
+    onPrev: handlePrevEpisode,
+  });
 
   // Mobile Vertical Swipe & PC Scroll / Drag to change episodes
   const touchStartYRef = useRef<number | null>(null);
@@ -546,6 +557,19 @@ function ReelShortWatchContent() {
               </div>
 
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={togglePictureInPicture}
+                  className={`p-2 rounded-full backdrop-blur-md transition-colors ${
+                    isPipActive
+                      ? "bg-rose-600 text-white shadow-lg shadow-rose-600/40"
+                      : "bg-black/50 hover:bg-black/80 text-white"
+                  }`}
+                  title="Picture-in-Picture (Tetap Mengambang saat Chrome Diminimalkan)"
+                >
+                  <PictureInPicture2 className="w-4 h-4 text-rose-300" />
+                </button>
+
                 <button
                   onClick={toggleNativeFullscreen}
                   className="p-2 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md transition-colors"

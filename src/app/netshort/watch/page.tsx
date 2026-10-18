@@ -23,11 +23,13 @@ import {
   Loader2,
   Maximize2,
   Minimize2,
+  PictureInPicture2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import { NetShortDetail, NetShortEpisode } from "@/lib/services/netshortService";
+import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import Hls from "hls.js";
 
 function NetShortWatchContent() {
@@ -229,6 +231,15 @@ function NetShortWatchContent() {
       handleSelectEpisode(currentEpisodeIndex - 1);
     }
   };
+
+  const { isPipActive, togglePictureInPicture } = useMiniPlayer({
+    videoRef,
+    containerRef: playerContainerRef,
+    title: detail?.title ? `${detail.title} - Ep ${currentEpisodeIndex + 1}` : "NetShort Drama",
+    poster: detail?.cover || "",
+    onNext: handleNextEpisode,
+    onPrev: handlePrevEpisode,
+  });
 
   // Mobile Vertical Swipe & PC Scroll / Drag to change episodes
   const touchStartYRef = useRef<number | null>(null);
@@ -539,8 +550,20 @@ function NetShortWatchContent() {
                 </div>
               </div>
 
-              {/* Mute, Fullscreen & Info Buttons */}
+              {/* Mute, Fullscreen, PiP & Info Buttons */}
               <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+                <button
+                  type="button"
+                  onClick={togglePictureInPicture}
+                  className={`w-8 h-8 rounded-full backdrop-blur-md border border-white/20 flex items-center justify-center transition-colors ${
+                    isPipActive
+                      ? "bg-purple-600 text-white shadow-lg shadow-purple-600/40"
+                      : "bg-black/50 text-white hover:bg-black/80"
+                  }`}
+                  title="Picture-in-Picture (Tetap Mengambang saat Chrome Diminimalkan)"
+                >
+                  <PictureInPicture2 className="w-4 h-4 text-purple-300" />
+                </button>
                 <button
                   onClick={toggleNativeFullscreen}
                   className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-black/80 transition-colors"

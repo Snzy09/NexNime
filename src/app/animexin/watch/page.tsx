@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -15,11 +15,13 @@ import {
   Sparkles,
   Loader2,
   ChevronRight,
+  PictureInPicture2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import { AnimeXinDetail } from "@/lib/services/animexinService";
+import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 
 function AnimeXinWatchContent() {
   const searchParams = useSearchParams();
@@ -57,6 +59,13 @@ function AnimeXinWatchContent() {
       : null;
 
   const streamSrc = activeServer?.embed_url || detail?.current_stream || "";
+  const playerContainerRef = useRef<HTMLDivElement>(null);
+
+  const { isPipActive, togglePictureInPicture } = useMiniPlayer({
+    containerRef: playerContainerRef,
+    title: detail?.title || initialTitle || "AnimeXin Donghua",
+    poster: detail?.poster || "",
+  });
 
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-cyan-500 selection:text-black">
@@ -75,6 +84,19 @@ function AnimeXinWatchContent() {
           </Link>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={togglePictureInPicture}
+              className={`px-3 py-1 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                isPipActive
+                  ? "bg-cyan-500 text-black border-cyan-400 font-bold"
+                  : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
+              }`}
+              title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
+            >
+              <PictureInPicture2 className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden sm:inline">Floating Player</span>
+            </button>
             <span className="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30 text-xs flex items-center gap-1">
               <Tv className="w-3.5 h-3.5" />
               AnimeXin Donghua
@@ -109,7 +131,10 @@ function AnimeXinWatchContent() {
             {/* Left 2 Cols: Player & Info */}
             <div className="lg:col-span-2 space-y-4">
               {/* 16:9 Video Player Container */}
-              <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl shadow-cyan-950/30">
+              <div
+                ref={playerContainerRef}
+                className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl shadow-cyan-950/30"
+              >
                 {streamSrc ? (
                   <iframe
                     src={streamSrc}
