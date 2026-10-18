@@ -6,11 +6,8 @@ import { useSearchParams } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRight,
-  ZoomIn,
-  ZoomOut,
   Maximize2,
   Tv,
-  FastForward,
   Play,
   RotateCcw,
   Download,
@@ -32,15 +29,6 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
   const [error, setError] = useState<string | null>(null);
   const [activeServerIdx, setActiveServerIdx] = useState(0);
 
-  // Responsive Zoom & Speed Mode
-  const [zoomLevel, setZoomLevel] = useState<number>(100); // 80% - 150%
-  const [playbackSpeed, setPlaybackSpeed] = useState<1 | 2 | 3>(1); // 1x, 2x, 3x
-  const [isAutoScroll, setIsAutoScroll] = useState<boolean>(false);
-
-  // Container ref
-  const playerContainerRef = useRef<HTMLDivElement>(null);
-  const scrollIntervalRef = useRef<any>(null);
-
   useEffect(() => {
     setLoading(true);
     const targetSlug = rawUrl || params.slug;
@@ -59,28 +47,7 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
       .finally(() => setLoading(false));
   }, [params.slug, rawUrl]);
 
-  // Auto-scroll loop if reader/page mode is active
-  useEffect(() => {
-    if (scrollIntervalRef.current) clearInterval(scrollIntervalRef.current);
-    if (isAutoScroll) {
-      const step = playbackSpeed === 1 ? 2 : playbackSpeed === 2 ? 5 : 9;
-      scrollIntervalRef.current = setInterval(() => {
-        window.scrollBy({ top: step, behavior: "smooth" });
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
-          setIsAutoScroll(false);
-        }
-      }, 50);
-    }
-    return () => {
-      if (scrollIntervalRef.current) clearInterval(scrollIntervalRef.current);
-    };
-  }, [isAutoScroll, playbackSpeed]);
-
   const activeServer = streamData?.servers?.[activeServerIdx];
-
-  const handleZoomIn = () => setZoomLevel((prev) => Math.min(150, prev + 10));
-  const handleZoomOut = () => setZoomLevel((prev) => Math.max(80, prev - 10));
-  const handleResetZoom = () => setZoomLevel(100);
 
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-amber-400 selection:text-black">
@@ -105,69 +72,6 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
                 {streamData?.title || animeTitle || params.slug}
               </h1>
             </div>
-          </div>
-
-          {/* Controls: Zoom In/Out, Speed 1x 2x 3x */}
-          <div className="flex items-center gap-2">
-            {/* Speed Control 1x 2x 3x */}
-            <div className="flex items-center bg-[#151520] p-1 rounded-lg border border-white/5 text-xs">
-              <span className="text-[10px] text-gray-400 px-1.5 font-bold hidden sm:inline">
-                SPEED:
-              </span>
-              {([1, 2, 3] as const).map((spd) => (
-                <button
-                  key={spd}
-                  onClick={() => setPlaybackSpeed(spd)}
-                  className={`px-2 py-0.5 rounded text-[11px] font-bold transition-colors ${
-                    playbackSpeed === spd
-                      ? "bg-amber-400 text-black shadow"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  {spd}x
-                </button>
-              ))}
-            </div>
-
-            {/* Zoom Controls (Ponsel & PC Responsive) */}
-            <div className="flex items-center bg-[#151520] p-1 rounded-lg border border-white/5 text-xs">
-              <button
-                onClick={handleZoomOut}
-                disabled={zoomLevel <= 80}
-                className="p-1 rounded hover:bg-white/10 text-gray-300 disabled:opacity-30"
-                title="Perkecil Tampilan"
-              >
-                <ZoomOut className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={handleResetZoom}
-                className="px-2 text-[10px] font-mono text-amber-300"
-                title="Reset Zoom 100%"
-              >
-                {zoomLevel}%
-              </button>
-              <button
-                onClick={handleZoomIn}
-                disabled={zoomLevel >= 150}
-                className="p-1 rounded hover:bg-white/10 text-gray-300 disabled:opacity-30"
-                title="Perbesar Tampilan (Zoom)"
-              >
-                <ZoomIn className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            {/* Auto-scroll toggle */}
-            <button
-              onClick={() => setIsAutoScroll(!isAutoScroll)}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors hidden sm:flex items-center gap-1 ${
-                isAutoScroll
-                  ? "bg-emerald-500 text-black shadow-md shadow-emerald-500/20"
-                  : "bg-white/5 text-gray-300 hover:bg-white/10"
-              }`}
-            >
-              <FastForward className="w-3.5 h-3.5" />
-              <span>{isAutoScroll ? "Auto-Scroll Aktif" : "Auto-Scroll"}</span>
-            </button>
           </div>
         </div>
       </header>
@@ -209,11 +113,7 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
 
         {/* Real Stream Player & Viewport */}
         {!loading && streamData && (
-          <div
-            ref={playerContainerRef}
-            style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: "top center" }}
-            className="transition-transform duration-300 space-y-6"
-          >
+          <div className="space-y-6">
             {/* Video / Embed Frame */}
             <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl">
               {activeServer?.url ? (
