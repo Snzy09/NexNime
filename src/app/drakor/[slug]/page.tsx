@@ -18,9 +18,14 @@ import {
   Bookmark,
   Tv,
   Film,
+  Maximize2,
+  X,
 } from "lucide-react";
 import { REAL_DRAKOR_TRENDING } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { saveWatchHistory, getSavedResumeTime } from "@/lib/services/watchHistory";
+import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
+import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 
 export default function DrakorDetailPage({ params }: { params: { slug: string } }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -126,6 +131,30 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
     currentEpData?.embed?.download_lite ||
     `https://drakorid.co/download-fast/${params.slug}/${currentEpisode}`;
 
+  const { isMini, sentinelRef, scrollToPlayer, dismissMini } = useMiniPlayer();
+  const playerContainerRef = useRef<HTMLDivElement>(null);
+
+  const { toast: shortcutToast } = useVideoShortcuts({
+    videoRef,
+    containerRef: playerContainerRef,
+    onNext: () => setCurrentEpisode((prev) => Math.min(episodes.length, prev + 1)),
+    onPrev: () => setCurrentEpisode((prev) => Math.max(1, prev - 1)),
+  });
+
+  useEffect(() => {
+    if (!currentDrama?.title) return;
+    saveWatchHistory({
+      id: `drakor-${params.slug}`,
+      title: currentDrama.title,
+      category: "drakor",
+      episodeNumber: currentEpisode,
+      poster: currentDrama.poster || "",
+      watchUrl: `/drakor/${params.slug}?ep=${currentEpisode}`,
+      currentTime: 0,
+      duration: 0,
+    });
+  }, [currentDrama, currentEpisode, params.slug]);
+
   return (
     <div className="min-h-screen bg-[#09090D] text-white flex flex-col selection:bg-blue-500 selection:text-white">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
@@ -145,44 +174,91 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
           <span className="text-blue-400 truncate max-w-xs">{currentDrama.title}</span>
         </div>
 
+        {/* Sentinel for Sticky Mini-Player */}
+        <div ref={sentinelRef} className="w-full h-px pointer-events-none -mt-px" />
+
+        {/* Placeholder when in Mini-Player mode */}
+        {isMini && (
+          <div className="aspect-video w-full rounded-2xl bg-[#0D0D14] border border-dashed border-blue-500/30 flex flex-col items-center justify-center gap-2 text-xs text-blue-300">
+            <div className="flex items-center gap-2">
+              <Clapperboard className="w-4 h-4 text-blue-400 animate-pulse" />
+              <span>Video diputar di Mini-Player (Pojok Layar)</span>
+            </div>
+            <button
+              onClick={scrollToPlayer}
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-500 rounded-lg text-white font-bold text-[11px] transition-colors"
+            >
+              Kembali ke Layar Penuh
+            </button>
+          </div>
+        )}
+
         {/* Video Player */}
-        <div className="rounded-2xl overflow-hidden bg-[#0D0D14] border border-white/10 shadow-2xl">
+        <div
+          ref={playerContainerRef}
+          className={`transition-all duration-300 overflow-hidden bg-[#0D0D14] ${
+            isMini
+              ? "fixed bottom-5 right-5 z-50 w-72 sm:w-96 rounded-2xl border-2 border-blue-500/50 shadow-2xl shadow-black/80 animate-in fade-in zoom-in-95"
+              : "rounded-2xl border border-white/10 shadow-2xl"
+          }`}
+        >
           {/* Top Bar Video Info */}
-          <div className="p-3 bg-[#13131D] border-b border-white/5 flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2 font-bold text-white">
-              <Clapperboard className="w-4 h-4 text-blue-400" />
-              <span>
+          <div className="p-3 bg-[#13131D] border-b border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2 font-bold text-white truncate max-w-[220px]">
+              <Clapperboard className="w-4 h-4 text-blue-400 shrink-0" />
+              <span className="truncate">
                 {currentDrama.title} — Episode {currentEpisode}
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentEpisode((prev) => Math.max(1, prev - 1))}
-                disabled={currentEpisode <= 1}
-                className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 disabled:opacity-30 flex items-center gap-1"
-              >
-                <ChevronLeft className="w-3.5 h-3.5" /> Prev Ep
-              </button>
-              <button
-                onClick={() => setCurrentEpisode((prev) => Math.min(episodes.length, prev + 1))}
-                disabled={currentEpisode >= episodes.length}
-                className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 disabled:opacity-30 flex items-center gap-1"
-              >
-                Next Ep <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-
-              {currentEpisode < episodes.length && (
+            {isMini ? (
+              <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   type="button"
-                  onClick={() => setShowAutoNext(true)}
-                  className="px-2 py-1 rounded bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 flex items-center gap-1 text-[11px] font-bold transition-colors"
-                  title="Putar episode berikutnya otomatis"
+                  onClick={scrollToPlayer}
+                  className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+                  title="Perbesar Layar"
                 >
-                  <span>⚡ Auto-Next</span>
+                  <Maximize2 className="w-3.5 h-3.5" />
                 </button>
-              )}
-            </div>
+                <button
+                  type="button"
+                  onClick={dismissMini}
+                  className="p-1.5 rounded-lg bg-white/10 hover:bg-rose-600 text-white transition-colors"
+                  title="Tutup Mini Player"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentEpisode((prev) => Math.max(1, prev - 1))}
+                  disabled={currentEpisode <= 1}
+                  className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 disabled:opacity-30 flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" /> Prev Ep
+                </button>
+                <button
+                  onClick={() => setCurrentEpisode((prev) => Math.min(episodes.length, prev + 1))}
+                  disabled={currentEpisode >= episodes.length}
+                  className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 disabled:opacity-30 flex items-center gap-1"
+                >
+                  Next Ep <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+
+                {currentEpisode < episodes.length && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAutoNext(true)}
+                    className="px-2 py-1 rounded bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 flex items-center gap-1 text-[11px] font-bold transition-colors"
+                    title="Putar episode berikutnya otomatis"
+                  >
+                    <span>⚡ Auto-Next</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Player Frame (Real DrakorID Player) */}
@@ -235,6 +311,9 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
               }}
               onCancel={() => setShowAutoNext(false)}
             />
+
+            {/* Keyboard Shortcuts Toast */}
+            <VideoShortcutToast toast={shortcutToast} />
           </div>
 
           {/* Server Selector Bar */}

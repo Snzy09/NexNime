@@ -16,6 +16,7 @@ import AnimeXinSection from "@/components/AnimeXinSection";
 import AnimeSailSection from "@/components/AnimeSailSection";
 import OppaDramaSection from "@/components/OppaDramaSection";
 import NovelSection from "@/components/NovelSection";
+import ContinueWatchingSection from "@/components/ContinueWatchingSection";
 import { NetShortItem } from "@/lib/services/netshortService";
 import { AnimeXinItem } from "@/lib/services/animexinService";
 import { AnimeSailCard } from "@/lib/services/animesailService";
@@ -189,6 +190,9 @@ export default function Home() {
             animexinList={animexinList}
           />
         )}
+
+        {/* Continue Watching / Lanjutkan Menonton (Saved Progress) */}
+        <ContinueWatchingSection />
 
         {/* 2. Anime Populer Pekan Ini (Screenshot 2) */}
         {loadingAnime ? (

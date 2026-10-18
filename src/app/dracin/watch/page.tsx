@@ -31,6 +31,8 @@ import SearchModal from "@/components/SearchModal";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { DracinItem, DracinDetail } from "@/lib/services/dracinService";
 import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
+import { saveWatchHistory, getSavedResumeTime } from "@/lib/services/watchHistory";
+import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 
 interface SubtitleTrack {
   language: string;
@@ -431,6 +433,33 @@ function DracinWatchContent() {
     }
   };
 
+  const lastSavedTimeRef = useRef(0);
+  const resumeHandledRef = useRef(false);
+
+  useEffect(() => {
+    resumeHandledRef.current = false;
+  }, [currentEpisodeNum, videoUrl]);
+
+  const handleLoadedMetadata = () => {
+    if (resumeHandledRef.current || !videoRef.current) return;
+    const paramT = parseFloat(searchParams.get("t") || "0");
+    const savedT = getSavedResumeTime(`dracin-${provider}-${rawId}`);
+    const resumeSec = paramT > 0 ? paramT : savedT;
+    if (resumeSec > 0 && resumeSec < (videoRef.current.duration || 9999) - 5) {
+      videoRef.current.currentTime = resumeSec;
+    }
+    resumeHandledRef.current = true;
+  };
+
+  const { toast: shortcutToast } = useVideoShortcuts({
+    videoRef,
+    containerRef: playerContainerRef,
+    onTogglePlay: togglePlay,
+    onToggleFullscreen: toggleNativeFullscreen,
+    onNext: handleNextEp,
+    onPrev: handlePrevEp,
+  });
+
   const selectedSub = subtitles.find((s) => s.language === selectedSubLang);
 
   return (
@@ -564,10 +593,26 @@ function DracinWatchContent() {
                 ref={videoRef}
                 playsInline
                 className="w-full h-full object-cover sm:object-contain bg-black"
+                onLoadedMetadata={handleLoadedMetadata}
                 onTimeUpdate={() => {
                   if (videoRef.current) {
-                    setCurrentTime(videoRef.current.currentTime);
-                    setDuration(videoRef.current.duration || 0);
+                    const cur = videoRef.current.currentTime;
+                    const dur = videoRef.current.duration || 0;
+                    setCurrentTime(cur);
+                    setDuration(dur);
+                    if (Math.abs(cur - lastSavedTimeRef.current) > 3 && dur > 0) {
+                      lastSavedTimeRef.current = cur;
+                      saveWatchHistory({
+                        id: `dracin-${provider}-${rawId}`,
+                        title: dramaTitle,
+                        category: "dracin",
+                        episodeNumber: currentEpisodeNum,
+                        poster: activeDrama.image || "",
+                        watchUrl: `/dracin/watch?provider=${provider}&id=${encodeURIComponent(rawId)}&ep=${currentEpisodeNum}`,
+                        currentTime: cur,
+                        duration: dur,
+                      });
+                    }
                   }
                 }}
                 onEnded={() => {
@@ -835,6 +880,9 @@ function DracinWatchContent() {
             }}
             onCancel={() => setShowAutoNext(false)}
           />
+
+          {/* Keyboard Shortcuts Feedback Toast */}
+          <VideoShortcutToast toast={shortcutToast} />
         </div>
       </main>
 

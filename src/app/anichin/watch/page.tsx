@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -16,12 +16,17 @@ import {
   Sparkles,
   Loader2,
   Play,
+  Maximize2,
+  X,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { AnichinStream, AnichinDetail } from "@/lib/services/anichinService";
+import { saveWatchHistory } from "@/lib/services/watchHistory";
+import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
+import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 
 function AnichinWatchContent() {
   const searchParams = useSearchParams();
@@ -105,6 +110,42 @@ function AnichinWatchContent() {
     currentEpIndex >= 0 && currentEpIndex < episodes.length - 1
       ? episodes[currentEpIndex + 1]
       : null;
+
+  const { isMini, sentinelRef, scrollToPlayer, dismissMini } = useMiniPlayer();
+  const playerContainerRef = useRef<HTMLDivElement>(null);
+
+  const { toast: shortcutToast } = useVideoShortcuts({
+    containerRef: playerContainerRef,
+    onNext: () => {
+      if (nextEp) {
+        setCurrentUrl(nextEp.url || nextEp.href);
+        window.scrollTo({ top: 120, behavior: "smooth" });
+      }
+    },
+    onPrev: () => {
+      if (currentEpIndex > 0) {
+        const prevEp = episodes[currentEpIndex - 1];
+        if (prevEp) {
+          setCurrentUrl(prevEp.url || prevEp.href);
+          window.scrollTo({ top: 120, behavior: "smooth" });
+        }
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (!detail?.title && !stream?.title && !initialTitle) return;
+    saveWatchHistory({
+      id: `anichin-${encodeURIComponent(currentUrl)}`,
+      title: detail?.title || stream?.title || initialTitle || "Donghua",
+      category: "donghua",
+      episodeNumber: currentEpIndex >= 0 ? currentEpIndex + 1 : 1,
+      poster: detail?.poster || "",
+      watchUrl: `/anichin/watch?url=${encodeURIComponent(currentUrl)}`,
+      currentTime: 0,
+      duration: 0,
+    });
+  }, [detail, stream, currentUrl, currentEpIndex, initialTitle]);
 
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-rose-500 selection:text-white">
@@ -200,8 +241,56 @@ function AnichinWatchContent() {
               </div>
             )}
 
+            {/* Sentinel for Sticky Mini-Player */}
+            <div ref={sentinelRef} className="w-full h-px pointer-events-none -mt-px" />
+
+            {/* Placeholder when in Mini-Player mode */}
+            {isMini && (
+              <div className="aspect-video w-full rounded-2xl bg-[#0D0D14] border border-dashed border-rose-500/30 flex flex-col items-center justify-center gap-2 text-xs text-rose-300">
+                <div className="flex items-center gap-2">
+                  <Tv className="w-4 h-4 text-rose-400 animate-pulse" />
+                  <span>Donghua diputar di Mini-Player (Pojok Layar)</span>
+                </div>
+                <button
+                  onClick={scrollToPlayer}
+                  className="px-3 py-1 bg-rose-600 hover:bg-rose-500 rounded-lg text-white font-bold text-[11px] transition-colors"
+                >
+                  Kembali ke Layar Penuh
+                </button>
+              </div>
+            )}
+
             {/* Player Container */}
-            <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl">
+            <div
+              ref={playerContainerRef}
+              className={`overflow-hidden bg-black transition-all duration-300 ${
+                isMini
+                  ? "fixed bottom-5 right-5 z-50 w-72 sm:w-96 aspect-video rounded-2xl border-2 border-rose-500/50 shadow-2xl shadow-black/80 animate-in fade-in zoom-in-95"
+                  : "relative aspect-video w-full rounded-2xl border border-white/10 shadow-2xl"
+              }`}
+            >
+              {/* Mini Player Header Controls */}
+              {isMini && (
+                <div className="absolute top-2 right-2 flex items-center gap-1.5 z-30">
+                  <button
+                    type="button"
+                    onClick={scrollToPlayer}
+                    className="p-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white shadow-lg transition-colors"
+                    title="Perbesar Layar"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={dismissMini}
+                    className="p-1.5 rounded-lg bg-black/70 hover:bg-white/20 text-white shadow-lg transition-colors"
+                    title="Tutup Mini Player"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
               {streamSrc ? (
                 <iframe
                   key={streamSrc}
@@ -234,6 +323,9 @@ function AnichinWatchContent() {
                 }}
                 onCancel={() => setShowAutoNext(false)}
               />
+
+              {/* Keyboard Shortcuts Feedback Toast */}
+              <VideoShortcutToast toast={shortcutToast} />
             </div>
 
             {/* Video Title & Actions */}

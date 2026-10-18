@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import SearchModal from "@/components/SearchModal";
@@ -18,9 +18,13 @@ import {
   Sun,
   Moon,
   Maximize2,
+  X,
 } from "lucide-react";
 import { REAL_ANIME_POPULAR } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { saveWatchHistory } from "@/lib/services/watchHistory";
+import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
+import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 
 export default function AnimeDetailPage({ params }: { params: { slug: string } }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -172,6 +176,33 @@ function isValidEmbedUrl(url?: string): boolean {
       .finally(() => setStreamLoading(false));
   }, [animeData, selectedEpIndex]);
 
+  const { isMini, sentinelRef, scrollToPlayer, dismissMini } = useMiniPlayer();
+  const playerContainerRef = useRef<HTMLDivElement>(null);
+
+  const { toast: shortcutToast } = useVideoShortcuts({
+    containerRef: playerContainerRef,
+    onNext: () =>
+      setSelectedEpIndex((prev) =>
+        Math.min((animeData?.episodes?.length || 1) - 1, prev + 1)
+      ),
+    onPrev: () => setSelectedEpIndex((prev) => Math.max(0, prev - 1)),
+  });
+
+  useEffect(() => {
+    if (!animeData?.title) return;
+    const epNum = selectedEpIndex + 1;
+    saveWatchHistory({
+      id: `anime-${params.slug}`,
+      title: animeData.title,
+      category: "anime",
+      episodeNumber: epNum,
+      poster: animeData.poster || "",
+      watchUrl: `/anime/${params.slug}?ep=${epNum}`,
+      currentTime: 0,
+      duration: 0,
+    });
+  }, [animeData, selectedEpIndex, params.slug]);
+
   if (loading || !animeData) {
     return (
       <div className="min-h-screen bg-[#09090D] text-white flex items-center justify-center">
@@ -206,57 +237,104 @@ function isValidEmbedUrl(url?: string): boolean {
           <span className="text-amber-400 truncate max-w-xs">{animeData.title}</span>
         </div>
 
+        {/* Sentinel for Sticky Mini-Player */}
+        <div ref={sentinelRef} className="w-full h-px pointer-events-none -mt-px" />
+
+        {/* Placeholder when in Mini-Player mode */}
+        {isMini && (
+          <div className="aspect-video w-full rounded-2xl bg-[#0D0D14] border border-dashed border-amber-400/30 flex flex-col items-center justify-center gap-2 text-xs text-amber-300">
+            <div className="flex items-center gap-2">
+              <Tv className="w-4 h-4 text-amber-400 animate-pulse" />
+              <span>Video diputar di Mini-Player (Pojok Layar)</span>
+            </div>
+            <button
+              onClick={scrollToPlayer}
+              className="px-3 py-1 bg-amber-500 hover:bg-amber-400 rounded-lg text-black font-bold text-[11px] transition-colors"
+            >
+              Kembali ke Layar Penuh
+            </button>
+          </div>
+        )}
+
         {/* Streaming Video Player Container */}
-        <div className="rounded-2xl overflow-hidden bg-[#0D0D14] border border-white/10 shadow-2xl">
+        <div
+          ref={playerContainerRef}
+          className={`overflow-hidden bg-[#0D0D14] transition-all duration-300 ${
+            isMini
+              ? "fixed bottom-5 right-5 z-50 w-72 sm:w-96 rounded-2xl border-2 border-amber-400/50 shadow-2xl shadow-black/80 animate-in fade-in zoom-in-95"
+              : "rounded-2xl border border-white/10 shadow-2xl"
+          }`}
+        >
           {/* Top Bar Video Controls */}
-          <div className="p-3 bg-[#13131D] border-b border-white/5 flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2 font-bold text-white">
-              <Tv className="w-4 h-4 text-amber-400" />
-              <span>
+          <div className="p-3 bg-[#13131D] border-b border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2 font-bold text-white truncate max-w-[220px]">
+              <Tv className="w-4 h-4 text-amber-400 shrink-0" />
+              <span className="truncate">
                 {animeData.title} — {currentEpisodeNumber}
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setLightsOff(!lightsOff)}
-                className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 flex items-center gap-1 transition-colors"
-              >
-                {lightsOff ? <Sun className="w-3.5 h-3.5 text-amber-300" /> : <Moon className="w-3.5 h-3.5" />}
-                <span>{lightsOff ? "Lights On" : "Lights Off"}</span>
-              </button>
-
-              <button
-                onClick={() => setSelectedEpIndex((prev) => Math.max(0, prev - 1))}
-                disabled={selectedEpIndex <= 0}
-                className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 disabled:opacity-30 flex items-center gap-1"
-              >
-                <ChevronLeft className="w-3.5 h-3.5" /> Prev
-              </button>
-
-              <button
-                onClick={() =>
-                  setSelectedEpIndex((prev) =>
-                    Math.min((animeData.episodes?.length || 1) - 1, prev + 1)
-                  )
-                }
-                disabled={selectedEpIndex >= (animeData.episodes?.length || 1) - 1}
-                className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 disabled:opacity-30 flex items-center gap-1"
-              >
-                Next <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-
-              {selectedEpIndex < (animeData.episodes?.length || 1) - 1 && (
+            {isMini ? (
+              <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   type="button"
-                  onClick={() => setShowAutoNext(true)}
-                  className="px-2 py-1 rounded bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 border border-amber-400/30 flex items-center gap-1 text-[11px] font-bold transition-colors"
-                  title="Putar episode berikutnya otomatis"
+                  onClick={scrollToPlayer}
+                  className="p-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-black font-bold transition-colors"
+                  title="Perbesar Layar"
                 >
-                  <span>⚡ Auto-Next</span>
+                  <Maximize2 className="w-3.5 h-3.5" />
                 </button>
-              )}
-            </div>
+                <button
+                  type="button"
+                  onClick={dismissMini}
+                  className="p-1.5 rounded-lg bg-white/10 hover:bg-rose-600 text-white transition-colors"
+                  title="Tutup Mini Player"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setLightsOff(!lightsOff)}
+                  className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 flex items-center gap-1 transition-colors"
+                >
+                  {lightsOff ? <Sun className="w-3.5 h-3.5 text-amber-300" /> : <Moon className="w-3.5 h-3.5" />}
+                  <span>{lightsOff ? "Lights On" : "Lights Off"}</span>
+                </button>
+
+                <button
+                  onClick={() => setSelectedEpIndex((prev) => Math.max(0, prev - 1))}
+                  disabled={selectedEpIndex <= 0}
+                  className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 disabled:opacity-30 flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" /> Prev
+                </button>
+
+                <button
+                  onClick={() =>
+                    setSelectedEpIndex((prev) =>
+                      Math.min((animeData.episodes?.length || 1) - 1, prev + 1)
+                    )
+                  }
+                  disabled={selectedEpIndex >= (animeData.episodes?.length || 1) - 1}
+                  className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 disabled:opacity-30 flex items-center gap-1"
+                >
+                  Next <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+
+                {selectedEpIndex < (animeData.episodes?.length || 1) - 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAutoNext(true)}
+                    className="px-2 py-1 rounded bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 border border-amber-400/30 flex items-center gap-1 text-[11px] font-bold transition-colors"
+                    title="Putar episode berikutnya otomatis"
+                  >
+                    <span>⚡ Auto-Next</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Video Player Display Frame (16:9) */}
@@ -310,6 +388,9 @@ function isValidEmbedUrl(url?: string): boolean {
               }}
               onCancel={() => setShowAutoNext(false)}
             />
+
+            {/* Keyboard Shortcuts Feedback Toast */}
+            <VideoShortcutToast toast={shortcutToast} />
           </div>
 
           {/* Server Selector Bar */}
