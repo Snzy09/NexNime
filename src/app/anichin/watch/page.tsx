@@ -18,6 +18,7 @@ import {
   Play,
   Maximize2,
   X,
+  PictureInPicture2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -111,8 +112,19 @@ function AnichinWatchContent() {
       ? episodes[currentEpIndex + 1]
       : null;
 
-  const { isMini, sentinelRef, scrollToPlayer, dismissMini } = useMiniPlayer();
   const playerContainerRef = useRef<HTMLDivElement>(null);
+  const {
+    isMini,
+    sentinelRef,
+    scrollToPlayer,
+    dismissMini,
+    togglePictureInPicture,
+    isPipActive,
+  } = useMiniPlayer({
+    containerRef: playerContainerRef,
+    title: stream?.title || initialTitle || "AniChin Donghua",
+    poster: detail?.poster || "",
+  });
 
   const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
     containerRef: playerContainerRef,
@@ -354,6 +366,20 @@ function AnichinWatchContent() {
                     <span>⚡ Auto-Next</span>
                   </button>
                 )}
+
+                <button
+                  type="button"
+                  onClick={togglePictureInPicture}
+                  className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                    isPipActive
+                      ? "bg-rose-500/25 border-rose-500/40 text-rose-300"
+                      : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-300"
+                  }`}
+                  title={isPipActive ? "Tutup Mini Player" : "Aktifkan Mini / Floating Player (bisa diminimize)"}
+                >
+                  <PictureInPicture2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Mini Player</span>
+                </button>
 
                 <button
                   onClick={() => {

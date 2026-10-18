@@ -24,6 +24,7 @@ import {
   Heart,
   Globe,
   Subtitles,
+  PictureInPicture2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -33,6 +34,7 @@ import { DracinItem, DracinDetail } from "@/lib/services/dracinService";
 import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
 import { saveWatchHistory, getSavedResumeTime } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
+import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 
 interface SubtitleTrack {
   language: string;
@@ -460,6 +462,15 @@ function DracinWatchContent() {
     onPrev: handlePrevEp,
   });
 
+  const { isPipActive, togglePictureInPicture } = useMiniPlayer({
+    videoRef,
+    containerRef: playerContainerRef,
+    title: `${dramaTitle} - Episode ${currentEpisodeNum}`,
+    poster: activeDrama.image || "",
+    onNext: handleNextEp,
+    onPrev: handlePrevEp,
+  });
+
   const selectedSub = subtitles.find((s) => s.language === selectedSubLang);
 
   return (
@@ -727,12 +738,27 @@ function DracinWatchContent() {
               type="button"
               onClick={toggleNativeFullscreen}
               className="w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 transition-all shadow-lg active:scale-90"
+              title="Layar Penuh"
             >
               {isNativeFullscreen ? (
                 <Minimize2 className="w-4 h-4 text-gray-200" />
               ) : (
                 <Maximize2 className="w-4 h-4 text-gray-200" />
               )}
+            </button>
+
+            {/* Picture-in-Picture (Tetap Berjalan saat Minimize App) */}
+            <button
+              type="button"
+              onClick={togglePictureInPicture}
+              className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md border border-white/10 transition-all shadow-lg active:scale-90 ${
+                isPipActive
+                  ? "bg-rose-600 text-white shadow-rose-600/40"
+                  : "bg-black/70 hover:bg-black/90 text-white"
+              }`}
+              title="Picture-in-Picture (Tetap Berjalan saat Minimize App)"
+            >
+              <PictureInPicture2 className="w-4 h-4" />
             </button>
           </div>
 
