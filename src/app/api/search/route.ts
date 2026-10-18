@@ -4,7 +4,6 @@ import { searchAnimeSail } from "@/lib/services/animesailService";
 import { searchAnimeXin } from "@/lib/services/animexinService";
 import { searchDonghua } from "@/lib/services/donghuaFilmService";
 import { searchAnime } from "@/lib/services/animeService";
-import { searchAnichin } from "@/lib/services/anichinService";
 import {
   searchFreeReels,
   searchPineDrama,
@@ -58,7 +57,6 @@ export async function GET(request: Request) {
   // Run all provider queries in parallel with timeouts and error isolation
   const [
     // Anime & Donghua
-    anichinRes,
     samehadakuRes,
     animeSailRes,
     animeXinRes,
@@ -81,7 +79,6 @@ export async function GET(request: Request) {
     // Film
     filmRes,
   ] = await Promise.all([
-    safeRun(searchAnichin(q)),
     safeRun(searchSamehadaku(q)),
     safeRun(searchAnimeSail(q)),
     safeRun(searchAnimeXin(q)),
@@ -108,27 +105,6 @@ export async function GET(request: Request) {
   // ----------------------------------------------------------------
   const animeItems: UniversalSearchItem[] = [];
   const seenAnime = new Set<string>();
-
-  (anichinRes || []).forEach((item: any) => {
-    const key = `ac-${item.slug || item.href}`;
-    if (!seenAnime.has(key) && item.title) {
-      seenAnime.add(key);
-      let cover = item.poster || item.thumb || item.thumbnail || "";
-      if (cover && !cover.startsWith("http")) {
-        cover = `https://anichin.moe/${cover.replace(/^\//, "")}`;
-      }
-      animeItems.push({
-        id: item.slug || item.href,
-        title: item.title,
-        cover,
-        href: `/anichin/watch?url=${encodeURIComponent(item.url || item.href)}&title=${encodeURIComponent(item.title)}`,
-        provider: "AniChin",
-        category: "anime",
-        badge: item.episode || item.type || "Donghua",
-        subText: item.sub || "Sub Indo",
-      });
-    }
-  });
 
   (samehadakuRes || []).forEach((item: any) => {
     const key = `smh-${item.slug}`;

@@ -98,14 +98,13 @@ export default function RegisterPage() {
 
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-300 flex items-center justify-center p-0.5 shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform shrink-0">
-            <div className="w-full h-full bg-[#0A0A0F] rounded-full flex items-center justify-center font-black text-xs tracking-tight">
-              <span className="text-amber-500">N</span>
-              <span className="text-amber-300">N</span>
-            </div>
-          </div>
+          <img
+            src="/icons/icon-192x192.png"
+            alt="NexNime Logo"
+            className="w-8 h-8 rounded-xl shadow-lg shadow-rose-600/30 group-hover:scale-105 transition-transform object-cover shrink-0"
+          />
           <span className="font-black text-xl tracking-tight leading-none">
-            <span className="text-amber-400">Nex</span>
+            <span className="text-rose-500">Nex</span>
             <span className="text-white">Nime</span>
           </span>
         </Link>
@@ -246,7 +245,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading || success}
-              className="w-full h-10 mt-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-black font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
+              className="w-full h-10 mt-3 rounded-xl bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
             >
               {loading ? (
                 <span>Mendaftarkan...</span>

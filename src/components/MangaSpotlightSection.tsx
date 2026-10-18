@@ -90,7 +90,7 @@ export default function MangaSpotlightSection({ items }: MangaSpotlightSectionPr
 
                 {/* Large Metallic Gold Rank Watermark */}
                 <div className="absolute bottom-1 left-2 z-10 flex items-baseline gap-1.5">
-                  <span className="text-3xl sm:text-4xl font-black italic tracking-tighter bg-gradient-to-b from-amber-200 via-amber-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-md">
+                  <span className="text-3xl sm:text-4xl font-black italic tracking-tighter bg-gradient-to-b from-rose-200 via-rose-500 to-red-700 bg-clip-text text-transparent drop-shadow-md">
                     #{rank}
                   </span>
                   <span className="text-[9px] font-mono text-gray-300/80 uppercase">

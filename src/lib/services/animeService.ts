@@ -11,7 +11,6 @@ if (typeof process !== "undefined") {
 
 import * as cheerio from "cheerio";
 import { REAL_SCHEDULE } from "./realDataFallback";
-import { getAnichinPopular } from "./anichinService";
 import { searchSamehadaku, getSamehadakuDetail } from "./samehadakuService";
 import {
   searchAnimeSail,
@@ -20,7 +19,6 @@ import {
 } from "./animesailService";
 
 const ANIMEINDO_BASE = "https://ww2.animeindo.pro";
-const ANICHIN_BASE = "https://anichin.moe";
 
 export interface AnimeItem {
   title: string;
@@ -310,28 +308,9 @@ export async function getAnimeHome(): Promise<AnimeItem[]> {
 }
 
 /**
- * Fetch real Donghua (Chinese Anime) directly from AniChin
+ * Fetch Donghua (Chinese Anime)
  */
 export async function getDonghuaHome(): Promise<AnimeItem[]> {
-  try {
-    const popular = await getAnichinPopular(1);
-    if (popular.length > 0) {
-      return popular.map((item) => ({
-        title: item.title.replace(/Subtitle Indonesia/gi, "").trim(),
-        url: item.url,
-        slug: item.slug,
-        poster: item.poster,
-        episode: item.episode || "Ongoing",
-        info: item.type || "Donghua",
-        rating: "9.20",
-        status: "Ongoing",
-        type: "Donghua" as const,
-        genres: ["Cultivation", "Action", "Fantasy", "Donghua"],
-      }));
-    }
-  } catch (err) {
-    console.error("getDonghuaHome error:", err);
-  }
   return [];
 }
 

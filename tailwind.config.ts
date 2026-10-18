@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import colors from "tailwindcss/colors";
 
 const config: Config = {
   content: [
@@ -11,13 +12,9 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        gold: {
-          300: "#F5DC9E",
-          400: "#ECC87B",
-          500: "#E5C07B",
-          600: "#CCA055",
-          DEFAULT: "#E5C07B",
-        },
+        amber: colors.rose,
+        yellow: colors.rose,
+        gold: colors.rose,
         surface: {
           950: "#070709",
           900: "#0C0C10",
