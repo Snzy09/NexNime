@@ -34,6 +34,7 @@ import { saveWatchHistory } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import BookmarkButton from "@/components/BookmarkButton";
 
 function DonghuaFilmWatchContent() {
   const searchParams = useSearchParams();
@@ -118,7 +119,7 @@ function DonghuaFilmWatchContent() {
     poster: detail?.poster || "",
   });
 
-  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus, skipIntro } = useVideoShortcuts({
     containerRef: playerContainerRef,
     onNext: () => {
       if (nextEp) handleSelectEpisode(nextEp.number);
@@ -392,12 +393,33 @@ function DonghuaFilmWatchContent() {
                   </button>
                 )}
 
+                <button
+                  type="button"
+                  onClick={() => skipIntro(85)}
+                  className="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 flex items-center gap-1 text-xs font-bold transition-colors"
+                  title="Lewati Lagu Opening / Intro (+85 detik)"
+                >
+                  <span>⏩ +85s</span>
+                </button>
+
                 <SleepTimerButton
                   sleepOption={sleepTimer.sleepOption}
                   formattedRemaining={sleepTimer.formattedRemaining}
                   isMenuOpen={sleepTimer.isMenuOpen}
                   onToggleMenu={sleepTimer.toggleMenu}
                   onSelectOption={sleepTimer.setTimer}
+                  accentColor="amber"
+                />
+
+                <BookmarkButton
+                  item={{
+                    id: `donghuafilm-${slug}`,
+                    title: detail?.title || "Donghua Film",
+                    category: "donghua",
+                    poster: detail?.poster || "",
+                    url: `/donghuafilm/watch?slug=${encodeURIComponent(slug)}&ep=${currentEpNum}`,
+                    totalEpisodes: detail?.episodes?.length ? `${detail.episodes.length} Ep` : undefined,
+                  }}
                   accentColor="amber"
                 />
 

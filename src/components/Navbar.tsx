@@ -21,6 +21,7 @@ import {
   LogIn,
   UserPlus,
   ChevronRight,
+  Bookmark,
 } from "lucide-react";
 
 interface NavbarProps {
@@ -81,6 +82,12 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
       match: (p: string) =>
         p.startsWith("/drakor") || p.startsWith("/oppadrama"),
     },
+    {
+      href: "/bookmark",
+      label: "Favorit",
+      icon: Bookmark,
+      match: (p: string) => p.startsWith("/bookmark"),
+    },
   ];
 
   // Detect active tab index for the 5-item mobile dock (0: Home, 1: Anime, 2: Other, 3: Jadwal, 4: Setting)
@@ -93,7 +100,8 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
     pathname.startsWith("/netshort") ||
     pathname.startsWith("/drakor") ||
     pathname.startsWith("/oppadrama") ||
-    pathname.startsWith("/novel");
+    pathname.startsWith("/novel") ||
+    pathname.startsWith("/bookmark");
 
   let activeTabIdx = 0;
   if (isSettingsOpen) {
@@ -154,6 +162,14 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
       desc: "Novel & Web Novel Terjemahan",
       href: "/novel",
       icon: BookMarked,
+      color: "text-amber-400",
+      bgColor: "bg-amber-500/10 border-amber-500/20 group-hover:border-amber-400/50",
+    },
+    {
+      title: "Favorit Saya",
+      desc: "Daftar Tontonan & Bacaan Tersimpan",
+      href: "/bookmark",
+      icon: Bookmark,
       color: "text-amber-400",
       bgColor: "bg-amber-500/10 border-amber-500/20 group-hover:border-amber-400/50",
     },
@@ -224,6 +240,20 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
                 Ctrl K
               </kbd>
             </button>
+
+            {/* Quick Bookmark Link */}
+            <Link
+              href="/bookmark"
+              className={`h-9 px-2.5 rounded-xl border flex items-center gap-1.5 text-xs font-semibold transition-all shrink-0 ${
+                pathname?.startsWith("/bookmark")
+                  ? "bg-amber-400/20 text-amber-300 border-amber-400/40"
+                  : "bg-[#12121A] hover:bg-[#181824] border-white/10 text-gray-300 hover:text-white"
+              }`}
+              title="Buka Favorit Saya"
+            >
+              <Bookmark className={`w-3.5 h-3.5 ${pathname?.startsWith("/bookmark") ? "fill-amber-400 text-amber-400" : "text-amber-400"}`} />
+              <span className="hidden sm:inline">Favorit</span>
+            </Link>
 
             {/* Desktop User Auth Buttons */}
             <div className="hidden sm:flex items-center gap-1.5 shrink-0">

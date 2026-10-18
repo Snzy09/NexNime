@@ -25,6 +25,7 @@ import {
 import { REAL_DRAKOR_TRENDING } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import BookmarkButton from "@/components/BookmarkButton";
 import { saveWatchHistory, getSavedResumeTime } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
@@ -151,7 +152,7 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
     onPrev: () => setCurrentEpisode((prev) => Math.max(1, prev - 1)),
   });
 
-  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus, skipIntro } = useVideoShortcuts({
     videoRef,
     containerRef: playerContainerRef,
     onNext: () => setCurrentEpisode((prev) => Math.min(episodes.length, prev + 1)),
@@ -288,12 +289,33 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                   </button>
                 )}
 
+                <button
+                  type="button"
+                  onClick={() => skipIntro(85)}
+                  className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 flex items-center gap-1 text-[11px] font-bold transition-colors"
+                  title="Lewati Lagu Opening / Intro (+85 detik)"
+                >
+                  <span>⏩ +85s</span>
+                </button>
+
                 <SleepTimerButton
                   sleepOption={sleepTimer.sleepOption}
                   formattedRemaining={sleepTimer.formattedRemaining}
                   isMenuOpen={sleepTimer.isMenuOpen}
                   onToggleMenu={sleepTimer.toggleMenu}
                   onSelectOption={sleepTimer.setTimer}
+                  accentColor="blue"
+                />
+
+                <BookmarkButton
+                  item={{
+                    id: `drakor-${params.slug}`,
+                    title: currentDrama.title,
+                    category: "drakor",
+                    poster: currentDrama.poster || "",
+                    url: `/drakor/${params.slug}`,
+                    totalEpisodes: episodes.length ? `${episodes.length} Ep` : undefined,
+                  }}
                   accentColor="blue"
                 />
               </div>

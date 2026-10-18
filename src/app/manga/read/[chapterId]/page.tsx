@@ -22,6 +22,7 @@ import {
   List,
 } from "lucide-react";
 import { CREATOR, SALURAN } from "@/lib/services/mangaTypes";
+import BookmarkButton from "@/components/BookmarkButton";
 
 export default function MangaReaderPage({ params }: { params?: { chapterId?: string } }) {
   const routeParams = useParams();
@@ -35,6 +36,27 @@ export default function MangaReaderPage({ params }: { params?: { chapterId?: str
   const [progress, setProgress] = useState<number>(0);
   const [chapterData, setChapterData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Manga reader layout mode: continuous webtoon vs paged flip
+  const [readMode, setReadMode] = useState<"webtoon" | "paged">("webtoon");
+  const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
+
+  // Restore saved read mode
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("nexnime_manga_read_mode");
+      if (saved === "webtoon" || saved === "paged") {
+        setReadMode(saved);
+      }
+    } catch {}
+  }, []);
+
+  const handleToggleReadMode = (mode: "webtoon" | "paged") => {
+    setReadMode(mode);
+    try {
+      localStorage.setItem("nexnime_manga_read_mode", mode);
+    } catch {}
+  };
 
   // Adjacent chapters & dropdown state
   const [allChapters, setAllChapters] = useState<any[]>([]);
@@ -160,6 +182,45 @@ export default function MangaReaderPage({ params }: { params?: { chapterId?: str
       : chapterData.images.hq
     : [];
 
+  // Reset page index when chapter changes
+  useEffect(() => {
+    setCurrentPageIndex(0);
+  }, [activeChapterId]);
+
+  // Keyboard navigation for Paged mode
+  useEffect(() => {
+    if (readMode !== "paged") return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+        e.preventDefault();
+        setCurrentPageIndex((prev) => Math.max(0, prev - 1));
+      } else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+        e.preventDefault();
+        setCurrentPageIndex((prev) =>
+          images.length > 0 ? Math.min(images.length - 1, prev + 1) : 0
+        );
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [readMode, images.length]);
+
+  const effectiveProgress =
+    readMode === "paged"
+      ? images.length > 1
+        ? (currentPageIndex / (images.length - 1)) * 100
+        : 100
+      : progress;
+
   const handleCopyAll = (urls: string[]) => {
     if (!urls || urls.length === 0) return;
     navigator.clipboard.writeText(urls.join("\n"));
@@ -173,7 +234,7 @@ export default function MangaReaderPage({ params }: { params?: { chapterId?: str
       <div className="fixed top-0 left-0 right-0 h-1 bg-white/10 z-50">
         <div
           className="h-full bg-gradient-to-r from-emerald-400 to-amber-400 transition-all duration-150"
-          style={{ width: `${progress}%` }}
+          style={{ width: `${effectiveProgress}%` }}
         />
       </div>
 
@@ -266,8 +327,50 @@ export default function MangaReaderPage({ params }: { params?: { chapterId?: str
               )}
             </div>
 
-            {/* Right: Quality, Download & Hide controls */}
+            {/* Right: Mode Switcher, Bookmark, Quality, Download & Hide controls */}
             <div className="flex items-center gap-1.5 shrink-0">
+              {/* Mode Switcher: Webtoon vs Paged */}
+              <div className="flex items-center bg-[#14141E] p-0.5 rounded-xl border border-white/5 text-[11px] font-bold">
+                <button
+                  type="button"
+                  onClick={() => handleToggleReadMode("webtoon")}
+                  className={`px-2 py-1 rounded-lg transition-colors ${
+                    readMode === "webtoon"
+                      ? "bg-emerald-400 text-black font-extrabold shadow-sm"
+                      : "text-gray-300 hover:text-white"
+                  }`}
+                  title="Mode Webtoon (Scroll Vertikal)"
+                >
+                  ↕ Webtoon
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleToggleReadMode("paged")}
+                  className={`px-2 py-1 rounded-lg transition-colors ${
+                    readMode === "paged"
+                      ? "bg-emerald-400 text-black font-extrabold shadow-sm"
+                      : "text-gray-300 hover:text-white"
+                  }`}
+                  title="Mode Paged (Flip / Per Halaman)"
+                >
+                  📖 Paged
+                </button>
+              </div>
+
+              {chapterData?.mangaId && (
+                <BookmarkButton
+                  item={{
+                    id: `manga-${chapterData.mangaId}`,
+                    title: chapterData.mangaTitle || "Manga",
+                    category: "manga",
+                    poster: "",
+                    url: `/manga/${chapterData.mangaId}`,
+                    totalEpisodes: chapterData.chapter ? `Ch. ${chapterData.chapter}` : undefined,
+                  }}
+                  accentColor="emerald"
+                />
+              )}
+
               <button
                 onClick={() => setUseDataSaver(!useDataSaver)}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors ${
@@ -300,10 +403,14 @@ export default function MangaReaderPage({ params }: { params?: { chapterId?: str
         </div>
       </header>
 
-      {/* Center Manga Webtoon Image Strip */}
+      {/* Center Manga Webtoon Image Strip / Paged View */}
       <main
         ref={containerRef}
-        onClick={() => setShowControls(!showControls)}
+        onClick={() => {
+          if (readMode === "webtoon") {
+            setShowControls(!showControls);
+          }
+        }}
         className="flex-1 flex flex-col items-center justify-center pt-16 pb-28 px-2 sm:px-4 cursor-pointer select-none"
       >
         {loading ? (
@@ -334,7 +441,7 @@ export default function MangaReaderPage({ params }: { params?: { chapterId?: str
               Kembali ke Daftar Chapter
             </Link>
           </div>
-        ) : (
+        ) : readMode === "webtoon" ? (
           <div
             className="w-full max-w-2xl transition-transform duration-200 flex flex-col items-center"
             style={{
@@ -389,6 +496,124 @@ export default function MangaReaderPage({ params }: { params?: { chapterId?: str
               </div>
             </div>
           </div>
+        ) : (
+          /* Paged Mode (Single Page Flip/Tap View) */
+          <div className="w-full max-w-3xl flex flex-col items-center">
+            <div
+              className="relative w-full min-h-[60vh] max-h-[82vh] flex items-center justify-center bg-[#0F0F14] rounded-2xl overflow-hidden border border-white/10 shadow-2xl transition-transform duration-200"
+              style={{
+                transform: `scale(${zoomLevel / 100})`,
+                transformOrigin: "center center",
+              }}
+            >
+              {images[currentPageIndex] && (
+                <img
+                  src={
+                    images[currentPageIndex].url?.startsWith("/api/manga")
+                      ? images[currentPageIndex].url
+                      : `/api/manga?action=image&url=${encodeURIComponent(images[currentPageIndex].url)}`
+                  }
+                  alt={`Halaman ${currentPageIndex + 1}`}
+                  className="max-h-[82vh] w-auto max-w-full object-contain mx-auto select-none pointer-events-none"
+                  referrerPolicy="no-referrer"
+                />
+              )}
+
+              {/* Tap Zones: Left 30% (Prev), Middle 40% (Toggle controls), Right 30% (Next) */}
+              <div className="absolute inset-0 flex z-10">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentPageIndex((prev) => Math.max(0, prev - 1));
+                  }}
+                  className="w-[30%] h-full cursor-w-resize flex items-center justify-start pl-3 text-transparent hover:text-white/60 transition-colors"
+                  title="Halaman Sebelumnya (←)"
+                >
+                  <ChevronLeft className="w-8 h-8 drop-shadow-md" />
+                </button>
+
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowControls((prev) => !prev);
+                  }}
+                  className="w-[40%] h-full cursor-pointer"
+                  title="Tampilkan / Sembunyikan Kontrol"
+                />
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentPageIndex((prev) => Math.min(images.length - 1, prev + 1));
+                  }}
+                  className="w-[30%] h-full cursor-e-resize flex items-center justify-end pr-3 text-transparent hover:text-white/60 transition-colors"
+                  title="Halaman Berikutnya (→)"
+                >
+                  <ChevronRight className="w-8 h-8 drop-shadow-md" />
+                </button>
+              </div>
+
+              {/* Page Indicator Badge */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-xs font-mono text-emerald-300 pointer-events-none z-20">
+                Hal. {currentPageIndex + 1} / {images.length}
+              </div>
+            </div>
+
+            {/* Page Navigation Strip */}
+            <div className="w-full mt-4 flex flex-wrap items-center justify-between gap-3 bg-[#13131D] border border-white/10 p-3 rounded-2xl">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentPageIndex((prev) => Math.max(0, prev - 1));
+                  }}
+                  disabled={currentPageIndex === 0}
+                  className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 text-xs font-bold text-gray-200 flex items-center gap-1 transition-colors"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" /> Prev
+                </button>
+                <span className="text-xs font-mono font-bold text-emerald-400">
+                  {currentPageIndex + 1} / {images.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentPageIndex((prev) => Math.min(images.length - 1, prev + 1));
+                  }}
+                  disabled={currentPageIndex >= images.length - 1}
+                  className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 text-xs font-bold text-gray-200 flex items-center gap-1 transition-colors"
+                >
+                  Next <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <div className="flex-1 max-w-xs mx-2 min-w-[140px]">
+                <input
+                  type="range"
+                  min={0}
+                  max={Math.max(0, images.length - 1)}
+                  value={currentPageIndex}
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={(e) => setCurrentPageIndex(Number(e.target.value))}
+                  className="w-full accent-emerald-400 cursor-pointer"
+                />
+              </div>
+
+              {currentPageIndex >= images.length - 1 && nextChapter && (
+                <Link
+                  href={`/manga/read/${nextChapter.id}`}
+                  className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-500 text-black text-xs font-bold flex items-center gap-1 transition-transform hover:scale-105"
+                >
+                  <span>Lanjut Ch. {nextChapter.chapter}</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              )}
+            </div>
+          </div>
         )}
       </main>
 
@@ -400,75 +625,123 @@ export default function MangaReaderPage({ params }: { params?: { chapterId?: str
       >
         <div className="max-w-lg mx-auto px-4">
           <div className="glass-nav rounded-2xl p-3 shadow-2xl border border-white/10 flex flex-col gap-2">
-            {/* Top Toolbar Row: Auto-Scroll Engine & Prev/Next */}
+            {/* Top Toolbar Row: Auto-Scroll or Page Stepper */}
             <div className="flex items-center justify-between pb-2 border-b border-white/5">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setIsAutoScrolling(!isAutoScrolling)}
-                  className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-md ${
-                    isAutoScrolling
-                      ? "bg-amber-400 text-black shadow-amber-400/20"
-                      : "bg-emerald-500 text-black shadow-emerald-500/20 hover:bg-emerald-400"
-                  }`}
-                >
-                  {isAutoScrolling ? (
-                    <Pause className="w-3.5 h-3.5 fill-black" />
-                  ) : (
-                    <Play className="w-3.5 h-3.5 fill-black" />
-                  )}
-                  <span>{isAutoScrolling ? "Jeda" : "Auto Scroll"}</span>
-                </button>
-
-                {/* Speed Presets: 1x, 2x, 3x */}
-                <div className="flex items-center bg-[#151520] p-0.5 rounded-lg border border-white/5 text-[11px] font-bold">
-                  {([1, 2, 3] as const).map((s) => (
+              {readMode === "webtoon" ? (
+                <>
+                  <div className="flex items-center gap-2">
                     <button
-                      key={s}
-                      onClick={() => {
-                        setScrollSpeed(s);
-                        setIsAutoScrolling(true);
-                      }}
-                      className={`px-2.5 py-1 rounded transition-colors ${
-                        scrollSpeed === s
-                          ? "bg-amber-400 text-black font-extrabold"
-                          : "text-gray-400 hover:text-white"
+                      onClick={() => setIsAutoScrolling(!isAutoScrolling)}
+                      className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-md ${
+                        isAutoScrolling
+                          ? "bg-amber-400 text-black shadow-amber-400/20"
+                          : "bg-emerald-500 text-black shadow-emerald-500/20 hover:bg-emerald-400"
                       }`}
                     >
-                      {s}x
+                      {isAutoScrolling ? (
+                        <Pause className="w-3.5 h-3.5 fill-black" />
+                      ) : (
+                        <Play className="w-3.5 h-3.5 fill-black" />
+                      )}
+                      <span>{isAutoScrolling ? "Jeda" : "Auto Scroll"}</span>
                     </button>
-                  ))}
-                </div>
-              </div>
 
-              {/* Prev / Next mobile shortcuts */}
-              <div className="flex items-center gap-1">
-                {prevChapter && (
-                  <Link
-                    href={`/manga/read/${prevChapter.id}`}
-                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300"
-                    title="Chapter Sebelumnya"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </Link>
-                )}
-                {nextChapter && (
-                  <Link
-                    href={`/manga/read/${nextChapter.id}`}
-                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300"
-                    title="Chapter Selanjutnya"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Link>
-                )}
-                {/* Scroll to Top */}
-                <button
-                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 ml-1"
-                  title="Kembali ke atas"
-                >
-                  <ArrowUp className="w-4 h-4" />
-                </button>
-              </div>
+                    {/* Speed Presets: 1x, 2x, 3x */}
+                    <div className="flex items-center bg-[#151520] p-0.5 rounded-lg border border-white/5 text-[11px] font-bold">
+                      {([1, 2, 3] as const).map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => {
+                            setScrollSpeed(s);
+                            setIsAutoScrolling(true);
+                          }}
+                          className={`px-2.5 py-1 rounded transition-colors ${
+                            scrollSpeed === s
+                              ? "bg-amber-400 text-black font-extrabold"
+                              : "text-gray-400 hover:text-white"
+                          }`}
+                        >
+                          {s}x
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Prev / Next mobile shortcuts */}
+                  <div className="flex items-center gap-1">
+                    {prevChapter && (
+                      <Link
+                        href={`/manga/read/${prevChapter.id}`}
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300"
+                        title="Chapter Sebelumnya"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </Link>
+                    )}
+                    {nextChapter && (
+                      <Link
+                        href={`/manga/read/${nextChapter.id}`}
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300"
+                        title="Chapter Selanjutnya"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                      className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 ml-1"
+                      title="Kembali ke atas"
+                    >
+                      <ArrowUp className="w-4 h-4" />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setCurrentPageIndex((prev) => Math.max(0, prev - 1))}
+                      disabled={currentPageIndex === 0}
+                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 text-xs font-bold text-gray-200 flex items-center gap-1"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Prev</span>
+                    </button>
+                    <span className="font-mono text-xs font-bold text-emerald-400 px-1">
+                      {currentPageIndex + 1} / {images.length}
+                    </span>
+                    <button
+                      onClick={() => setCurrentPageIndex((prev) => Math.min(images.length - 1, prev + 1))}
+                      disabled={currentPageIndex >= images.length - 1}
+                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 text-xs font-bold text-gray-200 flex items-center gap-1"
+                    >
+                      <span>Next</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    {prevChapter && (
+                      <Link
+                        href={`/manga/read/${prevChapter.id}`}
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300"
+                        title="Chapter Sebelumnya"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </Link>
+                    )}
+                    {nextChapter && (
+                      <Link
+                        href={`/manga/read/${nextChapter.id}`}
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300"
+                        title="Chapter Selanjutnya"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Bottom Toolbar Row: Zoom Controls (Mobile & Desktop) */}
@@ -505,7 +778,7 @@ export default function MangaReaderPage({ params }: { params?: { chapterId?: str
 
               {/* Progress percentage */}
               <div className="font-mono text-[11px] text-gray-400">
-                {Math.round(progress)}%
+                {Math.round(effectiveProgress)}%
               </div>
             </div>
           </div>

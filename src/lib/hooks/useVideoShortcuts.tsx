@@ -214,6 +214,17 @@ export function useVideoShortcuts({
         onPrev();
         showToast({ text: "Episode Sebelumnya", type: "episode" });
       }
+
+      // 10. Skip Intro / Opening (+85s): S
+      else if (key === "s" || key === "S") {
+        e.preventDefault();
+        const video = videoRef?.current;
+        if (video) {
+          const dur = video.duration || 0;
+          video.currentTime = dur > 0 ? Math.min(dur, video.currentTime + 85) : video.currentTime + 85;
+        }
+        showToast({ text: "⏩ Lewati Intro (+85s)", type: "seek_fwd" });
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -229,7 +240,16 @@ export function useVideoShortcuts({
     showToast,
   ]);
 
-  return { toast, isIframeFocused, refocus };
+  const skipIntro = useCallback((seconds = 85) => {
+    const video = videoRef?.current;
+    if (video) {
+      const dur = video.duration || 0;
+      video.currentTime = dur > 0 ? Math.min(dur, video.currentTime + seconds) : video.currentTime + seconds;
+    }
+    showToast({ text: `⏩ Lewati Intro (+${seconds}s)`, type: "seek_fwd" });
+  }, [videoRef, showToast]);
+
+  return { toast, isIframeFocused, refocus, skipIntro };
 }
 
 export function VideoShortcutToast({

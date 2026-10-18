@@ -24,6 +24,7 @@ import {
 import { REAL_ANIME_POPULAR } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import BookmarkButton from "@/components/BookmarkButton";
 import { saveWatchHistory } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
@@ -198,7 +199,7 @@ function isValidEmbedUrl(url?: string): boolean {
     onPrev: () => setSelectedEpIndex((prev) => Math.max(0, prev - 1)),
   });
 
-  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus, skipIntro } = useVideoShortcuts({
     containerRef: playerContainerRef,
     onNext: () =>
       setSelectedEpIndex((prev) =>
@@ -365,12 +366,33 @@ function isValidEmbedUrl(url?: string): boolean {
                   </button>
                 )}
 
+                <button
+                  type="button"
+                  onClick={() => skipIntro(85)}
+                  className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 flex items-center gap-1 text-[11px] font-bold transition-colors"
+                  title="Lewati Lagu Opening / Intro (+85 detik)"
+                >
+                  <span>⏩ +85s</span>
+                </button>
+
                 <SleepTimerButton
                   sleepOption={sleepTimer.sleepOption}
                   formattedRemaining={sleepTimer.formattedRemaining}
                   isMenuOpen={sleepTimer.isMenuOpen}
                   onToggleMenu={sleepTimer.toggleMenu}
                   onSelectOption={sleepTimer.setTimer}
+                  accentColor="amber"
+                />
+
+                <BookmarkButton
+                  item={{
+                    id: `anime-${params.slug}`,
+                    title: animeData.title,
+                    category: "anime",
+                    poster: animeData.poster || "",
+                    url: `/anime/${params.slug}`,
+                    totalEpisodes: animeData.total_episode ? `${animeData.total_episode} Ep` : undefined,
+                  }}
                   accentColor="amber"
                 />
               </div>
