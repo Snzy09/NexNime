@@ -102,3 +102,38 @@ export function clearWatchHistory(): void {
     console.error("Failed to clear watch history:", err);
   }
 }
+
+export function importWatchHistory(incoming: WatchHistoryItem[]): boolean {
+  if (typeof window === "undefined" || !Array.isArray(incoming)) return false;
+  try {
+    const current = getWatchHistory();
+    const map = new Map<string, WatchHistoryItem>();
+
+    for (const item of current) {
+      if (item && item.id) map.set(item.id, item);
+    }
+
+    for (const item of incoming) {
+      if (!item || !item.id || !item.title) continue;
+      const existing = map.get(item.id);
+      if (!existing || (item.updatedAt || 0) > (existing.updatedAt || 0)) {
+        map.set(item.id, item);
+      }
+    }
+
+    const merged = Array.from(map.values())
+      .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
+      .slice(0, MAX_HISTORY_ITEMS);
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+    return true;
+  } catch (err) {
+    console.error("Failed to import watch history:", err);
+    return false;
+  }
+}
+
+export function exportWatchHistoryJSON(): string {
+  return JSON.stringify(getWatchHistory(), null, 2);
+}
+

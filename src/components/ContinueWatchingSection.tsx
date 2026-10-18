@@ -2,13 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Play, X, Clock, Trash2, ChevronRight } from "lucide-react";
+import { Play, X, Clock, Trash2, ChevronRight, Share2 } from "lucide-react";
 import {
   WatchHistoryItem,
   getWatchHistory,
   removeWatchHistory,
   clearWatchHistory,
+  importWatchHistory,
 } from "@/lib/services/watchHistory";
+import SyncHistoryModal from "@/components/SyncHistoryModal";
 
 function formatDuration(sec: number): string {
   if (!sec || isNaN(sec)) return "00:00";
@@ -20,10 +22,29 @@ function formatDuration(sec: number): string {
 export default function ContinueWatchingSection() {
   const [history, setHistory] = useState<WatchHistoryItem[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     setHistory(getWatchHistory());
+
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const syncCode = params.get("sync");
+      if (syncCode && syncCode.length >= 6) {
+        fetch(`/api/sync-history?code=${encodeURIComponent(syncCode)}`)
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.success && Array.isArray(data.history)) {
+              importWatchHistory(data.history);
+              setHistory(getWatchHistory());
+              const cleanUrl = window.location.pathname;
+              window.history.replaceState({}, "", cleanUrl);
+            }
+          })
+          .catch(() => {});
+      }
+    }
   }, []);
 
   if (!mounted || history.length === 0) return null;
@@ -70,14 +91,25 @@ export default function ContinueWatchingSection() {
           </div>
         </div>
 
-        <button
-          onClick={handleClearAll}
-          className="text-[11px] text-gray-400 hover:text-rose-400 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg hover:bg-white/5"
-          title="Hapus riwayat tontonan"
-        >
-          <Trash2 className="w-3 h-3" />
-          <span className="hidden sm:inline">Bersihkan</span>
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setIsSyncModalOpen(true)}
+            className="text-[11px] text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg"
+            title="Sinkronisasi riwayat ke HP atau perangkat lain"
+          >
+            <Share2 className="w-3 h-3 text-cyan-400" />
+            <span className="hidden xs:inline">Sinkronisasi</span>
+          </button>
+
+          <button
+            onClick={handleClearAll}
+            className="text-[11px] text-gray-400 hover:text-rose-400 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg hover:bg-white/5"
+            title="Hapus riwayat tontonan"
+          >
+            <Trash2 className="w-3 h-3" />
+            <span className="hidden sm:inline">Bersihkan</span>
+          </button>
+        </div>
       </div>
 
       {/* Horizontal Carousel */}
@@ -171,6 +203,13 @@ export default function ContinueWatchingSection() {
           );
         })}
       </div>
+
+      {/* Sync History Modal */}
+      <SyncHistoryModal
+        isOpen={isSyncModalOpen}
+        onClose={() => setIsSyncModalOpen(false)}
+        onSyncSuccess={() => setHistory(getWatchHistory())}
+      />
     </section>
   );
 }

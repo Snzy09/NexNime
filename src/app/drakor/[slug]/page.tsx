@@ -134,7 +134,7 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
   const { isMini, sentinelRef, scrollToPlayer, dismissMini } = useMiniPlayer();
   const playerContainerRef = useRef<HTMLDivElement>(null);
 
-  const { toast: shortcutToast } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
     videoRef,
     containerRef: playerContainerRef,
     onNext: () => setCurrentEpisode((prev) => Math.min(episodes.length, prev + 1)),
@@ -312,8 +312,12 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
               onCancel={() => setShowAutoNext(false)}
             />
 
-            {/* Keyboard Shortcuts Toast */}
-            <VideoShortcutToast toast={shortcutToast} />
+            {/* Keyboard Shortcuts Toast & Iframe Focus Recovery */}
+            <VideoShortcutToast
+              toast={shortcutToast}
+              isIframeFocused={isIframeFocused}
+              onRefocus={refocus}
+            />
           </div>
 
           {/* Server Selector Bar */}
