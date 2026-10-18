@@ -163,15 +163,17 @@ function AnimeSailWatchContent() {
             >
               {streamSrc ? (
                 <div className="relative aspect-video w-full bg-black">
-                  <iframe
-                    key={streamSrc}
-                    src={streamSrc}
-                    title={episodeData.title}
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                    className="w-full h-full border-0"
-                  />
+                  {!sleepTimer.isSleeping ? (
+                    <iframe
+                      key={streamSrc}
+                      src={streamSrc}
+                      title={episodeData.title}
+                      allowFullScreen
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                      sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                      className="w-full h-full border-0"
+                    />
+                  ) : null}
                   <SleepTimerOverlay
                     show={sleepTimer.isSleeping}
                     onWakeUp={sleepTimer.wakeUp}

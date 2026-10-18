@@ -324,15 +324,17 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                 }}
               />
             ) : playerUrl ? (
-              <iframe
-                src={playerUrl}
-                title={`Nonton ${currentDrama.title} Episode ${currentEpisode}`}
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                referrerPolicy="no-referrer"
-                className="w-full h-full border-0"
-              />
+              !sleepTimer.isSleeping ? (
+                <iframe
+                  src={playerUrl}
+                  title={`Nonton ${currentDrama.title} Episode ${currentEpisode}`}
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full border-0"
+                />
+              ) : null
             ) : (
               <div className="text-center p-6 text-gray-400 text-xs">
                 Gagal memuat player video. Silakan pilih episode atau server lain.

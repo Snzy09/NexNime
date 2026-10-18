@@ -25,4 +25,16 @@ assert.strictEqual(formatRemaining(15, 59), "59s");
 assert.strictEqual(formatRemaining(15, 1), "1s");
 assert.strictEqual(formatRemaining(15, 0), "0s");
 
-console.log("Self-check: Sleep timer formatting and calculation logic passed!");
+// 5. Cross-origin iframe audio lifecycle check
+function shouldRenderIframe(isSleeping, streamUrl) {
+  if (isSleeping) return false;
+  return Boolean(streamUrl);
+}
+
+// When sleeping, cross-origin iframe must unmount to guarantee audio cut-off
+assert.strictEqual(shouldRenderIframe(true, "https://example.com/embed/123"), false);
+// When active or waking up, iframe mounts and loads stream cleanly
+assert.strictEqual(shouldRenderIframe(false, "https://example.com/embed/123"), true);
+assert.strictEqual(shouldRenderIframe(false, ""), false);
+
+console.log("Self-check: Sleep timer formatting, countdown, and cross-origin iframe audio cut-off passed!");

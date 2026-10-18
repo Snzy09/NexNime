@@ -31,6 +31,28 @@ export function useSleepTimer(options?: UseSleepTimerOptions) {
       } catch {}
     }
 
+    // Safety fallback: pause any HTML5 videos and broadcast pause commands to iframes
+    if (typeof document !== "undefined") {
+      try {
+        document.querySelectorAll("video").forEach((v) => {
+          try {
+            v.pause();
+          } catch {}
+        });
+      } catch {}
+
+      try {
+        document.querySelectorAll("iframe").forEach((ifr) => {
+          try {
+            ifr.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+            ifr.contentWindow?.postMessage(JSON.stringify({ method: "pause" }), "*");
+            ifr.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "pauseVideo" }), "*");
+            ifr.contentWindow?.postMessage("pause", "*");
+          } catch {}
+        });
+      } catch {}
+    }
+
     // Exit Picture-in-Picture if active
     if (typeof document !== "undefined" && document.pictureInPictureElement) {
       document.exitPictureInPicture().catch(() => {});

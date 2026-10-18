@@ -148,13 +148,15 @@ function AnimeXinWatchContent() {
                 className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl shadow-cyan-950/30"
               >
                 {streamSrc ? (
-                  <iframe
-                    src={streamSrc}
-                    allowFullScreen
-                    className="w-full h-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                  />
+                  !sleepTimer.isSleeping ? (
+                    <iframe
+                      src={streamSrc}
+                      allowFullScreen
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                      sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                    />
+                  ) : null
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-black/90">
                     <AlertCircle className="w-10 h-10 text-amber-400 mb-2" />

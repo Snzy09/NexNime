@@ -257,22 +257,24 @@ function DonghuaFilmWatchContent() {
                   controls
                   autoPlay
                   playsInline
-                  className="w-full h-full object-contain"
                   onEnded={() => {
-                    if (nextEp) {
+                    const slept = sleepTimer.notifyEpisodeEnded();
+                    if (!slept && nextEp) {
                       setShowAutoNext(true);
                     }
                   }}
                 />
               ) : currentEpisode?.embed_src ? (
-                <iframe
-                  src={currentEpisode.embed_src}
-                  title={`${detail.title} - Episode ${currentEpNum}`}
-                  className="w-full h-full border-0"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                />
+                !sleepTimer.isSleeping ? (
+                  <iframe
+                    src={currentEpisode.embed_src}
+                    title={`${detail.title} - Episode ${currentEpNum}`}
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                  />
+                ) : null
               ) : currentEpisode?.stream_url ? (
                 <video
                   src={currentEpisode.stream_url}
@@ -281,7 +283,8 @@ function DonghuaFilmWatchContent() {
                   playsInline
                   className="w-full h-full object-contain"
                   onEnded={() => {
-                    if (nextEp) {
+                    const slept = sleepTimer.notifyEpisodeEnded();
+                    if (!slept && nextEp) {
                       setShowAutoNext(true);
                     }
                   }}

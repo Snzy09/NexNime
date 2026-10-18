@@ -318,14 +318,16 @@ function AnichinWatchContent() {
               )}
 
               {streamSrc ? (
-                <iframe
-                  key={streamSrc}
-                  src={streamSrc}
-                  className="w-full h-full border-0"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                />
+                !sleepTimer.isSleeping ? (
+                  <iframe
+                    key={streamSrc}
+                    src={streamSrc}
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                  />
+                ) : null
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 p-6 text-center">
                   <AlertCircle className="w-10 h-10 text-rose-400 mb-2" />

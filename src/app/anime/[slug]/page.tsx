@@ -385,14 +385,16 @@ function isValidEmbedUrl(url?: string): boolean {
                 <span className="text-sm font-semibold tracking-wide">Menyiapkan streaming video...</span>
               </div>
             ) : servers.length > 0 && isValidEmbedUrl(servers[selectedServer]?.url) ? (
-              <iframe
-                src={servers[selectedServer].url}
-                title={`Streaming ${animeData.title} ${currentEpisodeNumber}`}
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                className="w-full h-full border-0"
-              />
+              !sleepTimer.isSleeping ? (
+                <iframe
+                  src={servers[selectedServer].url}
+                  title={`Streaming ${animeData.title} ${currentEpisodeNumber}`}
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                  className="w-full h-full border-0"
+                />
+              ) : null
             ) : (
               <div className="flex flex-col items-center gap-3 p-6 text-center">
                 <Tv className="w-10 h-10 text-amber-400/60" />

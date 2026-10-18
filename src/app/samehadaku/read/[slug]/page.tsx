@@ -157,18 +157,22 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
               className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl"
             >
               {activeServer?.url ? (
-                <iframe
-                  src={activeServer.url}
-                  className="w-full h-full border-0"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                />
+                !sleepTimer.isSleeping ? (
+                  <iframe
+                    src={activeServer.url}
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                  />
+                ) : null
               ) : activeServer?.embed ? (
-                <div
-                  dangerouslySetInnerHTML={{ __html: activeServer.embed }}
-                  className="w-full h-full flex items-center justify-center"
-                />
+                !sleepTimer.isSleeping ? (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: activeServer.embed }}
+                    className="w-full h-full flex items-center justify-center"
+                  />
+                ) : null
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-3">
                   <Play className="w-12 h-12 text-amber-400" />
