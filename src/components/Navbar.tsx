@@ -181,14 +181,13 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
           {/* Left: Brand Logo & Desktop Navigation */}
           <div className="flex items-center gap-3 lg:gap-5 shrink-0">
             <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-300 p-0.5 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform shrink-0">
-                <div className="w-full h-full bg-[#0B0B10] rounded-full flex items-center justify-center font-black text-xs sm:text-sm tracking-tight">
-                  <span className="text-amber-500">N</span>
-                  <span className="text-amber-300">N</span>
-                </div>
-              </div>
+              <img
+                src="/icons/icon-192x192.png"
+                alt="NexNime Logo"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shadow-lg shadow-rose-600/30 group-hover:scale-105 transition-transform object-cover shrink-0"
+              />
               <span className="font-black text-lg sm:text-xl tracking-tight leading-none group-hover:opacity-90 transition-opacity">
-                <span className="text-amber-400">Nex</span>
+                <span className="text-rose-500">Nex</span>
                 <span className="text-white">Nime</span>
               </span>
             </Link>
@@ -346,16 +345,16 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
                 }}
                 className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full p-0.5 transition-all duration-300 shadow-md ${
                   isOtherOpen || isOtherActive
-                    ? "bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 shadow-amber-500/40 scale-105 ring-2 ring-[#0C0C14]"
-                    : "bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-200 shadow-amber-500/25 hover:scale-105 active:scale-95 ring-2 ring-[#0C0C14]"
+                    ? "bg-gradient-to-tr from-rose-500 via-rose-400 to-red-500 shadow-rose-500/40 scale-105 ring-2 ring-[#0C0C14]"
+                    : "bg-gradient-to-tr from-rose-600 via-rose-500 to-rose-400 shadow-rose-500/25 hover:scale-105 active:scale-95 ring-2 ring-[#0C0C14]"
                 }`}
                 aria-label="Kategori Lainnya (Other)"
               >
                 <div
                   className={`w-full h-full rounded-full flex items-center justify-center transition-all ${
                     isOtherOpen || isOtherActive
-                      ? "bg-gradient-to-tr from-amber-400 to-yellow-300 text-black shadow-inner"
-                      : "bg-[#11111A] text-amber-400 group-hover:text-amber-300"
+                      ? "bg-gradient-to-tr from-rose-500 to-red-600 text-white shadow-inner"
+                      : "bg-[#11111A] text-rose-400 group-hover:text-rose-300"
                   }`}
                 >
                   <Sparkles
@@ -438,9 +437,9 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 to-yellow-300 p-0.5 shadow-md shadow-amber-500/20">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 to-red-500 p-0.5 shadow-md shadow-rose-500/20">
                   <div className="w-full h-full bg-[#0E0E16] rounded-[10px] flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <Sparkles className="w-4 h-4 text-rose-400" />
                   </div>
                 </div>
                 <div>

@@ -198,9 +198,9 @@ export default function SamehadakuDetailPage({ params }: { params: { slug: strin
                     {episodes.length > 0 && (
                       <Link
                         href={`/samehadaku/watch/${episodes[0].slug || episodes[0].episode}?url=${encodeURIComponent(episodes[0].url)}&animeTitle=${encodeURIComponent(detail.title)}`}
-                        className="px-6 py-2.5 rounded-full font-bold text-xs sm:text-sm text-black bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:scale-105 transition-transform flex items-center gap-2 shadow-lg shadow-amber-500/20"
+                        className="px-6 py-2.5 rounded-full font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:from-rose-500 hover:to-red-500 hover:scale-105 transition-transform flex items-center gap-2 shadow-lg shadow-rose-600/30"
                       >
-                        <Play className="w-4 h-4 fill-black" />
+                        <Play className="w-4 h-4 fill-white" />
                         <span>Tonton Episode Terbaru</span>
                       </Link>
                     )}

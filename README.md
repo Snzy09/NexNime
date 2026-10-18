@@ -37,7 +37,7 @@ NexNime adalah platform hiburan digital terpadu modern yang menggabungkan stream
 ## 🛠️ Tech Stack
 
 - **Framework**: [Next.js 14](https://nextjs.org/) (App Router, React 18, TypeScript)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) dengan palet warna Dark Obsidian & Amber Gold
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) dengan palet warna Dark Obsidian & Crimson Rose Red
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Streaming & Media**: [Hls.js](https://github.com/video-dev/hls.js/)
 - **Scraping & Data Extraction**: [Cheerio](https://cheerio.js.org/), [Axios](https://axios-http.com/)

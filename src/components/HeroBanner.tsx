@@ -416,9 +416,9 @@ export default function HeroBanner({
           <div className="mt-6 flex flex-wrap items-center gap-3 sm:gap-4">
             <Link
               href={slide.ctaLink}
-              className="inline-flex items-center gap-2.5 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full font-black text-xs sm:text-sm text-black bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-600 shadow-xl shadow-amber-500/30 transition-all hover:scale-105 active:scale-95 group/btn"
+              className="inline-flex items-center gap-2.5 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full font-black text-xs sm:text-sm text-white bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:from-rose-500 hover:to-red-500 shadow-xl shadow-rose-600/40 transition-all hover:scale-105 active:scale-95 group/btn"
             >
-              <Play className="w-4 h-4 fill-black group-hover/btn:scale-110 transition-transform" />
+              <Play className="w-4 h-4 fill-white group-hover/btn:scale-110 transition-transform" />
               <span>{slide.ctaText}</span>
             </Link>
             <Link
