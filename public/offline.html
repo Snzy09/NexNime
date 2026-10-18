@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Koneksi Terputus — NexNime</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #07070A;
+      color: #FFFFFF;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .card {
+      background: #111118;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.5rem;
+      padding: 2.5rem 1.75rem;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+    .icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1.25rem;
+      border-radius: 1rem;
+      background: rgba(225, 29, 72, 0.15);
+      border: 1px solid rgba(225, 29, 72, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon svg {
+      width: 32px;
+      height: 32px;
+      stroke: #FB7185;
+    }
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      color: #FFFFFF;
+    }
+    p {
+      font-size: 0.875rem;
+      color: #9CA3AF;
+      line-height: 1.5;
+      margin-bottom: 1.75rem;
+    }
+    button {
+      background: #E11D48;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1.75rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #BE123C;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18M8.46 8.46a7 7 0 019.9 0M10.58 10.58a4 4 0 014.24 0M1.42 4.93a11 11 0 0115.56 0M5.64 17.66l.01-.01M12 20h.01" />
+      </svg>
+    </div>
+    <h1>Koneksi Internet Terputus</h1>
+    <p>Anda sedang offline. Periksa koneksi data seluler atau Wi-Fi Anda untuk melanjutkan streaming di NexNime.</p>
+    <button onclick="window.location.reload()">Muat Ulang Halaman</button>
+  </div>
+</body>
+</html>
