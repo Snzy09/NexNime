@@ -24,9 +24,12 @@ import {
 } from "lucide-react";
 import { REAL_DRAKOR_TRENDING } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import BookmarkButton from "@/components/BookmarkButton";
 import { saveWatchHistory, getSavedResumeTime } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 
 export default function DrakorDetailPage({ params }: { params: { slug: string } }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -149,11 +152,16 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
     onPrev: () => setCurrentEpisode((prev) => Math.max(1, prev - 1)),
   });
 
-  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus, skipIntro } = useVideoShortcuts({
     videoRef,
     containerRef: playerContainerRef,
     onNext: () => setCurrentEpisode((prev) => Math.min(episodes.length, prev + 1)),
     onPrev: () => setCurrentEpisode((prev) => Math.max(1, prev - 1)),
+  });
+
+  const sleepTimer = useSleepTimer({
+    videoRef,
+    onSleep: () => setShowAutoNext(false),
   });
 
   useEffect(() => {
@@ -280,6 +288,36 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                     <span>⚡ Auto-Next</span>
                   </button>
                 )}
+
+                <button
+                  type="button"
+                  onClick={() => skipIntro(85)}
+                  className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 flex items-center gap-1 text-[11px] font-bold transition-colors"
+                  title="Lewati Lagu Opening / Intro (+85 detik)"
+                >
+                  <span>⏩ +85s</span>
+                </button>
+
+                <SleepTimerButton
+                  sleepOption={sleepTimer.sleepOption}
+                  formattedRemaining={sleepTimer.formattedRemaining}
+                  isMenuOpen={sleepTimer.isMenuOpen}
+                  onToggleMenu={sleepTimer.toggleMenu}
+                  onSelectOption={sleepTimer.setTimer}
+                  accentColor="blue"
+                />
+
+                <BookmarkButton
+                  item={{
+                    id: `drakor-${params.slug}`,
+                    title: currentDrama.title,
+                    category: "drakor",
+                    poster: currentDrama.poster || "",
+                    url: `/drakor/${params.slug}`,
+                    totalEpisodes: episodes.length ? `${episodes.length} Ep` : undefined,
+                  }}
+                  accentColor="blue"
+                />
               </div>
             )}
           </div>
@@ -301,21 +339,24 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                 playsInline
                 className="w-full h-full object-contain"
                 onEnded={() => {
-                  if (currentEpisode < episodes.length) {
+                  const slept = sleepTimer.notifyEpisodeEnded();
+                  if (!slept && currentEpisode < episodes.length) {
                     setShowAutoNext(true);
                   }
                 }}
               />
             ) : playerUrl ? (
-              <iframe
-                src={playerUrl}
-                title={`Nonton ${currentDrama.title} Episode ${currentEpisode}`}
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                referrerPolicy="no-referrer"
-                className="w-full h-full border-0"
-              />
+              !sleepTimer.isSleeping ? (
+                <iframe
+                  src={playerUrl}
+                  title={`Nonton ${currentDrama.title} Episode ${currentEpisode}`}
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full border-0"
+                />
+              ) : null
             ) : (
               <div className="text-center p-6 text-gray-400 text-xs">
                 Gagal memuat player video. Silakan pilih episode atau server lain.
@@ -333,6 +374,13 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                 setCurrentEpisode((prev) => Math.min(episodes.length, prev + 1));
               }}
               onCancel={() => setShowAutoNext(false)}
+            />
+
+            {/* Sleep Timer Overlay */}
+            <SleepTimerOverlay
+              show={sleepTimer.isSleeping}
+              onWakeUp={sleepTimer.wakeUp}
+              accentColor="blue"
             />
 
             {/* Keyboard Shortcuts Toast & Iframe Focus Recovery */}

@@ -14,10 +14,14 @@ import {
   AlertCircle,
   ExternalLink,
   ShieldCheck,
-  Server
+  Server,
+  PictureInPicture2,
 } from "lucide-react";
 import { Suspense } from "react";
 import { SamehadakuEpisodeStream } from "@/lib/services/samehadakuService";
+import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 
 function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
   const searchParams = useSearchParams();
@@ -28,6 +32,14 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
   const [streamData, setStreamData] = useState<SamehadakuEpisodeStream | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeServerIdx, setActiveServerIdx] = useState(0);
+  const playerContainerRef = useRef<HTMLDivElement>(null);
+
+  const { isPipActive, togglePictureInPicture } = useMiniPlayer({
+    containerRef: playerContainerRef,
+    title: streamData?.title || animeTitle || params.slug,
+  });
+
+  const sleepTimer = useSleepTimer();
 
   useEffect(() => {
     setLoading(true);
@@ -73,6 +85,31 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
               </h1>
             </div>
           </div>
+
+          <div className="flex items-center gap-2">
+            <SleepTimerButton
+              sleepOption={sleepTimer.sleepOption}
+              formattedRemaining={sleepTimer.formattedRemaining}
+              isMenuOpen={sleepTimer.isMenuOpen}
+              onToggleMenu={sleepTimer.toggleMenu}
+              onSelectOption={sleepTimer.setTimer}
+              accentColor="amber"
+            />
+
+            <button
+              type="button"
+              onClick={togglePictureInPicture}
+              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                isPipActive
+                  ? "bg-amber-400 text-black border-amber-400 font-bold"
+                  : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
+              }`}
+              title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
+            >
+              <PictureInPicture2 className="w-4 h-4 text-amber-400" />
+              <span className="hidden sm:inline">Floating Player</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -115,20 +152,27 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
         {!loading && streamData && (
           <div className="space-y-6">
             {/* Video / Embed Frame */}
-            <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl">
+            <div
+              ref={playerContainerRef}
+              className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl"
+            >
               {activeServer?.url ? (
-                <iframe
-                  src={activeServer.url}
-                  className="w-full h-full border-0"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                />
+                !sleepTimer.isSleeping ? (
+                  <iframe
+                    src={activeServer.url}
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                  />
+                ) : null
               ) : activeServer?.embed ? (
-                <div
-                  dangerouslySetInnerHTML={{ __html: activeServer.embed }}
-                  className="w-full h-full flex items-center justify-center"
-                />
+                !sleepTimer.isSleeping ? (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: activeServer.embed }}
+                    className="w-full h-full flex items-center justify-center"
+                  />
+                ) : null
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-3">
                   <Play className="w-12 h-12 text-amber-400" />
@@ -137,6 +181,13 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
                   </p>
                 </div>
               )}
+
+              {/* Sleep Timer Overlay */}
+              <SleepTimerOverlay
+                show={sleepTimer.isSleeping}
+                onWakeUp={sleepTimer.wakeUp}
+                accentColor="amber"
+              />
             </div>
 
             {/* Server Selector Bar */}

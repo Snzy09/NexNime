@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -17,10 +17,12 @@ import {
   ExternalLink,
   Film,
   Tv,
+  PictureInPicture2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
+import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import {
   OppaDramaEpisodeDetail,
   OppaDramaSeriesDetail,
@@ -119,6 +121,13 @@ function OppaDramaWatchContent() {
   };
 
   const streamSrc = activeMirrorUrl || episodeData?.streamUrl || "";
+  const playerContainerRef = useRef<HTMLDivElement>(null);
+
+  const { isPipActive, togglePictureInPicture } = useMiniPlayer({
+    containerRef: playerContainerRef,
+    title: episodeData?.title || seriesDetail?.title || initialTitle || "OppaDrama Player",
+    poster: seriesDetail?.thumbnail || "",
+  });
 
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-fuchsia-500 selection:text-black">
@@ -169,7 +178,10 @@ function OppaDramaWatchContent() {
         ) : (
           <div className="space-y-6">
             {/* Video Player */}
-            <div className="rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl relative">
+            <div
+              ref={playerContainerRef}
+              className="rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl relative"
+            >
               {streamSrc ? (
                 <div className="relative aspect-video w-full bg-black">
                   <iframe
@@ -269,6 +281,20 @@ function OppaDramaWatchContent() {
                       <ChevronRight className="w-4 h-4" />
                     </Link>
                   )}
+
+                  <button
+                    type="button"
+                    onClick={togglePictureInPicture}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-colors ${
+                      isPipActive
+                        ? "bg-fuchsia-500 text-black border-fuchsia-400 font-bold"
+                        : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
+                    }`}
+                    title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
+                  >
+                    <PictureInPicture2 className="w-4 h-4 text-fuchsia-400" />
+                    <span className="hidden sm:inline">Floating Player</span>
+                  </button>
 
                   <button
                     onClick={handleShare}

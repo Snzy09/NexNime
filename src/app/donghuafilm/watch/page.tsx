@@ -28,10 +28,13 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 import { DonghuaFilmDetail, DonghuaFilmEpisode } from "@/lib/services/donghuaFilmService";
 import { saveWatchHistory } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import BookmarkButton from "@/components/BookmarkButton";
 
 function DonghuaFilmWatchContent() {
   const searchParams = useSearchParams();
@@ -116,7 +119,7 @@ function DonghuaFilmWatchContent() {
     poster: detail?.poster || "",
   });
 
-  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus, skipIntro } = useVideoShortcuts({
     containerRef: playerContainerRef,
     onNext: () => {
       if (nextEp) handleSelectEpisode(nextEp.number);
@@ -124,6 +127,10 @@ function DonghuaFilmWatchContent() {
     onPrev: () => {
       if (prevEp) handleSelectEpisode(prevEp.number);
     },
+  });
+
+  const sleepTimer = useSleepTimer({
+    onSleep: () => setShowAutoNext(false),
   });
 
   useEffect(() => {
@@ -251,22 +258,24 @@ function DonghuaFilmWatchContent() {
                   controls
                   autoPlay
                   playsInline
-                  className="w-full h-full object-contain"
                   onEnded={() => {
-                    if (nextEp) {
+                    const slept = sleepTimer.notifyEpisodeEnded();
+                    if (!slept && nextEp) {
                       setShowAutoNext(true);
                     }
                   }}
                 />
               ) : currentEpisode?.embed_src ? (
-                <iframe
-                  src={currentEpisode.embed_src}
-                  title={`${detail.title} - Episode ${currentEpNum}`}
-                  className="w-full h-full border-0"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                />
+                !sleepTimer.isSleeping ? (
+                  <iframe
+                    src={currentEpisode.embed_src}
+                    title={`${detail.title} - Episode ${currentEpNum}`}
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                  />
+                ) : null
               ) : currentEpisode?.stream_url ? (
                 <video
                   src={currentEpisode.stream_url}
@@ -275,7 +284,8 @@ function DonghuaFilmWatchContent() {
                   playsInline
                   className="w-full h-full object-contain"
                   onEnded={() => {
-                    if (nextEp) {
+                    const slept = sleepTimer.notifyEpisodeEnded();
+                    if (!slept && nextEp) {
                       setShowAutoNext(true);
                     }
                   }}
@@ -301,6 +311,13 @@ function DonghuaFilmWatchContent() {
                   if (nextEp) handleSelectEpisode(nextEp.number);
                 }}
                 onCancel={() => setShowAutoNext(false)}
+              />
+
+              {/* Sleep Timer Overlay */}
+              <SleepTimerOverlay
+                show={sleepTimer.isSleeping}
+                onWakeUp={sleepTimer.wakeUp}
+                accentColor="amber"
               />
 
               {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}
@@ -375,6 +392,36 @@ function DonghuaFilmWatchContent() {
                     <span>⚡ Auto-Next</span>
                   </button>
                 )}
+
+                <button
+                  type="button"
+                  onClick={() => skipIntro(85)}
+                  className="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 flex items-center gap-1 text-xs font-bold transition-colors"
+                  title="Lewati Lagu Opening / Intro (+85 detik)"
+                >
+                  <span>⏩ +85s</span>
+                </button>
+
+                <SleepTimerButton
+                  sleepOption={sleepTimer.sleepOption}
+                  formattedRemaining={sleepTimer.formattedRemaining}
+                  isMenuOpen={sleepTimer.isMenuOpen}
+                  onToggleMenu={sleepTimer.toggleMenu}
+                  onSelectOption={sleepTimer.setTimer}
+                  accentColor="amber"
+                />
+
+                <BookmarkButton
+                  item={{
+                    id: `donghuafilm-${slug}`,
+                    title: detail?.title || "Donghua Film",
+                    category: "donghua",
+                    poster: detail?.poster || "",
+                    url: `/donghuafilm/watch?slug=${encodeURIComponent(slug)}&ep=${currentEpNum}`,
+                    totalEpisodes: detail?.episodes?.length ? `${detail.episodes.length} Ep` : undefined,
+                  }}
+                  accentColor="amber"
+                />
 
                 <button
                   type="button"

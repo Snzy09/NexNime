@@ -23,9 +23,12 @@ import {
 } from "lucide-react";
 import { REAL_ANIME_POPULAR } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import BookmarkButton from "@/components/BookmarkButton";
 import { saveWatchHistory } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 
 export default function AnimeDetailPage({ params }: { params: { slug: string } }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -196,13 +199,17 @@ function isValidEmbedUrl(url?: string): boolean {
     onPrev: () => setSelectedEpIndex((prev) => Math.max(0, prev - 1)),
   });
 
-  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus, skipIntro } = useVideoShortcuts({
     containerRef: playerContainerRef,
     onNext: () =>
       setSelectedEpIndex((prev) =>
         Math.min((animeData?.episodes?.length || 1) - 1, prev + 1)
       ),
     onPrev: () => setSelectedEpIndex((prev) => Math.max(0, prev - 1)),
+  });
+
+  const sleepTimer = useSleepTimer({
+    onSleep: () => setShowAutoNext(false),
   });
 
   useEffect(() => {
@@ -358,6 +365,36 @@ function isValidEmbedUrl(url?: string): boolean {
                     <span>⚡ Auto-Next</span>
                   </button>
                 )}
+
+                <button
+                  type="button"
+                  onClick={() => skipIntro(85)}
+                  className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 flex items-center gap-1 text-[11px] font-bold transition-colors"
+                  title="Lewati Lagu Opening / Intro (+85 detik)"
+                >
+                  <span>⏩ +85s</span>
+                </button>
+
+                <SleepTimerButton
+                  sleepOption={sleepTimer.sleepOption}
+                  formattedRemaining={sleepTimer.formattedRemaining}
+                  isMenuOpen={sleepTimer.isMenuOpen}
+                  onToggleMenu={sleepTimer.toggleMenu}
+                  onSelectOption={sleepTimer.setTimer}
+                  accentColor="amber"
+                />
+
+                <BookmarkButton
+                  item={{
+                    id: `anime-${params.slug}`,
+                    title: animeData.title,
+                    category: "anime",
+                    poster: animeData.poster || "",
+                    url: `/anime/${params.slug}`,
+                    totalEpisodes: animeData.total_episode ? `${animeData.total_episode} Ep` : undefined,
+                  }}
+                  accentColor="amber"
+                />
               </div>
             )}
           </div>
@@ -370,14 +407,16 @@ function isValidEmbedUrl(url?: string): boolean {
                 <span className="text-sm font-semibold tracking-wide">Menyiapkan streaming video...</span>
               </div>
             ) : servers.length > 0 && isValidEmbedUrl(servers[selectedServer]?.url) ? (
-              <iframe
-                src={servers[selectedServer].url}
-                title={`Streaming ${animeData.title} ${currentEpisodeNumber}`}
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                className="w-full h-full border-0"
-              />
+              !sleepTimer.isSleeping ? (
+                <iframe
+                  src={servers[selectedServer].url}
+                  title={`Streaming ${animeData.title} ${currentEpisodeNumber}`}
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                  className="w-full h-full border-0"
+                />
+              ) : null
             ) : (
               <div className="flex flex-col items-center gap-3 p-6 text-center">
                 <Tv className="w-10 h-10 text-amber-400/60" />
@@ -412,6 +451,13 @@ function isValidEmbedUrl(url?: string): boolean {
                 );
               }}
               onCancel={() => setShowAutoNext(false)}
+            />
+
+            {/* Sleep Timer Overlay */}
+            <SleepTimerOverlay
+              show={sleepTimer.isSleeping}
+              onWakeUp={sleepTimer.wakeUp}
+              accentColor="amber"
             />
 
             {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}

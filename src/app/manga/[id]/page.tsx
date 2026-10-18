@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import SearchModal from "@/components/SearchModal";
 import Footer from "@/components/Footer";
+import BookmarkButton from "@/components/BookmarkButton";
 import {
   BookOpen,
   Star,
@@ -239,6 +240,19 @@ export default function MangaDetailPage({ params }: { params?: { id?: string } }
                         )}
                       </>
                     )}
+
+                    <BookmarkButton
+                      item={{
+                        id: `manga-${currentManga.id}`,
+                        title: currentManga.title,
+                        category: "manga",
+                        poster: currentManga.coverUrl || "",
+                        url: `/manga/${currentManga.id}`,
+                        totalEpisodes: chapters.length ? `${chapters.length} Ch` : undefined,
+                      }}
+                      accentColor="emerald"
+                      variant="button"
+                    />
                   </div>
                 </div>
               </div>

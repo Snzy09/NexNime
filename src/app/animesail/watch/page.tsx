@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -17,10 +17,14 @@ import {
   Share2,
   ExternalLink,
   Film,
+  PictureInPicture2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
+import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 import {
   AnimeSailEpisodeDetail,
   AnimeSailAnimeDetail,
@@ -86,6 +90,15 @@ function AnimeSailWatchContent() {
       : null;
 
   const streamSrc = activeServer?.iframe || activeServer?.streamUrl || "";
+  const playerContainerRef = useRef<HTMLDivElement>(null);
+
+  const { isPipActive, togglePictureInPicture } = useMiniPlayer({
+    containerRef: playerContainerRef,
+    title: episodeData?.title || initialTitle || "AnimeSail Streaming",
+    poster: animeDetail?.thumbnail || "",
+  });
+
+  const sleepTimer = useSleepTimer();
 
   const handleShare = () => {
     if (typeof window !== "undefined") {
@@ -144,17 +157,27 @@ function AnimeSailWatchContent() {
         ) : (
           <div className="space-y-6">
             {/* Video Player Section */}
-            <div className="rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl relative">
+            <div
+              ref={playerContainerRef}
+              className="rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl relative"
+            >
               {streamSrc ? (
                 <div className="relative aspect-video w-full bg-black">
-                  <iframe
-                    key={streamSrc}
-                    src={streamSrc}
-                    title={episodeData.title}
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                    className="w-full h-full border-0"
+                  {!sleepTimer.isSleeping ? (
+                    <iframe
+                      key={streamSrc}
+                      src={streamSrc}
+                      title={episodeData.title}
+                      allowFullScreen
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                      sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                      className="w-full h-full border-0"
+                    />
+                  ) : null}
+                  <SleepTimerOverlay
+                    show={sleepTimer.isSleeping}
+                    onWakeUp={sleepTimer.wakeUp}
+                    accentColor="sky"
                   />
                 </div>
               ) : (
@@ -231,6 +254,29 @@ function AnimeSailWatchContent() {
                       <ChevronRight className="w-4 h-4" />
                     </Link>
                   )}
+
+                  <SleepTimerButton
+                    sleepOption={sleepTimer.sleepOption}
+                    formattedRemaining={sleepTimer.formattedRemaining}
+                    isMenuOpen={sleepTimer.isMenuOpen}
+                    onToggleMenu={sleepTimer.toggleMenu}
+                    onSelectOption={sleepTimer.setTimer}
+                    accentColor="sky"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={togglePictureInPicture}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-colors ${
+                      isPipActive
+                        ? "bg-sky-500 text-black border-sky-400 font-bold"
+                        : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
+                    }`}
+                    title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
+                  >
+                    <PictureInPicture2 className="w-4 h-4 text-sky-400" />
+                    <span className="hidden sm:inline">Floating Player</span>
+                  </button>
 
                   <button
                     onClick={handleShare}

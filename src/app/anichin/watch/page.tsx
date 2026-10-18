@@ -24,10 +24,13 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 import { AnichinStream, AnichinDetail } from "@/lib/services/anichinService";
 import { saveWatchHistory } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import BookmarkButton from "@/components/BookmarkButton";
 
 function AnichinWatchContent() {
   const searchParams = useSearchParams();
@@ -126,7 +129,7 @@ function AnichinWatchContent() {
     poster: detail?.poster || "",
   });
 
-  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus, skipIntro } = useVideoShortcuts({
     containerRef: playerContainerRef,
     onNext: () => {
       if (nextEp) {
@@ -143,6 +146,10 @@ function AnichinWatchContent() {
         }
       }
     },
+  });
+
+  const sleepTimer = useSleepTimer({
+    onSleep: () => setShowAutoNext(false),
   });
 
   useEffect(() => {
@@ -312,14 +319,16 @@ function AnichinWatchContent() {
               )}
 
               {streamSrc ? (
-                <iframe
-                  key={streamSrc}
-                  src={streamSrc}
-                  className="w-full h-full border-0"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                />
+                !sleepTimer.isSleeping ? (
+                  <iframe
+                    key={streamSrc}
+                    src={streamSrc}
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                  />
+                ) : null
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 p-6 text-center">
                   <AlertCircle className="w-10 h-10 text-rose-400 mb-2" />
@@ -342,6 +351,13 @@ function AnichinWatchContent() {
                   }
                 }}
                 onCancel={() => setShowAutoNext(false)}
+              />
+
+              {/* Sleep Timer Overlay */}
+              <SleepTimerOverlay
+                show={sleepTimer.isSleeping}
+                onWakeUp={sleepTimer.wakeUp}
+                accentColor="rose"
               />
 
               {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}
@@ -374,6 +390,36 @@ function AnichinWatchContent() {
                     <span>⚡ Auto-Next</span>
                   </button>
                 )}
+
+                <button
+                  type="button"
+                  onClick={() => skipIntro(85)}
+                  className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 flex items-center gap-1 text-xs font-bold transition-colors"
+                  title="Lewati Lagu Opening / Intro (+85 detik)"
+                >
+                  <span>⏩ +85s</span>
+                </button>
+
+                <SleepTimerButton
+                  sleepOption={sleepTimer.sleepOption}
+                  formattedRemaining={sleepTimer.formattedRemaining}
+                  isMenuOpen={sleepTimer.isMenuOpen}
+                  onToggleMenu={sleepTimer.toggleMenu}
+                  onSelectOption={sleepTimer.setTimer}
+                  accentColor="rose"
+                />
+
+                <BookmarkButton
+                  item={{
+                    id: `anichin-${encodeURIComponent(currentUrl)}`,
+                    title: detail?.title || stream?.title || initialTitle || "Donghua",
+                    category: "donghua",
+                    poster: detail?.poster || "",
+                    url: `/anichin/watch?url=${encodeURIComponent(currentUrl)}`,
+                    totalEpisodes: episodes.length ? `${episodes.length} Ep` : undefined,
+                  }}
+                  accentColor="rose"
+                />
 
                 <button
                   type="button"

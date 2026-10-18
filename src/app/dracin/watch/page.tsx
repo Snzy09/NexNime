@@ -30,11 +30,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 import { DracinItem, DracinDetail } from "@/lib/services/dracinService";
 import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
 import { saveWatchHistory, getSavedResumeTime } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import BookmarkButton from "@/components/BookmarkButton";
 
 interface SubtitleTrack {
   language: string;
@@ -453,7 +456,7 @@ function DracinWatchContent() {
     resumeHandledRef.current = true;
   };
 
-  const { toast: shortcutToast, isIframeFocused, refocus } = useVideoShortcuts({
+  const { toast: shortcutToast, isIframeFocused, refocus, skipIntro } = useVideoShortcuts({
     videoRef,
     containerRef: playerContainerRef,
     onTogglePlay: togglePlay,
@@ -469,6 +472,11 @@ function DracinWatchContent() {
     poster: activeDrama.image || "",
     onNext: handleNextEp,
     onPrev: handlePrevEp,
+  });
+
+  const sleepTimer = useSleepTimer({
+    videoRef,
+    onSleep: () => setShowAutoNext(false),
   });
 
   const selectedSub = subtitles.find((s) => s.language === selectedSubLang);
@@ -565,6 +573,27 @@ function DracinWatchContent() {
                 </select>
               )}
 
+              <SleepTimerButton
+                sleepOption={sleepTimer.sleepOption}
+                formattedRemaining={sleepTimer.formattedRemaining}
+                isMenuOpen={sleepTimer.isMenuOpen}
+                onToggleMenu={sleepTimer.toggleMenu}
+                onSelectOption={sleepTimer.setTimer}
+                accentColor="rose"
+              />
+
+              <BookmarkButton
+                item={{
+                  id: `dracin-${provider}-${rawId}`,
+                  title: dramaTitle,
+                  category: "dracin",
+                  poster: activeDrama.image || "",
+                  url: `/dracin/watch?provider=${provider}&id=${rawId}&ep=${currentEpisodeNum}`,
+                  totalEpisodes: totalEpisodesCount ? `${totalEpisodesCount} Ep` : undefined,
+                }}
+                accentColor="rose"
+              />
+
               <button
                 type="button"
                 onClick={() => setShowInfoModal(true)}
@@ -627,7 +656,8 @@ function DracinWatchContent() {
                   }
                 }}
                 onEnded={() => {
-                  if (currentEpisodeNum < totalEpisodesCount) {
+                  const slept = sleepTimer.notifyEpisodeEnded();
+                  if (!slept && currentEpisodeNum < totalEpisodesCount) {
                     setShowAutoNext(true);
                   }
                 }}
@@ -745,6 +775,16 @@ function DracinWatchContent() {
               ) : (
                 <Maximize2 className="w-4 h-4 text-gray-200" />
               )}
+            </button>
+
+            {/* Skip Intro / +85s */}
+            <button
+              type="button"
+              onClick={() => skipIntro(85)}
+              className="w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 transition-all shadow-lg active:scale-90 text-[10px] font-bold"
+              title="Lewati Lagu Opening / Intro (+85 detik)"
+            >
+              +85s
             </button>
 
             {/* Picture-in-Picture (Tetap Berjalan saat Minimize App) */}
@@ -905,6 +945,13 @@ function DracinWatchContent() {
               handleNextEp();
             }}
             onCancel={() => setShowAutoNext(false)}
+          />
+
+          {/* Sleep Timer Overlay */}
+          <SleepTimerOverlay
+            show={sleepTimer.isSleeping}
+            onWakeUp={sleepTimer.wakeUp}
+            accentColor="rose"
           />
 
           {/* Keyboard Shortcuts Feedback Toast & Iframe Focus Recovery */}
