@@ -186,7 +186,7 @@ export default function MangaDetailPage({ params }: { params?: { id?: string } }
                     )}
                   </div>
 
-                  <h1 className="text-2xl sm:text-4xl font-black text-white">{currentManga.title}</h1>
+                  <h1 className="text-xl sm:text-3xl md:text-4xl font-black text-white break-words leading-tight">{currentManga.title}</h1>
 
                   {(currentManga.author || currentManga.artist) && (
                     <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 my-2">
@@ -215,7 +215,7 @@ export default function MangaDetailPage({ params }: { params?: { id?: string } }
                     ))}
                   </div>
 
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mt-2 max-h-36 overflow-y-auto">
+                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mt-2 max-h-36 overflow-y-auto break-words line-clamp-3 sm:line-clamp-none">
                     {currentManga.synopsis ||
                       "Ikuti petualangan seru dan rilis chapter terbaru dalam bahasa Indonesia dengan grafis memukau."}
                   </p>

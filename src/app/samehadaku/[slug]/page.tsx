@@ -138,12 +138,12 @@ export default function SamehadakuDetailPage({ params }: { params: { slug: strin
         {!loading && detail && (
           <>
             {/* Hero Card */}
-            <div className="rounded-3xl bg-[#12121A] border border-white/10 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <div className="rounded-3xl bg-[#12121A] border border-white/10 p-4 sm:p-8 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 blur-[100px] pointer-events-none" />
 
-              <div className="flex flex-col md:flex-row gap-6 sm:gap-8 items-start relative z-10">
+              <div className="flex flex-col md:flex-row gap-5 sm:gap-8 items-start relative z-10">
                 {/* Poster Cover from Samehadaku */}
-                <div className="w-48 sm:w-56 aspect-[3/4] rounded-2xl overflow-hidden bg-black/60 shrink-0 border border-amber-400/30 shadow-2xl relative group">
+                <div className="w-32 sm:w-56 aspect-[3/4] rounded-2xl overflow-hidden bg-black/60 shrink-0 border border-amber-400/30 shadow-2xl relative group">
                   <img
                     src={detail.thumb}
                     alt={detail.title}
@@ -155,8 +155,8 @@ export default function SamehadakuDetailPage({ params }: { params: { slug: strin
                 </div>
 
                 {/* Details */}
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
                     <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
                       {detail.type || "ANIME"}
                     </span>
@@ -172,7 +172,7 @@ export default function SamehadakuDetailPage({ params }: { params: { slug: strin
                     </span>
                   </div>
 
-                  <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+                  <h1 className="text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight break-words leading-tight">
                     {detail.title}
                   </h1>
 
@@ -189,7 +189,7 @@ export default function SamehadakuDetailPage({ params }: { params: { slug: strin
                   </div>
 
                   {/* Synopsis from Scraper */}
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mt-2 max-w-4xl line-clamp-6">
+                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mt-2 max-w-4xl break-words line-clamp-3 sm:line-clamp-6">
                     {detail.synopsis}
                   </p>
 

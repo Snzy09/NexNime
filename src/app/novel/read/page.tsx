@@ -396,7 +396,7 @@ function NovelReaderContent() {
                     <span className="truncate">{novelDetail.title}</span>
                   </p>
                 )}
-                <h1 className="text-lg sm:text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
+                <h1 className="text-base sm:text-2xl md:text-3xl font-black tracking-tight text-white leading-tight break-words">
                   {chapterData.title || initialTitle}
                 </h1>
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">

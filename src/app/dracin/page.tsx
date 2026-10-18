@@ -438,7 +438,7 @@ function DracinHubContent() {
                     </div>
 
                     <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-                      <p className="text-xs font-bold text-white line-clamp-2 leading-snug group-hover:text-rose-300 transition-colors">
+                      <p className="text-xs font-bold text-white line-clamp-2 leading-snug break-words group-hover:text-rose-300 transition-colors">
                         {itemTitle}
                       </p>
                       <p className="text-[10px] text-gray-400 mt-1 truncate">
@@ -563,7 +563,7 @@ function DracinHubContent() {
                   </div>
 
                   <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-                    <p className="text-xs font-bold text-white line-clamp-2 leading-snug group-hover:text-amber-300 transition-colors">
+                    <p className="text-xs font-bold text-white line-clamp-2 leading-snug break-words group-hover:text-amber-300 transition-colors">
                       {item.title}
                     </p>
                     <p className="text-[10px] text-gray-400 mt-1 truncate">
@@ -662,7 +662,7 @@ function DracinHubContent() {
                     </div>
 
                     <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-                      <p className="text-xs font-bold text-white line-clamp-2 leading-snug group-hover:text-cyan-300 transition-colors">
+                      <p className="text-xs font-bold text-white line-clamp-2 leading-snug break-words group-hover:text-cyan-300 transition-colors">
                         {item.title || item.book_name}
                       </p>
                       <p className="text-[10px] text-gray-400 mt-1 truncate">
@@ -747,7 +747,7 @@ function DracinHubContent() {
                   </div>
 
                   <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-                    <p className="text-xs font-bold text-white line-clamp-2 leading-snug group-hover:text-rose-300 transition-colors">
+                    <p className="text-xs font-bold text-white line-clamp-2 leading-snug break-words group-hover:text-rose-300 transition-colors">
                       {drama.title}
                     </p>
                     <p className="text-[10px] text-gray-400 mt-1 truncate">
@@ -871,7 +871,7 @@ function DracinHubContent() {
                   </div>
                 </div>
                 <div className="p-2.5 sm:p-3 flex flex-col justify-between flex-1 space-y-1">
-                  <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-rose-300 transition-colors leading-snug">
+                  <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-snug break-words group-hover:text-rose-300 transition-colors">
                     {item.title}
                   </h3>
                 </div>
@@ -939,7 +939,7 @@ function DracinHubContent() {
                   </div>
                 </div>
                 <div className="p-2.5 sm:p-3 flex flex-col justify-between flex-1 space-y-1">
-                  <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 group-hover:text-purple-300 transition-colors leading-snug">
+                  <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-snug break-words group-hover:text-purple-300 transition-colors">
                     {item.title}
                   </h3>
                 </div>

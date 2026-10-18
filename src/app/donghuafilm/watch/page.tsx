@@ -518,9 +518,9 @@ function DonghuaFilmWatchContent() {
             )}
 
             {/* Donghua Information & Synopsis */}
-            <div className="flex flex-col md:flex-row gap-6 p-6 rounded-2xl bg-[#12121A] border border-white/10">
+            <div className="flex flex-col md:flex-row gap-4 sm:gap-6 p-4 sm:p-6 rounded-2xl bg-[#12121A] border border-white/10">
               {detail.poster || detail.cover ? (
-                <div className="w-32 sm:w-44 shrink-0 rounded-xl overflow-hidden aspect-[3/4] bg-black/60 shadow-lg border border-white/10">
+                <div className="w-28 sm:w-44 shrink-0 rounded-xl overflow-hidden aspect-[3/4] bg-black/60 shadow-lg border border-white/10">
                   <img
                     src={detail.poster || detail.cover}
                     alt={detail.title}
@@ -529,10 +529,10 @@ function DonghuaFilmWatchContent() {
                 </div>
               ) : null}
 
-              <div className="flex-1 space-y-3">
+              <div className="flex-1 min-w-0 space-y-3">
                 <div className="space-y-1">
-                  <h1 className="text-xl sm:text-2xl font-black text-white">{detail.title}</h1>
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-gray-300">
+                  <h1 className="text-lg sm:text-2xl font-black text-white break-words leading-tight">{detail.title}</h1>
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs text-gray-300">
                     <span className="text-amber-400 font-bold uppercase">{detail.type || "Donghua"}</span>
                     <span>•</span>
                     <span className="text-emerald-400 font-semibold">{detail.status_anime || "Ongoing"}</span>
@@ -556,7 +556,7 @@ function DonghuaFilmWatchContent() {
                 </div>
 
                 {detail.synopsis && (
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed max-w-3xl">
+                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed max-w-3xl break-words line-clamp-3 sm:line-clamp-none">
                     {detail.synopsis}
                   </p>
                 )}
@@ -564,7 +564,7 @@ function DonghuaFilmWatchContent() {
             </div>
 
             {/* Episode Selector Grid */}
-            <div className="space-y-3 p-6 rounded-2xl bg-[#12121A] border border-white/10">
+            <div className="space-y-3 p-4 sm:p-6 rounded-2xl bg-[#12121A] border border-white/10">
               <div className="flex items-center justify-between pb-3 border-b border-white/10">
                 <h3 className="font-bold text-sm sm:text-base text-white flex items-center gap-2">
                   <ListOrdered className="w-4 h-4 text-amber-400" />

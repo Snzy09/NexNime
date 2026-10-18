@@ -276,11 +276,11 @@ function FilmWatchContent() {
             )}
 
             {/* Film Overview & Metadata Card */}
-            <div className="rounded-3xl bg-[#12121A] border border-white/10 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <div className="rounded-2xl sm:rounded-3xl bg-[#12121A] border border-white/10 p-4 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden">
               <div className="flex flex-col md:flex-row gap-6 sm:gap-8 items-start">
                 {/* Poster */}
                 {detail.poster && (
-                  <div className="w-40 sm:w-48 aspect-[2/3] rounded-2xl overflow-hidden bg-black/60 shrink-0 border border-white/10 shadow-2xl">
+                  <div className="w-28 sm:w-44 md:w-48 aspect-[2/3] rounded-xl sm:rounded-2xl overflow-hidden bg-black/60 shrink-0 border border-white/10 shadow-2xl">
                     <img
                       src={detail.poster}
                       alt={detail.title}
@@ -289,12 +289,12 @@ function FilmWatchContent() {
                   </div>
                 )}
 
-                <div className="flex-1 space-y-3">
+                <div className="flex-1 space-y-3 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 uppercase">
                       {detail.type}
                     </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center gap-1">
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center gap-1">
                       <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                       {detail.rating}
                     </span>
@@ -312,7 +312,7 @@ function FilmWatchContent() {
                     )}
                   </div>
 
-                  <h2 className="text-2xl sm:text-3xl font-black text-white">{detail.title}</h2>
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white break-words leading-tight">{detail.title}</h2>
 
                   {/* Genres */}
                   <div className="flex flex-wrap items-center gap-1.5 pt-1">
@@ -327,7 +327,7 @@ function FilmWatchContent() {
                   </div>
 
                   {/* Synopsis */}
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed pt-2">
+                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed pt-2 break-words line-clamp-3 sm:line-clamp-none">
                     {detail.synopsis}
                   </p>
 
