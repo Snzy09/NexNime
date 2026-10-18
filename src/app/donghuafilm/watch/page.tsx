@@ -24,6 +24,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
+import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { DonghuaFilmDetail, DonghuaFilmEpisode } from "@/lib/services/donghuaFilmService";
 
 function DonghuaFilmWatchContent() {
@@ -39,6 +40,7 @@ function DonghuaFilmWatchContent() {
   const [error, setError] = useState<string | null>(null);
   const [showDownloads, setShowDownloads] = useState(false);
   const [playerMode, setPlayerMode] = useState<"embed" | "native">("embed");
+  const [showAutoNext, setShowAutoNext] = useState(false);
 
   // Fetch Donghua Detail
   useEffect(() => {
@@ -73,6 +75,7 @@ function DonghuaFilmWatchContent() {
 
   // When episode changes, update current episode
   const handleSelectEpisode = (epNum: number) => {
+    setShowAutoNext(false);
     setCurrentEpNum(epNum);
     if (detail?.episodes) {
       const found = detail.episodes.find((e) => e.number === epNum);
@@ -150,6 +153,11 @@ function DonghuaFilmWatchContent() {
                   autoPlay
                   playsInline
                   className="w-full h-full object-contain"
+                  onEnded={() => {
+                    if (nextEp) {
+                      setShowAutoNext(true);
+                    }
+                  }}
                 />
               ) : currentEpisode?.embed_src ? (
                 <iframe
@@ -157,7 +165,8 @@ function DonghuaFilmWatchContent() {
                   title={`${detail.title} - Episode ${currentEpNum}`}
                   className="w-full h-full border-0"
                   allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
                 />
               ) : currentEpisode?.stream_url ? (
                 <video
@@ -166,6 +175,11 @@ function DonghuaFilmWatchContent() {
                   autoPlay
                   playsInline
                   className="w-full h-full object-contain"
+                  onEnded={() => {
+                    if (nextEp) {
+                      setShowAutoNext(true);
+                    }
+                  }}
                 />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center bg-[#101018] text-center p-6 space-y-3">
@@ -176,6 +190,19 @@ function DonghuaFilmWatchContent() {
                   </p>
                 </div>
               )}
+
+              {/* Auto-Next Episode Overlay */}
+              <AutoNextCountdown
+                show={showAutoNext}
+                nextEpisodeTitle={nextEp ? `Episode ${nextEp.number}` : undefined}
+                countdownSeconds={5}
+                accentColor="amber"
+                onPlayNow={() => {
+                  setShowAutoNext(false);
+                  if (nextEp) handleSelectEpisode(nextEp.number);
+                }}
+                onCancel={() => setShowAutoNext(false)}
+              />
             </div>
 
             {/* Video Player Toolbar & Controls */}
@@ -231,6 +258,17 @@ function DonghuaFilmWatchContent() {
                   <span>Next</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
+
+                {nextEp && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAutoNext(true)}
+                    className="px-2 py-1.5 rounded-lg bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 border border-amber-400/30 flex items-center gap-1 text-xs font-bold transition-colors"
+                    title="Putar episode berikutnya otomatis"
+                  >
+                    <span>⚡ Auto-Next</span>
+                  </button>
+                )}
 
                 <button
                   onClick={() => setShowDownloads(!showDownloads)}

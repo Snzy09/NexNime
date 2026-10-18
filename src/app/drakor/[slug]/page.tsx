@@ -20,6 +20,7 @@ import {
   Film,
 } from "lucide-react";
 import { REAL_DRAKOR_TRENDING } from "@/lib/services/realDataFallback";
+import AutoNextCountdown from "@/components/AutoNextCountdown";
 
 export default function DrakorDetailPage({ params }: { params: { slug: string } }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -33,6 +34,7 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
   const [directStreamUrl, setDirectStreamUrl] = useState<string>("");
   const [loadingPlayer, setLoadingPlayer] = useState(true);
   const [playerMode, setPlayerMode] = useState<"embed" | "direct">("embed");
+  const [showAutoNext, setShowAutoNext] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -48,6 +50,7 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
   // Fetch real video player stream for the episode & server
   useEffect(() => {
     if (!params.slug) return;
+    setShowAutoNext(false);
     setLoadingPlayer(true);
     fetch(
       `/api/drakor?action=stream&slug=${encodeURIComponent(
@@ -168,6 +171,17 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
               >
                 Next Ep <ChevronRight className="w-3.5 h-3.5" />
               </button>
+
+              {currentEpisode < episodes.length && (
+                <button
+                  type="button"
+                  onClick={() => setShowAutoNext(true)}
+                  className="px-2 py-1 rounded bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 flex items-center gap-1 text-[11px] font-bold transition-colors"
+                  title="Putar episode berikutnya otomatis"
+                >
+                  <span>⚡ Auto-Next</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -187,13 +201,19 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                 controls
                 playsInline
                 className="w-full h-full object-contain"
+                onEnded={() => {
+                  if (currentEpisode < episodes.length) {
+                    setShowAutoNext(true);
+                  }
+                }}
               />
             ) : playerUrl ? (
               <iframe
                 src={playerUrl}
                 title={`Nonton ${currentDrama.title} Episode ${currentEpisode}`}
                 allowFullScreen
-                allow="autoplay; fullscreen; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
                 referrerPolicy="no-referrer"
                 className="w-full h-full border-0"
               />
@@ -202,6 +222,19 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                 Gagal memuat player video. Silakan pilih episode atau server lain.
               </div>
             )}
+
+            {/* Auto-Next Episode Overlay */}
+            <AutoNextCountdown
+              show={showAutoNext}
+              nextEpisodeTitle={`Episode ${currentEpisode + 1}`}
+              countdownSeconds={5}
+              accentColor="blue"
+              onPlayNow={() => {
+                setShowAutoNext(false);
+                setCurrentEpisode((prev) => Math.min(episodes.length, prev + 1));
+              }}
+              onCancel={() => setShowAutoNext(false)}
+            />
           </div>
 
           {/* Server Selector Bar */}

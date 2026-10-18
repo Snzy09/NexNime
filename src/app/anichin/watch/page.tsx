@@ -20,6 +20,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
+import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { AnichinStream, AnichinDetail } from "@/lib/services/anichinService";
 
 function AnichinWatchContent() {
@@ -35,6 +36,7 @@ function AnichinWatchContent() {
   const [error, setError] = useState<string | null>(null);
   const [currentUrl, setCurrentUrl] = useState(rawUrl);
   const [selectedServerIndex, setSelectedServerIndex] = useState<number>(0);
+  const [showAutoNext, setShowAutoNext] = useState(false);
 
   useEffect(() => {
     if (rawUrl) {
@@ -45,6 +47,7 @@ function AnichinWatchContent() {
   // Fetch Stream & Detail
   useEffect(() => {
     if (!currentUrl) return;
+    setShowAutoNext(false);
     setLoading(true);
     setError(null);
     setSelectedServerIndex(0);
@@ -93,6 +96,15 @@ function AnichinWatchContent() {
     stream?.stream_url ||
     stream?.embed_url ||
     "";
+
+  const currentEpIndex = episodes.findIndex((e) => {
+    const epUrl = e.url || e.href || "";
+    return currentUrl === epUrl || (e.slug && currentUrl.includes(e.slug));
+  });
+  const nextEp =
+    currentEpIndex >= 0 && currentEpIndex < episodes.length - 1
+      ? episodes[currentEpIndex + 1]
+      : null;
 
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-rose-500 selection:text-white">
@@ -196,7 +208,8 @@ function AnichinWatchContent() {
                   src={streamSrc}
                   className="w-full h-full border-0"
                   allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
                 />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 p-6 text-center">
@@ -205,6 +218,22 @@ function AnichinWatchContent() {
                   <p className="text-xs text-gray-500 mt-1">Coba tautan download atau tonton episode lainnya.</p>
                 </div>
               )}
+
+              {/* Auto-Next Episode Overlay */}
+              <AutoNextCountdown
+                show={showAutoNext}
+                nextEpisodeTitle={nextEp ? (nextEp.episode || nextEp.title) : undefined}
+                countdownSeconds={5}
+                accentColor="rose"
+                onPlayNow={() => {
+                  setShowAutoNext(false);
+                  if (nextEp) {
+                    setCurrentUrl(nextEp.url || nextEp.href);
+                    window.scrollTo({ top: 120, behavior: "smooth" });
+                  }
+                }}
+                onCancel={() => setShowAutoNext(false)}
+              />
             </div>
 
             {/* Video Title & Actions */}
@@ -219,6 +248,17 @@ function AnichinWatchContent() {
               </div>
 
               <div className="flex items-center gap-2">
+                {nextEp && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAutoNext(true)}
+                    className="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-bold text-rose-300 flex items-center gap-1.5 transition-colors"
+                    title="Putar episode berikutnya otomatis"
+                  >
+                    <span>⚡ Auto-Next</span>
+                  </button>
+                )}
+
                 <button
                   onClick={() => {
                     if (navigator.share) {

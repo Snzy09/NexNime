@@ -28,6 +28,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
+import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { DracinItem, DracinDetail } from "@/lib/services/dracinService";
 import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
 
@@ -69,6 +70,7 @@ function DracinWatchContent() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
   const [totalEpisodesCount, setTotalEpisodesCount] = useState<number>(queryTotalEp > 0 ? queryTotalEp : 80);
+  const [showAutoNext, setShowAutoNext] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerContainerRef = useRef<HTMLDivElement>(null);
@@ -147,6 +149,7 @@ function DracinWatchContent() {
     setLoadingVideo(true);
     setErrorMsg(null);
     setVideoUrl("");
+    setShowAutoNext(false);
 
     let url = `/api/dracin?action=episode&slug=${encodeURIComponent(rawId)}&ep=${currentEpisodeNum}`;
     if (provider === "freereels") {
@@ -567,7 +570,11 @@ function DracinWatchContent() {
                     setDuration(videoRef.current.duration || 0);
                   }
                 }}
-                onEnded={handleNextEp}
+                onEnded={() => {
+                  if (currentEpisodeNum < totalEpisodesCount) {
+                    setShowAutoNext(true);
+                  }
+                }}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
                 onError={() => {
@@ -815,6 +822,19 @@ function DracinWatchContent() {
               </div>
             </div>
           )}
+
+          {/* Auto-Next Episode Overlay */}
+          <AutoNextCountdown
+            show={showAutoNext}
+            nextEpisodeTitle={`Episode ${currentEpisodeNum + 1}`}
+            countdownSeconds={5}
+            accentColor="rose"
+            onPlayNow={() => {
+              setShowAutoNext(false);
+              handleNextEp();
+            }}
+            onCancel={() => setShowAutoNext(false)}
+          />
         </div>
       </main>
 

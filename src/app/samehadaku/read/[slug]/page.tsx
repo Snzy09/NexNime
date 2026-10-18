@@ -221,7 +221,8 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
                   src={activeServer.url}
                   className="w-full h-full border-0"
                   allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
                 />
               ) : activeServer?.embed ? (
                 <div

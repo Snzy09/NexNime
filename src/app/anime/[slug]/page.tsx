@@ -20,6 +20,7 @@ import {
   Maximize2,
 } from "lucide-react";
 import { REAL_ANIME_POPULAR } from "@/lib/services/realDataFallback";
+import AutoNextCountdown from "@/components/AutoNextCountdown";
 
 export default function AnimeDetailPage({ params }: { params: { slug: string } }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -30,6 +31,7 @@ export default function AnimeDetailPage({ params }: { params: { slug: string } }
   const [lightsOff, setLightsOff] = useState(false);
   const [animeData, setAnimeData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showAutoNext, setShowAutoNext] = useState(false);
 
   useEffect(() => {
     fetch(`/api/anime?action=detail&slug=${encodeURIComponent(params.slug)}`)
@@ -147,6 +149,7 @@ function isValidEmbedUrl(url?: string): boolean {
   // Load real stream for currently selected episode
   useEffect(() => {
     if (!animeData?.episodes || animeData.episodes.length === 0) return;
+    setShowAutoNext(false);
     const currentEp = animeData.episodes[selectedEpIndex] || animeData.episodes[0];
     if (!currentEp?.url) return;
 
@@ -242,11 +245,22 @@ function isValidEmbedUrl(url?: string): boolean {
               >
                 Next <ChevronRight className="w-3.5 h-3.5" />
               </button>
+
+              {selectedEpIndex < (animeData.episodes?.length || 1) - 1 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAutoNext(true)}
+                  className="px-2 py-1 rounded bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 border border-amber-400/30 flex items-center gap-1 text-[11px] font-bold transition-colors"
+                  title="Putar episode berikutnya otomatis"
+                >
+                  <span>⚡ Auto-Next</span>
+                </button>
+              )}
             </div>
           </div>
 
           {/* Video Player Display Frame (16:9) */}
-          <div className="relative aspect-video w-full bg-black flex items-center justify-center">
+          <div className="relative aspect-video w-full bg-black flex items-center justify-center overflow-hidden">
             {streamLoading ? (
               <div className="flex flex-col items-center gap-3 text-amber-400">
                 <Play className="w-10 h-10 animate-pulse fill-amber-400" />
@@ -257,7 +271,8 @@ function isValidEmbedUrl(url?: string): boolean {
                 src={servers[selectedServer].url}
                 title={`Streaming ${animeData.title} ${currentEpisodeNumber}`}
                 allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
                 className="w-full h-full border-0"
               />
             ) : (
@@ -276,6 +291,25 @@ function isValidEmbedUrl(url?: string): boolean {
                 )}
               </div>
             )}
+
+            {/* Auto-Next Episode Overlay */}
+            <AutoNextCountdown
+              show={showAutoNext}
+              nextEpisodeTitle={
+                selectedEpIndex < (animeData.episodes?.length || 1) - 1
+                  ? animeData.episodes?.[selectedEpIndex + 1]?.episode || `Episode ${selectedEpIndex + 2}`
+                  : undefined
+              }
+              countdownSeconds={5}
+              accentColor="amber"
+              onPlayNow={() => {
+                setShowAutoNext(false);
+                setSelectedEpIndex((prev) =>
+                  Math.min((animeData.episodes?.length || 1) - 1, prev + 1)
+                );
+              }}
+              onCancel={() => setShowAutoNext(false)}
+            />
           </div>
 
           {/* Server Selector Bar */}
