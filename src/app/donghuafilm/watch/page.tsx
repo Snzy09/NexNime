@@ -35,6 +35,7 @@ import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShort
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 import BookmarkButton from "@/components/BookmarkButton";
+import QuickReactions from "@/components/QuickReactions";
 
 function DonghuaFilmWatchContent() {
   const searchParams = useSearchParams();
@@ -516,6 +517,12 @@ function DonghuaFilmWatchContent() {
                 </div>
               </div>
             )}
+
+            {/* Quick Episode Reactions */}
+            <QuickReactions
+              contentId={`donghua-${slug}-ep-${currentEpNum}`}
+              title={`Reaksi Episode ${currentEpNum}`}
+            />
 
             {/* Donghua Information & Synopsis */}
             <div className="flex flex-col md:flex-row gap-4 sm:gap-6 p-4 sm:p-6 rounded-2xl bg-[#12121A] border border-white/10">

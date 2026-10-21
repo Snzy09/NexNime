@@ -98,4 +98,60 @@ assert.strictEqual(skipIntroTime(10, 1440, 85), 95);
 assert.strictEqual(skipIntroTime(1400, 1440, 85), 1440); // Clamped at duration end
 assert.strictEqual(skipIntroTime(0, 0, 85), 85); // Unknown duration
 
-console.log("Self-check: Watchlist CRUD, Manga Paged mode, and +85s Skip Intro assertions passed!");
+// 4. Quick Reactions (Base count hash, toggle increment/decrement)
+function getBaseCounts(id) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash << 5) - hash + id.charCodeAt(i);
+    hash |= 0;
+  }
+  const abs = Math.abs(hash);
+  return {
+    fire: (abs % 45) + 18,
+    sad: ((abs >> 2) % 30) + 6,
+    laugh: ((abs >> 4) % 35) + 12,
+    shock: ((abs >> 6) % 28) + 8,
+    love: ((abs >> 8) % 55) + 24,
+  };
+}
+
+const baseCountsA = getBaseCounts("anime-naruto-ep-1");
+const baseCountsB = getBaseCounts("anime-naruto-ep-1");
+const baseCountsC = getBaseCounts("donghua-btth-ep-10");
+
+// Consistent hashing
+assert.deepStrictEqual(baseCountsA, baseCountsB);
+// Distinct IDs get different hashes
+assert.notDeepStrictEqual(baseCountsA, baseCountsC);
+assert.ok(baseCountsA.fire >= 18);
+assert.ok(baseCountsA.love >= 24);
+
+// Toggle reaction logic
+function toggleReaction(state, key) {
+  const isCurrentActive = Boolean(state.userReactions[key]);
+  return {
+    counts: {
+      ...state.counts,
+      [key]: Math.max(0, (state.counts[key] || 0) + (isCurrentActive ? -1 : 1)),
+    },
+    userReactions: {
+      ...state.userReactions,
+      [key]: !isCurrentActive,
+    },
+  };
+}
+
+let reactionState = { counts: { ...baseCountsA }, userReactions: {} };
+const initialFire = reactionState.counts.fire;
+
+// Activate reaction
+reactionState = toggleReaction(reactionState, "fire");
+assert.strictEqual(reactionState.userReactions.fire, true);
+assert.strictEqual(reactionState.counts.fire, initialFire + 1);
+
+// Deactivate reaction
+reactionState = toggleReaction(reactionState, "fire");
+assert.strictEqual(reactionState.userReactions.fire, false);
+assert.strictEqual(reactionState.counts.fire, initialFire);
+
+console.log("Self-check: Watchlist CRUD, Manga Paged mode, +85s Skip Intro, and Quick Reactions assertions passed!");

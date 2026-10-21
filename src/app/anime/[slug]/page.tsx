@@ -25,6 +25,7 @@ import { REAL_ANIME_POPULAR } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
 import BookmarkButton from "@/components/BookmarkButton";
+import QuickReactions from "@/components/QuickReactions";
 import { saveWatchHistory } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
@@ -521,6 +522,12 @@ function isValidEmbedUrl(url?: string): boolean {
             </div>
           </div>
         </div>
+
+        {/* Quick Episode Reactions */}
+        <QuickReactions
+          contentId={`anime-${params.slug}-ep-${selectedEpIndex + 1}`}
+          title={`Reaksi ${currentEpisodeNumber}`}
+        />
 
         {/* Content Details & Episode Selector Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

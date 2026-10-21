@@ -30,6 +30,7 @@ import { saveWatchHistory, getSavedResumeTime } from "@/lib/services/watchHistor
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import QuickReactions from "@/components/QuickReactions";
 
 export default function DrakorDetailPage({ params }: { params: { slug: string } }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -462,6 +463,12 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
             </div>
           </div>
         </div>
+
+        {/* Quick Episode Reactions */}
+        <QuickReactions
+          contentId={`drakor-${params.slug}-ep-${currentEpisode}`}
+          title={`Reaksi Episode ${currentEpisode}`}
+        />
 
         {/* Drama Info & Episode List */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

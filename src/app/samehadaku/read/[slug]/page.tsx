@@ -22,6 +22,7 @@ import { SamehadakuEpisodeStream } from "@/lib/services/samehadakuService";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import QuickReactions from "@/components/QuickReactions";
 
 function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
   const searchParams = useSearchParams();
@@ -219,6 +220,12 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
                 ))}
               </div>
             </div>
+
+            {/* Quick Episode Reactions */}
+            <QuickReactions
+              contentId={`samehadaku-${rawUrl || params.slug}`}
+              title={`Reaksi Tayangan`}
+            />
 
             {/* Downloads list from Scraper (if available) */}
             {streamData.downloads && streamData.downloads.length > 0 && (

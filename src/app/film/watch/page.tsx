@@ -23,6 +23,7 @@ import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import { VidboxDetail } from "@/lib/services/vidboxService";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import QuickReactions from "@/components/QuickReactions";
 
 function FilmWatchContent() {
   const searchParams = useSearchParams();
@@ -274,6 +275,12 @@ function FilmWatchContent() {
                 )}
               </div>
             )}
+
+            {/* Quick Film Reactions */}
+            <QuickReactions
+              contentId={`film-${rawUrl || initialTitle || "vidbox"}${selectedEpisode ? `-ep-${selectedEpisode}` : ""}`}
+              title={`Reaksi ${detail.type === "TVSeries" ? `Episode ${selectedEpisode}` : "Film"}`}
+            />
 
             {/* Film Overview & Metadata Card */}
             <div className="rounded-2xl sm:rounded-3xl bg-[#12121A] border border-white/10 p-4 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden">

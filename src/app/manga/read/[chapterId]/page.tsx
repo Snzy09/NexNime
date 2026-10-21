@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { CREATOR, SALURAN } from "@/lib/services/mangaTypes";
 import BookmarkButton from "@/components/BookmarkButton";
+import QuickReactions from "@/components/QuickReactions";
 
 export default function MangaReaderPage({ params }: { params?: { chapterId?: string } }) {
   const routeParams = useParams();
@@ -469,6 +470,13 @@ export default function MangaReaderPage({ params }: { params?: { chapterId?: str
               );
             })}
 
+            {/* Quick Chapter Reactions */}
+            <QuickReactions
+              contentId={`manga-chapter-${activeChapterId}`}
+              title={`Reaksi Chapter ${chapterData.chapter || ""}`}
+              className="w-full mt-6"
+            />
+
             {/* End of Chapter Navigation Card */}
             <div className="w-full mt-8 p-6 rounded-2xl bg-[#12121A] border border-white/10 text-center space-y-4">
               <h3 className="text-sm sm:text-base font-bold text-white">
@@ -613,6 +621,13 @@ export default function MangaReaderPage({ params }: { params?: { chapterId?: str
                 </Link>
               )}
             </div>
+
+            {/* Quick Chapter Reactions (Paged Mode) */}
+            <QuickReactions
+              contentId={`manga-chapter-${activeChapterId}`}
+              title={`Reaksi Chapter ${chapterData.chapter || ""}`}
+              className="w-full mt-4"
+            />
           </div>
         )}
       </main>
