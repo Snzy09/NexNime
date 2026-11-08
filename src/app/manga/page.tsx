@@ -26,8 +26,8 @@ function MangaCatalog() {
   const [searchQuery, setSearchQuery] = useState(initialQ);
 
   useEffect(() => {
-    if (initialQ && initialQ !== searchQuery) {
-      setSearchQuery(initialQ);
+    if (initialQ) {
+      setSearchQuery((prev) => (prev !== initialQ ? initialQ : prev));
     }
   }, [initialQ]);
 

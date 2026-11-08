@@ -274,7 +274,8 @@ export default function Navbar({ onOpenSearch }: NavbarProps) {
       {/* Redesigned Minimalist 5-Item Mobile Bottom Navigation Dock */}
       <nav
         aria-label="Mobile Navigation"
-        className="lg:hidden fixed bottom-3 sm:bottom-4 left-3 right-3 sm:left-4 sm:right-4 z-50 max-w-md mx-auto select-none"
+        style={{ bottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))" }}
+        className="lg:hidden fixed left-3 right-3 sm:left-4 sm:right-4 z-50 max-w-md mx-auto select-none"
       >
         <div className="relative rounded-2xl sm:rounded-3xl bg-[#0C0C14]/90 backdrop-blur-2xl border border-white/10 shadow-[0_12px_36px_rgba(0,0,0,0.8)] px-1.5 py-1">
           {/* Smooth Sliding Switch Indicator Pill (Geser Animasi) */}

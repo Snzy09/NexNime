@@ -21,6 +21,11 @@ export default function AutoNextCountdown({
   accentColor = "rose",
 }: AutoNextCountdownProps) {
   const [secondsLeft, setSecondsLeft] = useState(countdownSeconds);
+  const onPlayNowRef = React.useRef(onPlayNow);
+
+  useEffect(() => {
+    onPlayNowRef.current = onPlayNow;
+  }, [onPlayNow]);
 
   useEffect(() => {
     if (!show) {
@@ -33,7 +38,7 @@ export default function AutoNextCountdown({
       setSecondsLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          onPlayNow();
+          onPlayNowRef.current();
           return 0;
         }
         return prev - 1;
@@ -41,7 +46,7 @@ export default function AutoNextCountdown({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [show, countdownSeconds, onPlayNow]);
+  }, [show, countdownSeconds]);
 
   if (!show) return null;
 
