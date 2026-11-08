@@ -150,9 +150,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="text-xs bg-white/5 hover:bg-white/10 text-gray-400 px-2 py-1 rounded border border-white/10"
+              className="text-xs bg-white/5 hover:bg-white/10 text-gray-400 p-1.5 sm:px-2.5 sm:py-1 rounded-lg border border-white/10 flex items-center justify-center shrink-0"
+              title="Tutup (ESC)"
             >
-              ESC
+              <span className="hidden sm:inline font-mono">ESC</span>
+              <X className="w-4 h-4 sm:hidden text-gray-300" />
             </button>
           )}
 

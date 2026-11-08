@@ -82,8 +82,8 @@ function DracinHubContent() {
       .then((d) => {
         if (d.categories && Array.isArray(d.categories)) {
           setFreeReelsCategories(d.categories);
-          if (d.categories.length > 0 && !selectedFreeCat) {
-            setSelectedFreeCat(d.categories[0].tab_key);
+          if (d.categories.length > 0) {
+            setSelectedFreeCat((prev) => prev || d.categories[0].tab_key);
           }
         }
       })

@@ -72,6 +72,10 @@ function NetShortWatchContent() {
 
   // Player controls
   const [isPlaying, setIsPlaying] = useState(true);
+  const isPlayingRef = useRef(isPlaying);
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
   const [isMuted, setIsMuted] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<1 | 1.25 | 1.5 | 2>(1);
   const [showEpisodeDrawer, setShowEpisodeDrawer] = useState(false);
@@ -153,7 +157,7 @@ function NetShortWatchContent() {
         hls.loadSource(activeStreamUrl);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          if (isPlaying) video.play().catch(() => {});
+          if (isPlayingRef.current) video.play().catch(() => {});
         });
         hls.on(Hls.Events.ERROR, (_, data) => {
           if (data.fatal) {
@@ -172,11 +176,11 @@ function NetShortWatchContent() {
         });
       } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
         video.src = activeStreamUrl;
-        if (isPlaying) video.play().catch(() => {});
+        if (isPlayingRef.current) video.play().catch(() => {});
       }
     } else {
       video.src = activeStreamUrl;
-      if (isPlaying) video.play().catch(() => {});
+      if (isPlayingRef.current) video.play().catch(() => {});
     }
 
     return () => {

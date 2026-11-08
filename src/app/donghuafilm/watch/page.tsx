@@ -46,6 +46,7 @@ function DonghuaFilmWatchContent() {
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<DonghuaFilmDetail | null>(null);
   const [currentEpNum, setCurrentEpNum] = useState<number>(initialEp);
+  const initialEpRef = useRef(initialEp);
   const [currentEpisode, setCurrentEpisode] = useState<DonghuaFilmEpisode | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showDownloads, setShowDownloads] = useState(false);
@@ -63,7 +64,7 @@ function DonghuaFilmWatchContent() {
           setDetail(data);
           // Find selected episode or the first available
           const epList = data.episodes as DonghuaFilmEpisode[];
-          const target = epList.find((e) => e.number === currentEpNum) || epList[epList.length - 1] || epList[0];
+          const target = epList.find((e) => e.number === initialEpRef.current) || epList[epList.length - 1] || epList[0];
           if (target) {
             setCurrentEpNum(target.number);
             setCurrentEpisode(target);
