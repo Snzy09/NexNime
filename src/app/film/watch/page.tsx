@@ -31,14 +31,13 @@ import { VidboxDetail } from "@/lib/services/vidboxService";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import QuickReactions from "@/components/QuickReactions";
 
-export type IframeConfigMode = "standard" | "relaxed" | "same-origin" | "adshield";
+export type IframeConfigMode = "standard" | "relaxed" | "same-origin";
 
 interface IframeConfigOption {
   id: IframeConfigMode;
   name: string;
   badge: string;
   description: string;
-  sandbox?: string;
   referrerPolicy: React.HTMLAttributeReferrerPolicy;
   allow: string;
 }
@@ -48,17 +47,15 @@ const IFRAME_CONFIGS: Record<IframeConfigMode, IframeConfigOption> = {
     id: "standard",
     name: "Standard HD (Rekomendasi)",
     badge: "Bypass Error",
-    description: "Tanpa sandbox restriktif, mengizinkan MSE, Video.js & HLS penuh agar terhindar dari format not supported.",
-    sandbox: undefined,
+    description: "Tanpa sandbox, mengizinkan MSE, Video.js & HLS penuh agar terhindar dari format not supported.",
     referrerPolicy: "no-referrer",
     allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen *",
   },
   relaxed: {
     id: "relaxed",
-    name: "Relaxed Sandbox",
+    name: "Relaxed Allow",
     badge: "Fleksibel",
-    description: "Sandbox fleksibel dengan izin popup escape dan navigasi aman.",
-    sandbox: "allow-scripts allow-same-origin allow-forms allow-presentation allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation",
+    description: "Policy fleksibel dengan izin fullscreen dan navigasi penuh.",
     referrerPolicy: "no-referrer",
     allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen",
   },
@@ -67,18 +64,8 @@ const IFRAME_CONFIGS: Record<IframeConfigMode, IframeConfigOption> = {
     name: "VidBox Same-Origin",
     badge: "Official",
     description: "Header referrer same-origin sesuai konfigurasi bawaan platform VidBox.",
-    sandbox: undefined,
     referrerPolicy: "same-origin",
     allow: "autoplay; encrypted-media; picture-in-picture; fullscreen *",
-  },
-  adshield: {
-    id: "adshield",
-    name: "Ad-Shield Sandbox",
-    badge: "Ketat",
-    description: "Sandbox ketat untuk memblokir popup iklan eksternal.",
-    sandbox: "allow-scripts allow-same-origin allow-forms allow-presentation",
-    referrerPolicy: "origin",
-    allow: "autoplay; encrypted-media; picture-in-picture; fullscreen",
   },
 };
 
@@ -299,7 +286,6 @@ function FilmWatchContent() {
                   className="w-full h-full border-0"
                   allowFullScreen
                   allow={IFRAME_CONFIGS[iframeConfigMode].allow}
-                  sandbox={IFRAME_CONFIGS[iframeConfigMode].sandbox}
                   referrerPolicy={IFRAME_CONFIGS[iframeConfigMode].referrerPolicy}
                 />
               ) : (

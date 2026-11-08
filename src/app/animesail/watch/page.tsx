@@ -170,7 +170,6 @@ function AnimeSailWatchContent() {
                       title={episodeData.title}
                       allowFullScreen
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                      sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
                       className="w-full h-full border-0"
                     />
                   ) : null}

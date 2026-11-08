@@ -190,7 +190,6 @@ function OppaDramaWatchContent() {
                     title={episodeData?.title || seriesDetail?.title || "Video Player"}
                     allowFullScreen
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
                     className="w-full h-full border-0"
                   />
                 </div>
