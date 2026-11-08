@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Heart, Play, ChevronRight, Sparkles, Film, Tv } from "lucide-react";
 import { OppaDramaCard } from "@/lib/services/oppadramaService";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 
 interface OppaDramaSectionProps {
   items: OppaDramaCard[];
@@ -55,11 +56,10 @@ export default function OppaDramaSection({ items }: OppaDramaSectionProps) {
           >
             <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
               {item.thumbnail ? (
-                <img
+                <ImageWithSkeleton
                   src={item.thumbnail}
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-fuchsia-950/20 text-fuchsia-300 text-xs text-center p-3">
@@ -67,7 +67,7 @@ export default function OppaDramaSection({ items }: OppaDramaSectionProps) {
                 </div>
               )}
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
 
               {/* Play Button Overlay */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">

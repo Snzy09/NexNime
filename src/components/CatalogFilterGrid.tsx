@@ -17,6 +17,7 @@ import {
   Filter,
 } from "lucide-react";
 import { AnimeItem } from "@/lib/services/animeService";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 
 interface CatalogFilterGridProps {
   items: AnimeItem[];
@@ -483,13 +484,13 @@ export default function CatalogFilterGrid({ items }: CatalogFilterGridProps) {
               className="group relative rounded-xl overflow-hidden bg-[#13131A] border border-white/5 hover:border-amber-400/40 transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-xl hover:shadow-black/50"
             >
               <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/40">
-                <img
+                <ImageWithSkeleton
                   src={anime.poster}
                   alt={anime.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/60" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/60 pointer-events-none" />
 
                 {/* Badges */}
                 <div className="absolute top-2 left-2 right-2 flex items-center justify-between z-10">

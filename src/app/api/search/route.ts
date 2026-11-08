@@ -9,6 +9,7 @@ import {
   searchPineDrama,
   searchMelolo,
 } from "@/lib/services/dramoxService";
+import { searchDramaBox } from "@/lib/services/dramaboxService";
 import { searchDracin } from "@/lib/services/dracinService";
 import { searchReelShort } from "@/lib/services/reelshortService";
 import { searchNetShort } from "@/lib/services/netshortService";
@@ -63,6 +64,7 @@ export async function GET(request: Request) {
     donghuaRes,
     animeRes,
     // Short Drama / Dracin
+    dramaBoxRes,
     freeReelsRes,
     pineDramaRes,
     meloloRes,
@@ -85,6 +87,7 @@ export async function GET(request: Request) {
     safeRun(searchDonghua(q)),
     safeRun(searchAnime(q)),
 
+    safeRun(searchDramaBox(q)),
     safeRun(searchFreeReels(q, limitParam)),
     safeRun(searchPineDrama(q, "id", limitParam)),
     safeRun(searchMelolo(q, limitParam, "id")),
@@ -205,6 +208,25 @@ export async function GET(request: Request) {
   // ----------------------------------------------------------------
   const dracinItems: UniversalSearchItem[] = [];
   const seenDracin = new Set<string>();
+
+  (dramaBoxRes?.books || []).forEach((item: any) => {
+    const id = item.bookId;
+    const title = item.title;
+    const key = `db-${id}`;
+    if (!seenDracin.has(key) && title) {
+      seenDracin.add(key);
+      dracinItems.push({
+        id: String(id),
+        title,
+        cover: item.cover || "",
+        href: `/dracin/watch?provider=dramabox&id=${encodeURIComponent(id)}&title=${encodeURIComponent(title)}`,
+        provider: "DramaBox",
+        category: "dracin",
+        badge: item.status || "Short Drama",
+        subText: item.genres?.[0] || (item.chapterCount ? `${item.chapterCount} Ep` : undefined),
+      });
+    }
+  });
 
   (freeReelsRes || []).forEach((item: any) => {
     const id = item.id || item.key;

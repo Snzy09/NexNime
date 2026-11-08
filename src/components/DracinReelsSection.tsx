@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Video, Play, Eye, ChevronRight, Sparkles } from "lucide-react";
 import { DracinItem } from "@/lib/services/dracinService";
 import DraggableCarousel from "@/components/DraggableCarousel";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 
 interface DracinReelsSectionProps {
   items: DracinItem[];
@@ -54,14 +55,13 @@ export default function DracinReelsSection({ items }: DracinReelsSectionProps) {
             >
               {/* Poster Container */}
               <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
-                <img
+                <ImageWithSkeleton
                   src={dracin.image || "https://d378mspt4q6n8p.cloudfront.net/posters/dragon-emperor.jpg"}
                   alt={dracin.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none"
-                  loading="lazy"
                 />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/60" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/60 pointer-events-none" />
 
                 {/* Play Button Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">

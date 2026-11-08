@@ -17,6 +17,12 @@ import {
   ExternalLink,
   Tv,
   PictureInPicture2,
+  RotateCcw,
+  Settings,
+  Shield,
+  Zap,
+  Globe,
+  Sparkles,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -24,6 +30,57 @@ import SearchModal from "@/components/SearchModal";
 import { VidboxDetail } from "@/lib/services/vidboxService";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import QuickReactions from "@/components/QuickReactions";
+
+export type IframeConfigMode = "standard" | "relaxed" | "same-origin" | "adshield";
+
+interface IframeConfigOption {
+  id: IframeConfigMode;
+  name: string;
+  badge: string;
+  description: string;
+  sandbox?: string;
+  referrerPolicy: React.HTMLAttributeReferrerPolicy;
+  allow: string;
+}
+
+const IFRAME_CONFIGS: Record<IframeConfigMode, IframeConfigOption> = {
+  standard: {
+    id: "standard",
+    name: "Standard HD (Rekomendasi)",
+    badge: "Bypass Error",
+    description: "Tanpa sandbox restriktif, mengizinkan MSE, Video.js & HLS penuh agar terhindar dari format not supported.",
+    sandbox: undefined,
+    referrerPolicy: "no-referrer",
+    allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen *",
+  },
+  relaxed: {
+    id: "relaxed",
+    name: "Relaxed Sandbox",
+    badge: "Fleksibel",
+    description: "Sandbox fleksibel dengan izin popup escape dan navigasi aman.",
+    sandbox: "allow-scripts allow-same-origin allow-forms allow-presentation allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation",
+    referrerPolicy: "no-referrer",
+    allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen",
+  },
+  "same-origin": {
+    id: "same-origin",
+    name: "VidBox Same-Origin",
+    badge: "Official",
+    description: "Header referrer same-origin sesuai konfigurasi bawaan platform VidBox.",
+    sandbox: undefined,
+    referrerPolicy: "same-origin",
+    allow: "autoplay; encrypted-media; picture-in-picture; fullscreen *",
+  },
+  adshield: {
+    id: "adshield",
+    name: "Ad-Shield Sandbox",
+    badge: "Ketat",
+    description: "Sandbox ketat untuk memblokir popup iklan eksternal.",
+    sandbox: "allow-scripts allow-same-origin allow-forms allow-presentation",
+    referrerPolicy: "origin",
+    allow: "autoplay; encrypted-media; picture-in-picture; fullscreen",
+  },
+};
 
 function FilmWatchContent() {
   const searchParams = useSearchParams();
@@ -35,6 +92,11 @@ function FilmWatchContent() {
   const [detail, setDetail] = useState<VidboxDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeServerIdx, setActiveServerIdx] = useState(0);
+
+  // Iframe player configurations
+  const [iframeConfigMode, setIframeConfigMode] = useState<IframeConfigMode>("standard");
+  const [playerKey, setPlayerKey] = useState(0);
+  const [showConfigMenu, setShowConfigMenu] = useState(false);
 
   // Series state (if TV Series)
   const [selectedSeason, setSelectedSeason] = useState(1);
@@ -168,19 +230,77 @@ function FilmWatchContent() {
 
         {/* Real Stream Player & Detail */}
         {!loading && detail && (
-          <div className="space-y-6">
-            {/* Video Player Frame */}
+          <div className="space-y-4 sm:space-y-6">
+            {/* Quick Player Configuration Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-[#101018] border border-white/10">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                <span className="text-xs font-bold text-gray-400 flex items-center gap-1 mr-1 shrink-0">
+                  <Settings className="w-3.5 h-3.5 text-red-400" />
+                  <span className="hidden sm:inline">Konfigurasi Iframe:</span>
+                </span>
+                {(Object.keys(IFRAME_CONFIGS) as IframeConfigMode[]).map((mode) => {
+                  const cfg = IFRAME_CONFIGS[mode];
+                  const isActive = iframeConfigMode === mode;
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => {
+                        setIframeConfigMode(mode);
+                        setPlayerKey((k) => k + 1);
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+                        isActive
+                          ? "bg-red-600 text-white shadow-md shadow-red-600/30"
+                          : "bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5"
+                      }`}
+                      title={cfg.description}
+                    >
+                      <span>{cfg.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setPlayerKey((k) => k + 1)}
+                  className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-200 text-xs font-semibold border border-white/10 flex items-center gap-1.5 transition-colors active:scale-95"
+                  title="Muat ulang iframe player jika video terhenti atau macet"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-red-400" />
+                  <span>Muat Ulang Video</span>
+                </button>
+
+                {activeServerUrl && (
+                  <button
+                    type="button"
+                    onClick={() => window.open(activeServerUrl, "_blank", "noopener,noreferrer")}
+                    className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-200 text-xs font-semibold border border-white/10 flex items-center gap-1.5 transition-colors"
+                    title="Buka player langsung di tab baru (bypass proteksi iframe)"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-red-400" />
+                    <span className="hidden sm:inline">Tab Baru</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Video Player Frame with dynamic config */}
             <div
               ref={playerContainerRef}
               className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl"
             >
               {activeServerUrl ? (
                 <iframe
+                  key={`${activeServerUrl}-${iframeConfigMode}-${playerKey}`}
                   src={activeServerUrl}
                   className="w-full h-full border-0"
                   allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                  allow={IFRAME_CONFIGS[iframeConfigMode].allow}
+                  sandbox={IFRAME_CONFIGS[iframeConfigMode].sandbox}
+                  referrerPolicy={IFRAME_CONFIGS[iframeConfigMode].referrerPolicy}
                 />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-3">
@@ -190,6 +310,19 @@ function FilmWatchContent() {
                   </p>
                 </div>
               )}
+            </div>
+
+            {/* Troubleshooting Hint Box */}
+            <div className="flex items-start gap-2.5 p-3 rounded-xl bg-red-950/20 border border-red-500/20 text-xs text-gray-300">
+              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-white">
+                  Mengalami pesan &quot;The media could not be loaded / format not supported&quot;?
+                </p>
+                <p className="text-gray-400 mt-0.5 leading-relaxed text-[11px]">
+                  Gunakan konfigurasi <strong>Standard HD</strong> (tanpa sandbox restriktif) di atas, atau pilih server alternatif lain di bawah (misal <strong>VidLink Pro</strong>, <strong>VidSrc</strong>, atau <strong>Embed.su</strong>). Jika browser memblokir embed, klik tombol <strong>Tab Baru</strong>.
+                </p>
+              </div>
             </div>
 
             {/* Server Selector Bar for Movies */}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Clapperboard, Star, ChevronRight, Play } from "lucide-react";
 import { DrakorItem } from "@/lib/services/drakorService";
 import DraggableCarousel from "@/components/DraggableCarousel";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 
 interface DrakorSectionProps {
   items: DrakorItem[];
@@ -54,13 +55,12 @@ export default function DrakorSection({ items }: DrakorSectionProps) {
             >
               {/* Poster Container */}
               <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/40">
-                <img
+                <ImageWithSkeleton
                   src={drama.poster || "https://drakorid.org/wp-content/uploads/2024/03/queen-of-tears.jpg"}
                   alt={drama.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none"
-                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/60" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/60 pointer-events-none" />
 
                 {/* Play Hover Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">

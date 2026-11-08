@@ -99,7 +99,37 @@ function DracinWatchContent() {
   useEffect(() => {
     if (!rawId) return;
 
-    if (provider === "freereels") {
+    if (provider === "dramabox") {
+      fetch(`/api/dracin?provider=dramabox&action=detail&id=${encodeURIComponent(rawId)}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.detail && data.detail.episodes) {
+            setDetail({
+              film: {
+                id: data.detail.book.bookId,
+                slug: data.detail.book.bookId,
+                title: data.detail.book.title,
+                image: data.detail.book.cover,
+                episodes: data.detail.totalEpisodes,
+                views: data.detail.book.viewCount,
+                description: data.detail.book.intro,
+                url: `/dracin/watch?provider=dramabox&id=${encodeURIComponent(rawId)}`,
+              },
+              total_episode: data.detail.totalEpisodes,
+              episodes: data.detail.episodes.map((e: any) => ({
+                number: e.index,
+                title: e.name,
+                watch_url: `/dracin/watch?provider=dramabox&id=${encodeURIComponent(rawId)}&ep=${e.index}`,
+                video: e.m3u8 || e.mp4,
+                subtitle: null,
+                image: e.cover,
+              })),
+            });
+            setTotalEpisodesCount(data.detail.totalEpisodes || 40);
+          }
+        })
+        .catch(() => setTotalEpisodesCount(40));
+    } else if (provider === "freereels") {
       fetch(`/api/dracin?provider=freereels&action=detail&id=${encodeURIComponent(rawId)}`)
         .then((r) => r.json())
         .then((data) => {
@@ -159,7 +189,9 @@ function DracinWatchContent() {
     setShowAutoNext(false);
 
     let url = `/api/dracin?action=episode&slug=${encodeURIComponent(rawId)}&ep=${currentEpisodeNum}`;
-    if (provider === "freereels") {
+    if (provider === "dramabox") {
+      url = `/api/dracin?provider=dramabox&action=stream&id=${encodeURIComponent(rawId)}&ep=${currentEpisodeNum}`;
+    } else if (provider === "freereels") {
       url = `/api/dracin?provider=freereels&action=stream&id=${encodeURIComponent(rawId)}&ep=${currentEpisodeNum}`;
     } else if (provider === "pinedrama") {
       url = `/api/dracin?provider=pinedrama&action=stream&id=${encodeURIComponent(rawId)}&ep=${currentEpisodeNum}&lang=${selectedLang}`;
@@ -170,7 +202,14 @@ function DracinWatchContent() {
     fetch(url)
       .then((r) => r.json())
       .then((d) => {
-        if (provider === "freereels") {
+        if (provider === "dramabox") {
+          const streamUrl = d.stream?.stream_url || d.stream?.m3u8 || d.stream?.mp4;
+          if (streamUrl) {
+            setVideoUrl(streamUrl);
+          } else {
+            setErrorMsg(d.error || "Stream video DramaBox tidak tersedia untuk episode ini.");
+          }
+        } else if (provider === "freereels") {
           const streamData = d.stream;
           const streamUrl = streamData?.stream_url || streamData?.proxy_stream_url || streamData?.raw_stream_url;
           if (streamUrl) {

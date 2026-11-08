@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Video, Play, ChevronRight, Sparkles, Flame } from "lucide-react";
 import { NetShortItem } from "@/lib/services/netshortService";
 import DraggableCarousel from "@/components/DraggableCarousel";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 
 interface NetShortSectionProps {
   items: NetShortItem[];
@@ -57,12 +58,10 @@ export default function NetShortSection({ items }: NetShortSectionProps) {
             {/* Standard Aspect Ratio container */}
             <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
               {drama.cover ? (
-                <img
+                <ImageWithSkeleton
                   src={drama.cover}
                   alt={drama.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none"
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-purple-950/20 text-purple-300 text-xs p-3 text-center">
@@ -70,7 +69,7 @@ export default function NetShortSection({ items }: NetShortSectionProps) {
                 </div>
               )}
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
 
               {/* Play Button Overlay */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">

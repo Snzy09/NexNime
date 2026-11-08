@@ -212,11 +212,17 @@ export async function getVidboxDetail(target: string): Promise<VidboxDetail | nu
 
     if (isMovie) {
       const servers: { name: string; url: string }[] = [];
+      let tmdbId: string | null = null;
+
       $('.vb-player__tabs .vb-srv').each((_, el) => {
         const name = $(el).attr('data-name') || $(el).text().trim();
         const url = $(el).attr('data-url');
         if (url) {
           servers.push({ name, url });
+          if (!tmdbId) {
+            const m = url.match(/(?:movie|film|e)\/(\d+)/);
+            if (m && m[1]) tmdbId = m[1];
+          }
         }
       });
 
@@ -224,6 +230,27 @@ export async function getVidboxDetail(target: string): Promise<VidboxDetail | nu
       const iframeSrc = $('.vb-player iframe').attr('src') || '';
       if (iframeSrc && !servers.some(s => s.url === iframeSrc)) {
         servers.unshift({ name: 'Default HD', url: iframeSrc });
+        if (!tmdbId) {
+          const m = iframeSrc.match(/(?:movie|film|e)\/(\d+)/);
+          if (m && m[1]) tmdbId = m[1];
+        }
+      }
+
+      // Add high-reliability alternative embed servers if TMDB ID is known
+      if (tmdbId) {
+        const extraMirrors = [
+          { name: 'VidLink Pro (Fast HD)', url: `https://vidlink.pro/movie/${tmdbId}` },
+          { name: 'VidSrc (Multi-Sub)', url: `https://vidsrc.to/embed/movie/${tmdbId}` },
+          { name: 'Embed.su (1080p)', url: `https://embed.su/embed/movie/${tmdbId}` },
+          { name: 'AutoEmbed Mirror', url: `https://player.autoembed.cc/embed/movie/${tmdbId}` },
+          { name: 'VidSrc CC', url: `https://vidsrc.cc/v2/embed/movie/${tmdbId}` },
+          { name: 'SuperEmbed', url: `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1` },
+        ];
+        for (const mirror of extraMirrors) {
+          if (!servers.some(s => s.url === mirror.url)) {
+            servers.push(mirror);
+          }
+        }
       }
 
       info.servers = servers;

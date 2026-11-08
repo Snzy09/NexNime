@@ -18,6 +18,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { UniversalSearchItem } from "@/app/api/search/route";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -266,25 +267,16 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                       >
                         <div className="w-10 h-14 rounded-lg overflow-hidden bg-[#111118] shrink-0 relative">
                           {item.cover ? (
-                            <img
+                            <ImageWithSkeleton
                               src={item.cover}
                               alt={item.title}
-                              referrerPolicy="no-referrer"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                              onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).style.display = "none";
-                                const fb = e.currentTarget.parentElement?.querySelector(".modal-poster-fallback");
-                                if (fb) (fb as HTMLElement).style.display = "flex";
-                              }}
                             />
-                          ) : null}
-                          <div
-                            className={`modal-poster-fallback w-full h-full ${
-                              item.cover ? "hidden" : "flex"
-                            } items-center justify-center bg-gradient-to-b from-[#181824] to-[#0A0A10] text-[9px] font-bold text-amber-400 p-1 text-center`}
-                          >
-                            {item.provider ? item.provider.slice(0, 3).toUpperCase() : "NN"}
-                          </div>
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-[#181824] to-[#0A0A10] text-[9px] font-bold text-amber-400 p-1 text-center">
+                              {item.provider ? item.provider.slice(0, 3).toUpperCase() : "NN"}
+                            </div>
+                          )}
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-bold text-white truncate group-hover:text-amber-300 transition-colors">

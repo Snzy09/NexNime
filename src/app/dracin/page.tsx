@@ -19,6 +19,7 @@ import {
   Film,
 } from "lucide-react";
 import { DracinItem } from "@/lib/services/dracinService";
+import { DramaBoxBook, DramaBoxGenre } from "@/lib/services/dramaboxService";
 import { ReelShortItem } from "@/lib/services/reelshortService";
 import { NetShortItem } from "@/lib/services/netshortService";
 import { FreeReelsItem, FreeReelsCategory, PineDramaItem, PineDramaLanguage } from "@/lib/services/dramoxService";
@@ -26,9 +27,17 @@ import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
 import DracinReelsSection from "@/components/DracinReelsSection";
 import DracinScheduleSection from "@/components/DracinScheduleSection";
 import DracinReelsSkeleton from "@/components/skeletons/DracinReelsSkeleton";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 
 function DracinHubContent() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // 0. DramaBox State (Flagship Main Scraper)
+  const [dramaBoxBooks, setDramaBoxBooks] = useState<DramaBoxBook[]>([]);
+  const [dramaBoxFeatured, setDramaBoxFeatured] = useState<DramaBoxBook[]>([]);
+  const [dramaBoxGenres, setDramaBoxGenres] = useState<DramaBoxGenre[]>([]);
+  const [selectedDramaBoxGenre, setSelectedDramaBoxGenre] = useState<number>(0);
+  const [loadingDramaBox, setLoadingDramaBox] = useState(true);
 
   // 1. FreeReels State
   const [freeReelsTab, setFreeReelsTab] = useState<"feed" | "popular" | "soon" | "freesoon" | "category">("feed");
@@ -71,6 +80,46 @@ function DracinHubContent() {
   // 6. NetShort State
   const [netShortDramas, setNetShortDramas] = useState<NetShortItem[]>([]);
   const [loadingNetShort, setLoadingNetShort] = useState(true);
+
+  // -------------------------------------------------------------
+  // Data Fetching: DramaBox (Main Scraper)
+  // -------------------------------------------------------------
+  useEffect(() => {
+    // Initial home and categories fetch
+    fetch("/api/dracin?provider=dramabox&action=home")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.featured && Array.isArray(d.featured)) {
+          setDramaBoxFeatured(d.featured);
+        }
+      })
+      .catch(() => {});
+
+    fetch("/api/dracin?provider=dramabox&action=categories")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.categories && Array.isArray(d.categories)) {
+          setDramaBoxGenres(d.categories);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setLoadingDramaBox(true);
+    fetch(`/api/dracin?provider=dramabox&action=browse&genre=${selectedDramaBoxGenre}&page=1`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.books && Array.isArray(d.books)) {
+          setDramaBoxBooks(d.books);
+          if (d.genres && Array.isArray(d.genres) && dramaBoxGenres.length === 0) {
+            setDramaBoxGenres(d.genres);
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingDramaBox(false));
+  }, [selectedDramaBoxGenre, dramaBoxGenres.length]);
 
   // -------------------------------------------------------------
   // Data Fetching: FreeReels
@@ -221,11 +270,17 @@ function DracinHubContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2 w-full">
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
           <a
-            href="#freereels"
-            className="px-3 py-1 rounded-full bg-rose-500 text-white font-bold text-xs shadow-md shadow-rose-500/25 flex items-center gap-1 shrink-0"
+            href="#dramabox"
+            className="px-3.5 py-1 rounded-full bg-gradient-to-r from-rose-600 to-amber-600 text-white font-extrabold text-xs shadow-md shadow-rose-600/30 flex items-center gap-1.5 shrink-0"
           >
-            <Sparkles className="w-3 h-3" />
-            <span>FreeReels</span>
+            <Flame className="w-3.5 h-3.5 text-amber-300" />
+            <span>DramaBox (Utama)</span>
+          </a>
+          <a
+            href="#freereels"
+            className="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold border border-white/10 transition-colors shrink-0"
+          >
+            FreeReels
           </a>
           <a
             href="#pinedrama"
@@ -259,6 +314,126 @@ function DracinHubContent() {
           </a>
         </div>
       </div>
+
+      {/* ========================================================= */}
+      {/* SECTION 0: DRAMABOX (Flagship Main Short Drama Scraper) */}
+      {/* ========================================================= */}
+      <section id="dramabox" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5 w-full scroll-mt-20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center">
+                <Flame className="w-5 h-5 text-rose-500" />
+              </div>
+              <h2 className="text-lg sm:text-xl font-black tracking-tight text-white flex items-center gap-2">
+                <span>DramaBox</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-extrabold border border-amber-400/30 uppercase tracking-wider">
+                  Main Scraper
+                </span>
+              </h2>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">
+              Scraper live langsung dari DramaBox CDN: episode reels 9:16 vertikal, Werewolves, CEO, Romance &amp; Revenge
+            </p>
+          </div>
+
+          {/* Genre Filters Scroll */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            <button
+              type="button"
+              onClick={() => setSelectedDramaBoxGenre(0)}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1 ${
+                selectedDramaBoxGenre === 0
+                  ? "bg-rose-600 text-white shadow-md shadow-rose-600/30"
+                  : "bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white"
+              }`}
+            >
+              <span>Semua</span>
+            </button>
+            {dramaBoxGenres.slice(1, 12).map((g) => (
+              <button
+                key={g.id}
+                type="button"
+                onClick={() => setSelectedDramaBoxGenre(g.id)}
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                  selectedDramaBoxGenre === g.id
+                    ? "bg-rose-600 text-white shadow-md shadow-rose-600/30 font-bold"
+                    : "bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white"
+                }`}
+              >
+                {g.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* DramaBox Grid */}
+        {loadingDramaBox ? (
+          <DracinReelsSkeleton />
+        ) : dramaBoxBooks.length === 0 ? (
+          <div className="p-8 text-center text-xs text-gray-500 bg-white/5 rounded-2xl border border-white/5">
+            Tidak ada serial drama ditemukan pada kategori ini.
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {dramaBoxBooks.map((book) => (
+              <Link
+                key={book.bookId}
+                href={`/dracin/watch?provider=dramabox&id=${encodeURIComponent(book.bookId)}&title=${encodeURIComponent(book.title)}`}
+                className="group relative rounded-2xl overflow-hidden bg-[#101018] border border-white/5 hover:border-rose-500/50 transition-all hover:shadow-xl hover:shadow-rose-950/30 flex flex-col"
+              >
+                <div className="aspect-[3/4.2] w-full relative overflow-hidden bg-[#181824]">
+                  {book.cover ? (
+                    <ImageWithSkeleton
+                      src={book.cover}
+                      alt={book.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-[#181824] to-[#0A0A10] text-rose-500 font-bold text-xs p-2 text-center">
+                      DramaBox
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+
+                  {/* Top Badges */}
+                  <div className="absolute top-2 left-2 right-2 flex items-center justify-between gap-1 pointer-events-none">
+                    <span className="px-1.5 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-[10px] font-extrabold text-amber-300 border border-white/10 flex items-center gap-0.5">
+                      ★ {book.rating ? book.rating.toFixed(1) : "8.5"}
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded-md bg-rose-600/90 text-white text-[10px] font-bold">
+                      {book.chapterCount ? `${book.chapterCount} Ep` : "Reels"}
+                    </span>
+                  </div>
+
+                  {/* Hover Play Button */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-10 h-10 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg shadow-rose-900/60 transform scale-75 group-hover:scale-100 transition-transform">
+                      <Play className="w-4 h-4 fill-current ml-0.5" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-2.5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xs font-bold text-white line-clamp-1 group-hover:text-rose-400 transition-colors">
+                      {book.title}
+                    </h3>
+                    <p className="text-[10px] text-gray-400 line-clamp-1 mt-0.5">
+                      {book.genres?.[0] || book.tags?.[0] || "Short Drama"}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] text-gray-500 mt-2 pt-1 border-t border-white/5">
+                    <span className="text-rose-400 font-semibold">DramaBox</span>
+                    <span>{book.viewCountDisplay || "HD 720p"}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
 
       {/* Popular Dracin Ranking Carousel */}
       {!loadingAsiaList && dramaList.length > 0 && (
@@ -407,11 +582,10 @@ function DracinHubContent() {
                 >
                   <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
                     {item.cover ? (
-                      <img
+                      <ImageWithSkeleton
                         src={item.cover}
                         alt={itemTitle}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-rose-950/30 text-rose-300 text-xs text-center p-3">
@@ -419,7 +593,7 @@ function DracinHubContent() {
                       </div>
                     )}
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
 
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-xl shadow-rose-600/50">
@@ -533,11 +707,10 @@ function DracinHubContent() {
               >
                 <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
                   {item.cover ? (
-                    <img
+                    <ImageWithSkeleton
                       src={item.cover}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-amber-950/30 text-amber-300 text-xs text-center p-3">
@@ -545,7 +718,7 @@ function DracinHubContent() {
                     </div>
                   )}
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
 
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-500 text-black flex items-center justify-center shadow-xl shadow-amber-500/50">
@@ -635,11 +808,10 @@ function DracinHubContent() {
                 >
                   <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
                     {item.cover || item.thumb_url ? (
-                      <img
+                      <ImageWithSkeleton
                         src={item.cover || item.thumb_url}
                         alt={item.title || item.book_name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-cyan-950/30 text-cyan-300 text-xs text-center p-3">
@@ -647,7 +819,7 @@ function DracinHubContent() {
                       </div>
                     )}
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
 
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-cyan-500 text-black flex items-center justify-center shadow-xl shadow-cyan-500/50">
@@ -714,11 +886,10 @@ function DracinHubContent() {
               >
                 <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
                   {drama.image ? (
-                    <img
+                    <ImageWithSkeleton
                       src={drama.image}
                       alt={drama.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-rose-950/30 text-rose-300 text-xs text-center p-3">
@@ -726,7 +897,7 @@ function DracinHubContent() {
                     </div>
                   )}
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
 
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-xl shadow-rose-600/50">
@@ -830,11 +1001,10 @@ function DracinHubContent() {
               >
                 <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/70">
                   {item.cover ? (
-                    <img
+                    <ImageWithSkeleton
                       src={item.cover}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-rose-950/20 text-xs text-rose-300 p-2 text-center">
@@ -918,11 +1088,10 @@ function DracinHubContent() {
               >
                 <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/70">
                   {item.cover ? (
-                    <img
+                    <ImageWithSkeleton
                       src={item.cover}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-purple-950/20 text-xs text-purple-300 p-2 text-center">

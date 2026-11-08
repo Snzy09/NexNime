@@ -7,6 +7,14 @@ import {
   getDracinEpisode,
 } from "@/lib/services/dracinService";
 import {
+  getDramaBoxHome,
+  getDramaBoxBrowse,
+  searchDramaBox,
+  getDramaBoxDetail,
+  getDramaBoxStream,
+  toDracinItem,
+} from "@/lib/services/dramaboxService";
+import {
   getFreeReelsFeed,
   getFreeReelsPopular,
   getFreeReelsSoon,
@@ -42,6 +50,8 @@ export async function GET(request: Request) {
   const ep = searchParams.get("ep") || "1";
   const lang = searchParams.get("lang") || "id";
   const limit = parseInt(searchParams.get("limit") || "15", 10);
+  const page = searchParams.get("page") || "1";
+  const genre = searchParams.get("genre") || "0";
 
   try {
     // -------------------------------------------------------------
@@ -81,6 +91,43 @@ export async function GET(request: Request) {
         });
       } catch (err: any) {
         return new NextResponse("Error fetching subtitle: " + err?.message, { status: 500 });
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Provider: DramaBox (Main Scraper for Short Drama / Dracin)
+    // -------------------------------------------------------------
+    if (provider === "dramabox") {
+      if (action === "home") {
+        const homeData = await getDramaBoxHome(lang);
+        return NextResponse.json({ success: true, ...homeData });
+      }
+      if (action === "browse" || action === "feed" || action === "popular") {
+        const browseData = await getDramaBoxBrowse({
+          lang,
+          genre: parseInt(genre, 10) || 0,
+          page: parseInt(page, 10) || 1,
+        });
+        return NextResponse.json({ success: true, ...browseData });
+      }
+      if (action === "categories") {
+        const browseData = await getDramaBoxBrowse({ lang, genre: 0, page: 1 });
+        return NextResponse.json({ success: true, categories: browseData.genres });
+      }
+      if (action === "search" && q) {
+        const searchData = await searchDramaBox(q, {
+          lang,
+          page: parseInt(page, 10) || 1,
+        });
+        return NextResponse.json({ success: true, ...searchData });
+      }
+      if ((action === "detail" || action === "episodes") && id) {
+        const detail = await getDramaBoxDetail(id, lang);
+        return NextResponse.json({ success: true, detail });
+      }
+      if (action === "stream" && id) {
+        const stream = await getDramaBoxStream({ bookId: id, episode: ep, lang });
+        return NextResponse.json({ success: true, stream });
       }
     }
 
@@ -205,11 +252,14 @@ export async function GET(request: Request) {
     // Default & Multi-Provider Search
     // -------------------------------------------------------------
     if (action === "search" && q) {
-      const [asiaItems, freeReelsItems, pineItems] = await Promise.all([
+      const [dramaBoxRes, asiaItems, freeReelsItems, pineItems] = await Promise.all([
+        searchDramaBox(q, { lang }).catch(() => ({ books: [] })),
         searchDracin(q).catch(() => []),
         searchFreeReels(q, 10).catch(() => []),
         searchPineDrama(q, "id", 10).catch(() => []),
       ]);
+
+      const normalizedDramaBox = (dramaBoxRes.books || []).map((b) => toDracinItem(b));
 
       const normalizedFreeReels = freeReelsItems.map((f) => ({
         id: f.id || f.key,
@@ -231,7 +281,7 @@ export async function GET(request: Request) {
         url: `/dracin/watch?provider=pinedrama&id=${encodeURIComponent(p.id)}&title=${encodeURIComponent(p.title)}`,
       }));
 
-      const combined = [...asiaItems, ...normalizedFreeReels, ...normalizedPine];
+      const combined = [...normalizedDramaBox, ...asiaItems, ...normalizedFreeReels, ...normalizedPine];
       if (combined.length > 0) return NextResponse.json({ success: true, items: combined });
 
       const filtered = REAL_DRACIN_SHORTS.filter((d) =>
@@ -240,8 +290,32 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: true, items: filtered });
     }
 
-    // AsiaBox Fallback endpoints
+    // Detail & Episodes endpoint (defaults to DramaBox first, then AsiaBox)
     if (action === "detail" && id) {
+      try {
+        const dbDetail = await getDramaBoxDetail(id, lang);
+        if (dbDetail && dbDetail.episodes.length > 0) {
+          return NextResponse.json({
+            success: true,
+            detail: {
+              film: toDracinItem(dbDetail.book),
+              total_episode: dbDetail.totalEpisodes,
+              episodes: dbDetail.episodes.map((e) => ({
+                number: e.index,
+                title: e.name,
+                watch_url: `/dracin/watch?provider=dramabox&id=${encodeURIComponent(id)}&ep=${e.index}`,
+                video: e.m3u8 || e.mp4,
+                subtitle: null,
+                image: e.cover,
+                free: e.free,
+              })),
+            },
+          });
+        }
+      } catch {
+        // Fallback to AsiaBox
+      }
+
       const detail = await getDracinDetail(id);
       if (detail && detail.episodes.length > 0) return NextResponse.json({ success: true, detail });
 
@@ -266,6 +340,24 @@ export async function GET(request: Request) {
 
     if (action === "episode" && id) {
       const epNum = parseInt(ep, 10);
+      try {
+        const stream = await getDramaBoxStream({ bookId: id, episode: epNum, lang });
+        if (stream && stream.stream_url) {
+          return NextResponse.json({
+            success: true,
+            episode: {
+              number: stream.index,
+              title: stream.name,
+              video: stream.stream_url,
+              image: stream.cover,
+              subtitle: null,
+            },
+          });
+        }
+      } catch {
+        // Fallback
+      }
+
       let episode = await getDracinEpisode(id, epNum);
       if (!episode || !episode.video) {
         const detail = await getDracinDetail(id);
@@ -283,7 +375,20 @@ export async function GET(request: Request) {
       );
     }
 
-    // Default: AsiaBox Home
+    // Default: Main DramaBox Home / Browse
+    try {
+      const dbBrowse = await getDramaBoxBrowse({ lang, genre: 0, page: 1 });
+      if (dbBrowse && dbBrowse.books.length > 0) {
+        return NextResponse.json({
+          success: true,
+          items: dbBrowse.books.map(toDracinItem),
+          genres: dbBrowse.genres,
+        });
+      }
+    } catch {
+      // Fallback to AsiaBox
+    }
+
     const items = await getDracinHome();
     if (items.length > 0) return NextResponse.json({ success: true, items });
     return NextResponse.json({ success: true, items: REAL_DRACIN_SHORTS });

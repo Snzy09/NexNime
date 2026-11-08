@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Video, Play, Eye, ChevronRight, Sparkles, Flame } from "lucide-react";
 import DraggableCarousel from "@/components/DraggableCarousel";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 
 export interface ReelShortItem {
   book_id: string;
@@ -66,15 +67,13 @@ export default function ReelShortSection({ items }: ReelShortSectionProps) {
           >
             {/* Standard Aspect Ratio container */}
             <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
-              <img
+              <ImageWithSkeleton
                 src={item.cover}
                 alt={item.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none"
-                loading="lazy"
-                referrerPolicy="no-referrer"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
 
               {/* Play Button Overlay */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">

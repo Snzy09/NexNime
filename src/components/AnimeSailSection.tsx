@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Compass, Play, ChevronRight, Sparkles, Clock } from "lucide-react";
 import { AnimeSailCard } from "@/lib/services/animesailService";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 
 interface AnimeSailSectionProps {
   items: AnimeSailCard[];
@@ -55,11 +56,10 @@ export default function AnimeSailSection({ items }: AnimeSailSectionProps) {
           >
             <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
               {item.thumbnail ? (
-                <img
+                <ImageWithSkeleton
                   src={item.thumbnail}
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-sky-950/30 text-sky-300 text-xs text-center p-3">
@@ -67,7 +67,7 @@ export default function AnimeSailSection({ items }: AnimeSailSectionProps) {
                 </div>
               )}
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
 
               {/* Play Button Overlay */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">

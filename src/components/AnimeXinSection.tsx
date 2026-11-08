@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Tv, Play, ChevronRight, Sparkles, Star } from "lucide-react";
 import { AnimeXinItem } from "@/lib/services/animexinService";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 
 interface AnimeXinSectionProps {
   items: AnimeXinItem[];
@@ -53,7 +54,7 @@ export default function AnimeXinSection({ items }: AnimeXinSectionProps) {
           >
             <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
               {item.poster ? (
-                <img
+                <ImageWithSkeleton
                   src={
                     item.poster.startsWith("http")
                       ? `/api/animexin?action=image&url=${encodeURIComponent(item.poster)}`
@@ -61,7 +62,6 @@ export default function AnimeXinSection({ items }: AnimeXinSectionProps) {
                   }
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-cyan-950/30 text-cyan-300 text-xs text-center p-3">
@@ -69,7 +69,7 @@ export default function AnimeXinSection({ items }: AnimeXinSectionProps) {
                 </div>
               )}
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
 
               {/* Play Button Overlay */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">

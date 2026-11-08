@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Link from "next/link";
 import { Film, Clapperboard, Search, Flame, Star, Play, AlertCircle, Tv, Heart } from "lucide-react";
 import CatalogGridSkeleton from "@/components/skeletons/CatalogGridSkeleton";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import { VidboxItem } from "@/lib/services/vidboxService";
 import { OppaDramaCard } from "@/lib/services/oppadramaService";
 
@@ -168,7 +169,7 @@ export default function FilmHubPage() {
                   >
                     <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
                       {item.poster ? (
-                        <img
+                        <ImageWithSkeleton
                           src={item.poster}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -178,7 +179,7 @@ export default function FilmHubPage() {
                           <Film className="w-8 h-8 text-red-500/40" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40 pointer-events-none" />
                       <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-red-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase border border-red-500/30">
                         VIDBOX MOVIE
                       </div>
@@ -247,7 +248,7 @@ export default function FilmHubPage() {
                   >
                     <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
                       {item.poster ? (
-                        <img
+                        <ImageWithSkeleton
                           src={item.poster}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -257,7 +258,7 @@ export default function FilmHubPage() {
                           <Tv className="w-8 h-8 text-rose-400/40" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40 pointer-events-none" />
                       <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-rose-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase border border-rose-500/30">
                         TV SERIES
                       </div>
@@ -324,7 +325,7 @@ export default function FilmHubPage() {
                   >
                     <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/60">
                       {item.thumbnail ? (
-                        <img
+                        <ImageWithSkeleton
                           src={item.thumbnail}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -334,7 +335,7 @@ export default function FilmHubPage() {
                           <Film className="w-10 h-10 text-fuchsia-400/40" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/40 pointer-events-none" />
                       <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-fuchsia-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase border border-fuchsia-400/30">
                         OPPADRAMA MOVIE
                       </div>

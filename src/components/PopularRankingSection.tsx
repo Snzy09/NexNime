@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Flame, Star, ChevronRight } from "lucide-react";
 import { AnimeItem } from "@/lib/services/animeService";
 import DraggableCarousel from "@/components/DraggableCarousel";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 
 interface PopularRankingSectionProps {
   items: AnimeItem[];
@@ -54,15 +55,14 @@ export default function PopularRankingSection({ items }: PopularRankingSectionPr
             >
               {/* Poster Container */}
               <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/40">
-                <img
+                <ImageWithSkeleton
                   src={anime.poster}
                   alt={anime.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none"
-                  loading="lazy"
                 />
 
                 {/* Gradient Overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/60" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#13131A] via-transparent to-black/60 pointer-events-none" />
 
                 {/* Top Badges */}
                 <div className="absolute top-2 left-2 right-2 flex items-center justify-between z-10">
