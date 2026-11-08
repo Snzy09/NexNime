@@ -31,6 +31,7 @@ import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import FloatingPlayerButton from "@/components/FloatingPlayerButton";
 import { DracinItem, DracinDetail } from "@/lib/services/dracinService";
 import { REAL_DRACIN_SHORTS } from "@/lib/services/realDataFallback";
 import { saveWatchHistory, getSavedResumeTime } from "@/lib/services/watchHistory";
@@ -618,6 +619,12 @@ function DracinWatchContent() {
                 isMenuOpen={sleepTimer.isMenuOpen}
                 onToggleMenu={sleepTimer.toggleMenu}
                 onSelectOption={sleepTimer.setTimer}
+                accentColor="rose"
+              />
+
+              <FloatingPlayerButton
+                isPipActive={isPipActive}
+                onClick={togglePictureInPicture}
                 accentColor="rose"
               />
 

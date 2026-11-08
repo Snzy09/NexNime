@@ -24,6 +24,7 @@ import { AnimeXinDetail } from "@/lib/services/animexinService";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import FloatingPlayerButton from "@/components/FloatingPlayerButton";
 
 function AnimeXinWatchContent() {
   const searchParams = useSearchParams();
@@ -96,19 +97,11 @@ function AnimeXinWatchContent() {
               onSelectOption={sleepTimer.setTimer}
               accentColor="cyan"
             />
-            <button
-              type="button"
+            <FloatingPlayerButton
+              isPipActive={isPipActive}
               onClick={togglePictureInPicture}
-              className={`px-3 py-1 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                isPipActive
-                  ? "bg-cyan-500 text-black border-cyan-400 font-bold"
-                  : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
-              }`}
-              title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
-            >
-              <PictureInPicture2 className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden sm:inline">Floating Player</span>
-            </button>
+              accentColor="cyan"
+            />
             <span className="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30 text-xs flex items-center gap-1">
               <Tv className="w-3.5 h-3.5" />
               AnimeXin Donghua

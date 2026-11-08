@@ -25,6 +25,7 @@ import {
 import { REAL_DRAKOR_TRENDING } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import FloatingPlayerButton from "@/components/FloatingPlayerButton";
 import BookmarkButton from "@/components/BookmarkButton";
 import { saveWatchHistory, getSavedResumeTime } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
@@ -305,6 +306,12 @@ export default function DrakorDetailPage({ params }: { params: { slug: string } 
                   isMenuOpen={sleepTimer.isMenuOpen}
                   onToggleMenu={sleepTimer.toggleMenu}
                   onSelectOption={sleepTimer.setTimer}
+                  accentColor="blue"
+                />
+
+                <FloatingPlayerButton
+                  isPipActive={isPipActive}
+                  onClick={togglePictureInPicture}
                   accentColor="blue"
                 />
 

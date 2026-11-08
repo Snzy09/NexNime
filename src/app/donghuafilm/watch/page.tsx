@@ -29,6 +29,7 @@ import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import FloatingPlayerButton from "@/components/FloatingPlayerButton";
 import { DonghuaFilmDetail, DonghuaFilmEpisode } from "@/lib/services/donghuaFilmService";
 import { saveWatchHistory } from "@/lib/services/watchHistory";
 import { useVideoShortcuts, VideoShortcutToast } from "@/lib/hooks/useVideoShortcuts";
@@ -424,19 +425,11 @@ function DonghuaFilmWatchContent() {
                   accentColor="amber"
                 />
 
-                <button
-                  type="button"
+                <FloatingPlayerButton
+                  isPipActive={isPipActive}
                   onClick={togglePictureInPicture}
-                  className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1 transition-colors ${
-                    isPipActive
-                      ? "bg-amber-400/25 border-amber-400/40 text-amber-300"
-                      : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-300"
-                  }`}
-                  title={isPipActive ? "Tutup Mini Player" : "Aktifkan Mini / Floating Player (bisa diminimize)"}
-                >
-                  <PictureInPicture2 className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Mini Player</span>
-                </button>
+                  accentColor="amber"
+                />
 
                 <button
                   onClick={() => setShowDownloads(!showDownloads)}

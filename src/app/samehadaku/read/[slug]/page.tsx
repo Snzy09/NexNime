@@ -22,6 +22,7 @@ import { SamehadakuEpisodeStream } from "@/lib/services/samehadakuService";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import FloatingPlayerButton from "@/components/FloatingPlayerButton";
 import QuickReactions from "@/components/QuickReactions";
 
 function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
@@ -97,19 +98,11 @@ function SamehadakuReaderContent({ params }: { params: { slug: string } }) {
               accentColor="amber"
             />
 
-            <button
-              type="button"
+            <FloatingPlayerButton
+              isPipActive={isPipActive}
               onClick={togglePictureInPicture}
-              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                isPipActive
-                  ? "bg-amber-400 text-black border-amber-400 font-bold"
-                  : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
-              }`}
-              title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
-            >
-              <PictureInPicture2 className="w-4 h-4 text-amber-400" />
-              <span className="hidden sm:inline">Floating Player</span>
-            </button>
+              accentColor="amber"
+            />
           </div>
         </div>
       </header>

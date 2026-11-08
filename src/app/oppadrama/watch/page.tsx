@@ -23,6 +23,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import FloatingPlayerButton from "@/components/FloatingPlayerButton";
 import {
   OppaDramaEpisodeDetail,
   OppaDramaSeriesDetail,
@@ -129,6 +132,8 @@ function OppaDramaWatchContent() {
     poster: seriesDetail?.thumbnail || "",
   });
 
+  const sleepTimer = useSleepTimer();
+
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-fuchsia-500 selection:text-black">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
@@ -146,6 +151,19 @@ function OppaDramaWatchContent() {
           </Link>
 
           <div className="flex items-center gap-2">
+            <SleepTimerButton
+              sleepOption={sleepTimer.sleepOption}
+              formattedRemaining={sleepTimer.formattedRemaining}
+              isMenuOpen={sleepTimer.isMenuOpen}
+              onToggleMenu={sleepTimer.toggleMenu}
+              onSelectOption={sleepTimer.setTimer}
+              accentColor="fuchsia"
+            />
+            <FloatingPlayerButton
+              isPipActive={isPipActive}
+              onClick={togglePictureInPicture}
+              accentColor="fuchsia"
+            />
             <span className="px-2.5 py-1 rounded-full bg-fuchsia-500/20 text-fuchsia-300 font-bold border border-fuchsia-500/30 text-xs flex items-center gap-1.5">
               <Heart className="w-3.5 h-3.5 fill-fuchsia-400" />
               OppaDrama Stream
@@ -183,16 +201,18 @@ function OppaDramaWatchContent() {
               className="rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl relative"
             >
               {streamSrc ? (
-                <div className="relative aspect-video w-full bg-black">
-                  <iframe
-                    key={streamSrc}
-                    src={streamSrc}
-                    title={episodeData?.title || seriesDetail?.title || "Video Player"}
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                    className="w-full h-full border-0"
-                  />
-                </div>
+                !sleepTimer.isSleeping ? (
+                  <div className="relative aspect-video w-full bg-black">
+                    <iframe
+                      key={streamSrc}
+                      src={streamSrc}
+                      title={episodeData?.title || seriesDetail?.title || "Video Player"}
+                      allowFullScreen
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                      className="w-full h-full border-0"
+                    />
+                  </div>
+                ) : null
               ) : (
                 <div className="aspect-video w-full flex flex-col items-center justify-center text-center p-6 bg-[#0E0E14]">
                   <AlertCircle className="w-10 h-10 text-amber-400 mb-2" />
@@ -200,6 +220,13 @@ function OppaDramaWatchContent() {
                   <p className="text-xs text-gray-400 mt-1">Silakan pilih episode lain pada daftar di bawah.</p>
                 </div>
               )}
+
+              {/* Sleep Timer Overlay */}
+              <SleepTimerOverlay
+                show={sleepTimer.isSleeping}
+                onWakeUp={sleepTimer.wakeUp}
+                accentColor="fuchsia"
+              />
 
               {/* Server / Mirror Switcher */}
               {episodeData?.mirrors && episodeData.mirrors.length > 0 && (
@@ -281,19 +308,11 @@ function OppaDramaWatchContent() {
                     </Link>
                   )}
 
-                  <button
-                    type="button"
+                  <FloatingPlayerButton
+                    isPipActive={isPipActive}
                     onClick={togglePictureInPicture}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-colors ${
-                      isPipActive
-                        ? "bg-fuchsia-500 text-black border-fuchsia-400 font-bold"
-                        : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
-                    }`}
-                    title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
-                  >
-                    <PictureInPicture2 className="w-4 h-4 text-fuchsia-400" />
-                    <span className="hidden sm:inline">Floating Player</span>
-                  </button>
+                    accentColor="fuchsia"
+                  />
 
                   <button
                     onClick={handleShare}

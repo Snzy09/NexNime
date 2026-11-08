@@ -24,6 +24,7 @@ import {
 import { REAL_ANIME_POPULAR } from "@/lib/services/realDataFallback";
 import AutoNextCountdown from "@/components/AutoNextCountdown";
 import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import FloatingPlayerButton from "@/components/FloatingPlayerButton";
 import BookmarkButton from "@/components/BookmarkButton";
 import QuickReactions from "@/components/QuickReactions";
 import { saveWatchHistory } from "@/lib/services/watchHistory";
@@ -382,6 +383,12 @@ function isValidEmbedUrl(url?: string): boolean {
                   isMenuOpen={sleepTimer.isMenuOpen}
                   onToggleMenu={sleepTimer.toggleMenu}
                   onSelectOption={sleepTimer.setTimer}
+                  accentColor="amber"
+                />
+
+                <FloatingPlayerButton
+                  isPipActive={isPipActive}
+                  onClick={togglePictureInPicture}
                   accentColor="amber"
                 />
 

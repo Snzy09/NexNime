@@ -29,6 +29,9 @@ import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import { VidboxDetail } from "@/lib/services/vidboxService";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
+import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
+import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import FloatingPlayerButton from "@/components/FloatingPlayerButton";
 import QuickReactions from "@/components/QuickReactions";
 
 export type IframeConfigMode = "standard" | "relaxed" | "same-origin";
@@ -138,6 +141,8 @@ function FilmWatchContent() {
     poster: detail?.poster || "",
   });
 
+  const sleepTimer = useSleepTimer();
+
   return (
     <div className="min-h-screen bg-[#07070A] text-white flex flex-col selection:bg-red-500 selection:text-white">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
@@ -165,19 +170,22 @@ function FilmWatchContent() {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={togglePictureInPicture}
-            className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-              isPipActive
-                ? "bg-red-600 text-white border-red-500 font-bold"
-                : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
-            }`}
-            title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
-          >
-            <PictureInPicture2 className="w-4 h-4 text-red-400" />
-            <span className="hidden sm:inline">Floating Player</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <SleepTimerButton
+              sleepOption={sleepTimer.sleepOption}
+              formattedRemaining={sleepTimer.formattedRemaining}
+              isMenuOpen={sleepTimer.isMenuOpen}
+              onToggleMenu={sleepTimer.toggleMenu}
+              onSelectOption={sleepTimer.setTimer}
+              accentColor="red"
+            />
+
+            <FloatingPlayerButton
+              isPipActive={isPipActive}
+              onClick={togglePictureInPicture}
+              accentColor="red"
+            />
+          </div>
         </div>
       </header>
 
@@ -280,14 +288,16 @@ function FilmWatchContent() {
               className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl"
             >
               {activeServerUrl ? (
-                <iframe
-                  key={`${activeServerUrl}-${iframeConfigMode}-${playerKey}`}
-                  src={activeServerUrl}
-                  className="w-full h-full border-0"
-                  allowFullScreen
-                  allow={IFRAME_CONFIGS[iframeConfigMode].allow}
-                  referrerPolicy={IFRAME_CONFIGS[iframeConfigMode].referrerPolicy}
-                />
+                !sleepTimer.isSleeping ? (
+                  <iframe
+                    key={`${activeServerUrl}-${iframeConfigMode}-${playerKey}`}
+                    src={activeServerUrl}
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    allow={IFRAME_CONFIGS[iframeConfigMode].allow}
+                    referrerPolicy={IFRAME_CONFIGS[iframeConfigMode].referrerPolicy}
+                  />
+                ) : null
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-3">
                   <Play className="w-12 h-12 text-red-500" />
@@ -296,6 +306,13 @@ function FilmWatchContent() {
                   </p>
                 </div>
               )}
+
+              {/* Sleep Timer Overlay */}
+              <SleepTimerOverlay
+                show={sleepTimer.isSleeping}
+                onWakeUp={sleepTimer.wakeUp}
+                accentColor="red"
+              />
             </div>
 
             {/* Troubleshooting Hint Box */}

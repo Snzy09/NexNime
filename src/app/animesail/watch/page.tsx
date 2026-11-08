@@ -25,6 +25,7 @@ import SearchModal from "@/components/SearchModal";
 import { useMiniPlayer } from "@/lib/hooks/useMiniPlayer";
 import { useSleepTimer } from "@/lib/hooks/useSleepTimer";
 import { SleepTimerButton, SleepTimerOverlay } from "@/components/SleepTimerControl";
+import FloatingPlayerButton from "@/components/FloatingPlayerButton";
 import {
   AnimeSailEpisodeDetail,
   AnimeSailAnimeDetail,
@@ -263,19 +264,11 @@ function AnimeSailWatchContent() {
                     accentColor="sky"
                   />
 
-                  <button
-                    type="button"
+                  <FloatingPlayerButton
+                    isPipActive={isPipActive}
                     onClick={togglePictureInPicture}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-colors ${
-                      isPipActive
-                        ? "bg-sky-500 text-black border-sky-400 font-bold"
-                        : "bg-white/5 hover:bg-white/10 border-white/10 text-gray-200"
-                    }`}
-                    title="Mini Floating Player (Tetap tampil saat Chrome diminimalkan)"
-                  >
-                    <PictureInPicture2 className="w-4 h-4 text-sky-400" />
-                    <span className="hidden sm:inline">Floating Player</span>
-                  </button>
+                    accentColor="sky"
+                  />
 
                   <button
                     onClick={handleShare}
